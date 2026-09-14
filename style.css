@@ -1,0 +1,286 @@
+/* ═══════════════════════════════════════════════════
+   ซักป่ะ? — Custom Styles
+   Tailwind CSS handles most styling via CDN.
+   This file adds custom animations, font config,
+   and fine-tuned overrides.
+   ═══════════════════════════════════════════════════ */
+
+/* ── Font Family Override ── */
+.font-kanit {
+  font-family: 'Kanit', sans-serif;
+}
+
+/* ── Smooth Scroll ── */
+html {
+  scroll-behavior: smooth;
+}
+
+/* ── Navbar Glass Effect ── */
+#navbar {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.5);
+}
+
+#navbar.scrolled {
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.06);
+  border-bottom-color: rgba(226, 232, 240, 0.8);
+}
+
+/* ── Fade-In-Up Animation ── */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.7s ease-out forwards;
+  opacity: 0;
+}
+
+.animation-delay-100 {
+  animation-delay: 0.1s;
+}
+
+.animation-delay-200 {
+  animation-delay: 0.2s;
+}
+
+.animation-delay-300 {
+  animation-delay: 0.3s;
+}
+
+.animation-delay-400 {
+  animation-delay: 0.4s;
+}
+
+/* ── Float Animation for Blobs ── */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px) scale(1);
+  }
+  50% {
+    transform: translateY(-20px) scale(1.05);
+  }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-float-delayed {
+  animation: float 8s ease-in-out 2s infinite;
+}
+
+/* ── Price Counting Animation ── */
+@keyframes priceChange {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.price-animate {
+  animation: priceChange 0.3s ease-out;
+}
+
+/* ── FAQ Accordion ── */
+.faq-item .faq-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.35s ease, padding 0.35s ease;
+}
+
+.faq-item.active .faq-content {
+  display: block;
+  max-height: 200px;
+}
+
+.faq-item.active .faq-icon {
+  transform: rotate(180deg);
+}
+
+.faq-item.active {
+  border-color: rgba(59, 130, 246, 0.3);
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.08);
+}
+
+/* ── Calculator Button Selected State ── */
+.size-btn.selected,
+.detergent-btn.selected {
+  border-color: #3b82f6;
+  background-color: rgba(59, 130, 246, 0.05);
+}
+
+.size-btn:not(.selected) .size-check,
+.detergent-btn:not(.selected) .detergent-check {
+  opacity: 0 !important;
+}
+
+.size-btn.selected .size-check,
+.detergent-btn.selected .detergent-check {
+  opacity: 1 !important;
+}
+
+.loc-btn.selected {
+  border-color: #3b82f6;
+  background-color: rgba(59, 130, 246, 0.05);
+}
+
+/* ── Scroll-triggered reveal ── */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── Selection Color ── */
+::selection {
+  background-color: rgba(30, 136, 229, 0.2);
+  color: #0d47a1;
+}
+
+/* ── Scrollbar Styling ── */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(to bottom, #93c5fd, #60a5fa);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(to bottom, #60a5fa, #3b82f6);
+}
+
+/* ── Booking Form Choice Cards ── */
+.booking-choice-card {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+}
+
+.booking-choice-card.active {
+  border-color: #06C755 !important;
+  background-color: rgba(6, 199, 85, 0.06) !important;
+  box-shadow: 0 4px 14px rgba(6, 199, 85, 0.15);
+}
+
+.booking-choice-card.active .choice-badge {
+  background-color: #06C755 !important;
+  color: white !important;
+}
+
+.booking-choice-card.active .choice-check {
+  opacity: 1 !important;
+  transform: scale(1) !important;
+}
+
+.choice-check {
+  transition: all 0.2s ease;
+  transform: scale(0.6);
+}
+
+/* ── LINE Chat Bubble Preview Mockup ── */
+.line-chat-container {
+  background: #8499B1;
+  background: linear-gradient(180deg, #7A90A7 0%, #6E849B 100%);
+  border-radius: 1.5rem;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.15), 0 20px 30px -10px rgba(100, 116, 139, 0.3);
+}
+
+.line-chat-bubble {
+  position: relative;
+  background: #FFFFFF;
+  border-radius: 1.25rem 1.25rem 1.25rem 0.25rem;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
+}
+
+.line-chat-bubble::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: -8px;
+  width: 0;
+  height: 0;
+  border-right: 10px solid #FFFFFF;
+  border-top: 10px solid transparent;
+}
+
+/* ── Toast Notification ── */
+.toast-msg {
+  visibility: hidden;
+  opacity: 0;
+  transform: translate(-50%, 20px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.toast-msg.show {
+  visibility: visible;
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+/* ── Responsive tweaks ── */
+@media (max-width: 640px) {
+  #hero h1 {
+    font-size: 2.5rem;
+  }
+
+  #hero h1 span:last-child {
+    font-size: 1.5rem;
+  }
+}
+
+/* ── Laundry Prep Checklist ── */
+.checklist-card {
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+}
+
+.checklist-card:hover {
+  transform: translateY(-2px);
+}
+
+.checklist-card.checked {
+  background-color: #f0fdf4 !important;
+  border-color: #86efac !important;
+  box-shadow: 0 4px 14px rgba(34, 197, 94, 0.12) !important;
+}
+
+.checklist-card.checked .chk-box {
+  background-color: #06C755 !important;
+  border-color: #06C755 !important;
+}
+
+.checklist-card.checked .chk-box i {
+  opacity: 1 !important;
+}
+
+.checklist-card.checked h4 {
+  color: #15803d !important;
+}
+
+

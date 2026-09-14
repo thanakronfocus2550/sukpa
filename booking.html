@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>จองคิวด่วน — ซักป่ะ? 🫧 ซัก-อบแห้ง ส่งถึงหอ มจพ.ปราจีน</title>
+    <meta name="description" content="สร้างข้อความจองคิวซักผ้า ส่งเข้า LINE OpenChat ง่ายๆ ใน 1 นาที ซักสะอาด อบแห้งสนิท ส่งถึงหอ มจพ.ปราจีนบุรี" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="จองคิวด่วน — ซักป่ะ? 🫧" />
+    <meta property="og:description" content="สร้างข้อความจองคิว ส่งเข้า LINE OpenChat ง่ายๆ สรุปยอดเงินอัตโนมัติ" />
+    <meta property="og:image" content="Img/logo/logo.png" />
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        kanit: ['Kanit', 'sans-serif'],
+                    },
+                    colors: {
+                        lineGreen: '#06C755',
+                        brandBlue: '#2563EB',
+                    }
+                },
+            },
+        }
+    </script>
+
+    <!-- Google Font: Kanit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+    <style>
+        body {
+            font-family: 'Kanit', sans-serif;
+            background-color: #F8FAFC;
+        }
+
+        /* Choice Card Styling */
+        .option-card {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+
+        .option-card:hover {
+            border-color: #93C5FD;
+            transform: translateY(-1px);
+        }
+
+        .option-card.active {
+            border-color: #06C755;
+            background-color: rgba(6, 199, 85, 0.05);
+            box-shadow: 0 4px 14px -2px rgba(6, 199, 85, 0.2);
+        }
+
+        .option-card.active .check-indicator {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .check-indicator {
+            opacity: 0;
+            transform: scale(0.6);
+            transition: all 0.2s ease;
+        }
+
+        /* Toast */
+        #toast {
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        #toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        /* LINE Chat Bubble Tail */
+        .chat-bubble::after {
+            content: '';
+            position: absolute;
+            top: 14px;
+            right: -8px;
+            width: 0;
+            height: 0;
+            border-top: 6px solid transparent;
+            border-bottom: 6px solid transparent;
+            border-left: 8px solid #E8F8EE;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen text-slate-800 flex flex-col justify-between selection:bg-blue-500 selection:text-white">
+
+    <!-- Top Navigation -->
+    <header class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-slate-200/80 shadow-xs">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+            <a href="index.html" class="flex items-center gap-2.5 group">
+                <img src="Img/logo/logo.png" alt="ซักป่ะ? โลโก้" class="w-9 h-9 object-contain group-hover:scale-105 transition-transform" />
+                <div class="leading-tight">
+                    <span class="font-extrabold text-xl bg-gradient-to-r from-blue-600 via-blue-500 to-cyan-500 bg-clip-text text-transparent">ซักป่ะ?</span>
+                    <span class="text-xs text-slate-400 block -mt-0.5">มจพ.ปราจีนบุรี</span>
+                </div>
+            </a>
+
+            <a href="index.html" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-semibold text-slate-600 hover:text-blue-600 hover:bg-slate-100 transition-colors">
+                <i class="fas fa-arrow-left text-xs"></i>
+                <span>กลับหน้าหลัก</span>
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-10 flex-grow w-full">
+
+        <!-- Title Banner -->
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-green-50 border border-green-200 text-green-700 text-xs font-semibold mb-3">
+                <i class="fab fa-line text-sm text-[#06C755]"></i>
+                <span>LINE OpenChat Fast Booking</span>
+            </div>
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-800">
+                สร้างข้อความจองคิว ส่งใน OpenChat ง่ายๆ 🫧
+            </h1>
+            <p class="text-sm sm:text-base text-slate-500 mt-1 max-w-lg mx-auto">
+                เลือกรายละเอียดด้านล่าง ระบบจะจัดฟอร์มและคำนวณยอดบิลให้ทันที กดปุ่มเดียวส่งเข้า LINE ได้เลย!
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+
+            <!-- LEFT COLUMN: Booking Form (7 Cols) -->
+            <div class="lg:col-span-7 space-y-6">
+
+                <!-- 1. ข้อมูลติดต่อ -->
+                <div class="bg-white rounded-2xl border border-slate-200/80 p-5 sm:p-6 shadow-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="font-bold text-base sm:text-lg text-slate-800 flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-full bg-blue-50 text-blue-600 text-xs font-bold flex items-center justify-center">1</span>
+                            ข้อมูลผู้จอง
+                        </h2>
+                        <span class="text-[11px] text-green-700 bg-green-50 px-2 py-0.5 rounded-md flex items-center gap-1 font-medium">
+                            <i class="fas fa-check-circle text-xs"></i> จำข้อมูลในเครื่องอัตโนมัติ
+                        </span>
+                    </div>
+
+                    <div class="space-y-3.5">
+                        <div>
+                            <label for="input-name" class="block text-xs font-bold text-slate-600 mb-1">ชื่อ / ชื่อเล่น <span class="text-red-500">*</span></label>
+                            <div class="relative">
+                                <i class="fas fa-user absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                                <input type="text" id="input-name" placeholder="เช่น กาย, มิ้นท์, บอย"
+                                    class="w-full pl-10 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-800 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all" />
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="input-phone" class="block text-xs font-bold text-slate-600 mb-1">เบอร์โทรศัพท์ <span class="text-red-500">*</span></label>
+                            <div class="relative">
+                                <i class="fas fa-phone absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                                <input type="tel" id="input-phone" placeholder="08X-XXX-XXXX" maxlength="12"
+                                    class="w-full pl-10 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-800 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all font-mono" />
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="input-dorm" class="block text-xs font-bold text-slate-600 mb-1">ชื่อหอพัก / ตึก / จุดนัดรับ <span class="text-red-500">*</span></label>
+                            <div class="relative">
+                                <i class="fas fa-building absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                                <input type="text" id="input-dorm" placeholder="เช่น หอมังกือ ตึก A, หอในหญิง 1"
+                                    class="w-full pl-10 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-800 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. ขนาดถุงผ้า (Pricing Base) -->
+                <div class="bg-white rounded-2xl border border-slate-200/80 p-5 sm:p-6 shadow-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="font-bold text-base sm:text-lg text-slate-800 flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-full bg-blue-50 text-blue-600 text-xs font-bold flex items-center justify-center">2</span>
+                            ขนาดเครื่องซักผ้า (ซัก)
+                        </h2>
+                        <span class="text-xs text-red-500 font-semibold">* จำเป็น</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="size-options">
+                        <!-- Size S -->
+                        <div class="option-card active flex items-start justify-between p-3.5 rounded-xl border-2 border-slate-200 bg-white relative select-none cursor-pointer"
+                            data-group="size" data-value="s" data-price="50" data-text="Size S (9 kg) - 50฿">
+                            <div class="flex items-start gap-3">
+                                <div class="text-3xl">👕</div>
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="font-bold text-slate-800 text-sm">Size S (9 kg)</span>
+                                        <span class="text-xs font-extrabold text-[#06C755] bg-green-50 px-2 py-0.5 rounded-full">50฿</span>
+                                    </div>
+                                    <p class="text-[11px] text-slate-500 mt-1 leading-relaxed">เหมาะสำหรับ: ผ้าชิ้นเล็ก/ผ้าใช้ประจำวัน</p>
+                                </div>
+                            </div>
+                            <div class="check-indicator w-5 h-5 rounded-full bg-[#06C755] text-white flex items-center justify-center text-[10px] flex-shrink-0 mt-1">
+                                <i class="fas fa-check"></i>
+                            </div>
+                        </div>
+
+                        <!-- Size M -->
+                        <div class="option-card flex items-start justify-between p-3.5 rounded-xl border-2 border-slate-200 bg-white relative select-none cursor-pointer"
+                            data-group="size" data-value="m" data-price="70" data-text="Size M (14 kg) - 70฿">
+                            <div class="flex items-start gap-3">
+                                <div class="text-3xl">👕</div>
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="font-bold text-slate-800 text-sm">Size M (14 kg)</span>
+                                        <span class="text-xs font-extrabold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">70฿</span>
+                                    </div>
+                                    <p class="text-[11px] text-slate-500 mt-1 leading-relaxed">เหมาะสำหรับ: ผ้าใช้ประจำวัน ปริมาณ 15–25 ชิ้น</p>
+                                </div>
+                            </div>
+                            <div class="check-indicator w-5 h-5 rounded-full bg-[#06C755] text-white flex items-center justify-center text-[10px] flex-shrink-0 mt-1">
+                                <i class="fas fa-check"></i>
+                            </div>
+                        </div>
+
+                        <!-- Size L -->
+                        <div class="option-card flex items-start justify-between p-3.5 rounded-xl border-2 border-slate-200 bg-white relative select-none cursor-pointer"
+                            data-group="size" data-value="l" data-price="80" data-text="Size L (18 kg) - 80฿">
+                            <div class="flex items-start gap-3">
+                                <div class="text-3xl">🧺</div>
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="font-bold text-slate-800 text-sm">Size L (18 kg)</span>
+                                        <span class="text-xs font-extrabold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full">80฿</span>
+                                    </div>
+                                    <p class="text-[11px] text-slate-500 mt-1 leading-relaxed">เหมาะสำหรับ: ผ้ากองโต ปริมาณ 25–35 ชิ้น หรือเครื่องนอนขนาดกลาง</p>
+                                </div>
+                            </div>
+                            <div class="check-indicator w-5 h-5 rounded-full bg-[#06C755] text-white flex items-center justify-center text-[10px] flex-shrink-0 mt-1">
+                                <i class="fas fa-check"></i>
+                            </div>
+                        </div>
+
+                        <!-- Size Jumbo -->
+                        <div class="option-card flex items-start justify-between p-3.5 rounded-xl border-2 border-slate-200 bg-white relative select-none cursor-pointer"
+                            data-group="size" data-value="jumbo" data-price="110" data-text="Jumbo (28 kg) - 110฿">
+                            <div class="flex items-start gap-3">
+                                <div class="text-3xl">📦</div>
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="font-bold text-slate-800 text-sm">Jumbo (28 kg)</span>
+                                        <span class="text-xs font-extrabold text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full">110฿</span>
+                                    </div>
+                                    <p class="text-[11px] text-slate-500 mt-1 leading-relaxed">เหมาะสำหรับ: ผ้าชิ้นใหญ่พิเศษ ผ้าหนา หรือผ้ากองใหญ่</p>
+                                </div>
+                            </div>
+                            <div class="check-indicator w-5 h-5 rounded-full bg-[#06C755] text-white flex items-center justify-center text-[10px] flex-shrink-0 mt-1">
+                                <i class="fas fa-check"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. เครื่องอบผ้า (Drying Price) -->
+                <div class="bg-white rounded-2xl border border-slate-200/80 p-5 sm:p-6 shadow-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="font-bold text-base sm:text-lg text-slate-800 flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-full bg-orange-50 text-orange-600 text-xs font-bold flex items-center justify-center">3</span>
+                            เครื่องอบผ้า (Drying Price)
+                        </h2>
+                        <span class="text-xs text-red-500 font-semibold">* จำเป็น</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="dryer-options">
+                        <!-- 15 kg -->
+                        <div class="option-card active flex items-start justify-between p-3.5 rounded-xl border-2 border-slate-200 bg-white relative select-none cursor-pointer"
+                            data-group="dryer" data-value="d15" data-price="50" data-text="เครื่องอบ 15 kg (24 นาที) - 50฿">
+                            <div class="flex items-start gap-3">
+                                <div class="text-3xl">💨</div>
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="font-bold text-slate-800 text-sm">เครื่องอบ 15 kg</span>
+                                        <span class="text-xs font-semibold text-slate-500">(24 นาที)</span>
+                                        <span class="text-xs font-extrabold text-orange-600 bg-orange-50 px-2 py-0.5 rounded-full">50฿</span>
+                                    </div>
+                                    <p class="text-[11px] text-slate-500 mt-1 leading-relaxed">เหมาะสำหรับ: ผ้าชิ้นไม่ใหญ่มาก แห้งง่าย</p>
+                                </div>
+                            </div>
+                            <div class="check-indicator w-5 h-5 rounded-full bg-[#06C755] text-white flex items-center justify-center text-[10px] flex-shrink-0 mt-1">
+                                <i class="fas fa-check"></i>
+                            </div>
+                        </div>
+
+                        <!-- 25 kg -->
+                        <div class="option-card flex items-start justify-between p-3.5 rounded-xl border-2 border-slate-200 bg-white relative select-none cursor-pointer"
+                            data-group="dryer" data-value="d25" data-price="70" data-text="เครื่องอบ 25 kg (24 นาที) - 70฿">
+                            <div class="flex items-start gap-3">
+                                <div class="text-3xl">🔥</div>
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="font-bold text-slate-800 text-sm">เครื่องอบ 25 kg</span>
+                                        <span class="text-xs font-semibold text-slate-500">(24 นาที)</span>
+                                        <span class="text-xs font-extrabold text-red-600 bg-red-50 px-2 py-0.5 rounded-full">70฿</span>
+                                    </div>
+                                    <p class="text-[11px] text-slate-500 mt-1 leading-relaxed">เหมาะสำหรับ: ผ้านวมหนา, ผ้าปูที่นอน หรือผ้าปริมาณมากที่ต้องการพื้นที่ให้อากาศหมุนเวียน ผ้าจะได้แห้งทั่วถึง</p>
+                                </div>
+                            </div>
+                            <div class="check-indicator w-5 h-5 rounded-full bg-[#06C755] text-white flex items-center justify-center text-[10px] flex-shrink-0 mt-1">
+                                <i class="fas fa-check"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. น้ำยาซักผ้า / ปรับผ้านุ่ม -->
+                <div class="bg-white rounded-2xl border border-slate-200/80 p-5 sm:p-6 shadow-sm">
+                    <div class="flex items-center justify-between mb-3">
+                        <h2 class="font-bold text-base text-slate-800 flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-full bg-blue-50 text-blue-600 text-xs font-bold flex items-center justify-center">4</span>
+                            น้ำยาซักผ้า / ปรับผ้านุ่ม
+                        </h2>
+                        <span class="text-xs text-red-500 font-semibold">* จำเป็น</span>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="detergent-options">
+                        <div class="option-card active flex items-center justify-between p-3.5 rounded-xl border-2 border-slate-200 bg-white select-none cursor-pointer"
+                            data-group="detergent" data-value="own" data-surcharge="0" data-text="ของตัวเอง (วางคู่กับถุงผ้า)">
+                            <div class="flex items-center gap-3">
+                                <span class="text-2xl">🧴</span>
+                                <div>
+                                    <div class="font-bold text-xs sm:text-sm text-slate-800">ของตัวเอง</div>
+                                    <div class="text-[11px] text-slate-500">วางคู่กับถุงผ้า</div>
+                                </div>
+                            </div>
+                            <span class="text-xs font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-full">ฟรี</span>
+                        </div>
+
+                        <div class="option-card flex items-center justify-between p-3.5 rounded-xl border-2 border-slate-200 bg-white select-none cursor-pointer"
+                            data-group="detergent" data-value="shop" data-surcharge="15" data-text="ไม่มีน้ำยา / ร้านจัดเตรียมให้ (+15฿)">
+                            <div class="flex items-center gap-3">
+                                <span class="text-2xl">🧼</span>
+                                <div>
+                                    <div class="font-bold text-xs sm:text-sm text-slate-800">ร้านจัดเตรียมให้</div>
+                                    <div class="text-[11px] text-slate-500">ซัก+ปรับผ้านุ่มมาตรฐาน</div>
+                                </div>
+                            </div>
+                            <span class="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">+15฿</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5. จุดรับ-ส่ง / โซนหอพัก -->
+                <div class="bg-white rounded-2xl border border-slate-200/80 p-5 sm:p-6 shadow-sm">
+                    <h2 class="font-bold text-base sm:text-lg text-slate-800 flex items-center gap-2 mb-3">
+                        <span class="w-6 h-6 rounded-full bg-blue-50 text-blue-600 text-xs font-bold flex items-center justify-center">5</span>
+                        จุดรับ-ส่ง / โซนหอพัก
+                    </h2>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5" id="zone-options">
+                        <div class="option-card active p-3 rounded-xl border-2 border-slate-200 bg-white text-center select-none cursor-pointer"
+                            data-group="zone" data-value="off" data-surcharge="30" data-text="นอก มจพ. (30฿)">
+                            <div class="text-xs font-bold text-slate-800">นอก มจพ.</div>
+                            <div class="text-[11px] text-slate-400">หอนอกรอบ ม.</div>
+                            <div class="text-xs font-bold text-blue-600 mt-1">30฿</div>
+                        </div>
+
+                        <div class="option-card p-3 rounded-xl border-2 border-slate-200 bg-white text-center select-none cursor-pointer"
+                            data-group="zone" data-value="on" data-surcharge="40" data-text="หอใน มจพ. (40฿)">
+                            <div class="text-xs font-bold text-slate-800">หอใน มจพ.</div>
+                            <div class="text-[11px] text-slate-400">หอพักในมหาวิทยาลัย</div>
+                            <div class="text-xs font-bold text-blue-600 mt-1">40฿</div>
+                        </div>
+
+                        <div class="option-card p-3 rounded-xl border-2 border-slate-200 bg-white text-center select-none cursor-pointer"
+                            data-group="zone" data-value="far" data-surcharge="45" data-text="โซนไกล เกิน 5 โล (45฿)">
+                            <div class="text-xs font-bold text-slate-800">โซนไกล (>5 km)</div>
+                            <div class="text-[11px] text-slate-400">ระยะเกิน 5 โล (+15฿)</div>
+                            <div class="text-xs font-bold text-amber-600 mt-1">45฿</div>
+                        </div>
+                    </div>
+
+                    <!-- หมายเหตุใต้ตึก -->
+                    <div class="mt-3 flex items-start gap-2 p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-500">
+                        <i class="fas fa-info-circle text-blue-500 mt-0.5"></i>
+                        <span>รับ-ส่งเฉพาะชั้นล่างใต้ตึก กรุณานำผ้าลงมารอที่จุดนัดพบตามเวลานัดหมายครับ</span>
+                    </div>
+                </div>
+
+                <!-- 5. หมายเหตุเพิ่มเติม -->
+                <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-sm">
+                    <label for="input-notes" class="block text-xs font-bold text-slate-600 mb-1">
+                        หมายเหตุ / เวลาที่สะดวก (ถ้ามี)
+                    </label>
+                    <input type="text" id="input-notes" placeholder="เช่น สะดวกหลัง 17:00 น., ฝากป้อมยาม, แยกผ้าขาว"
+                        class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-800 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all" />
+                </div>
+
+            </div>
+
+            <!-- RIGHT COLUMN: Bill Summary & Live LINE Preview (5 Cols, Sticky) -->
+            <div class="lg:col-span-5 space-y-5 lg:sticky lg:top-20">
+
+                <!-- Live LINE Chat Simulation Card -->
+                <div class="bg-gradient-to-b from-[#7494B6] to-[#607D9B] rounded-3xl p-4 sm:p-5 shadow-xl text-white">
+                    <div class="flex items-center justify-between pb-3 border-b border-white/20 mb-3 text-xs">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-[#06C755] animate-ping"></span>
+                            <span class="font-bold tracking-wide">LINE OPENCHAT PREVIEW</span>
+                        </div>
+                        <span class="text-white/80" id="clock-display">ตอนนี้</span>
+                    </div>
+
+                    <!-- LINE Message Bubble -->
+                    <div class="relative bg-[#E8F8EE] text-slate-800 rounded-2xl p-4 shadow-sm chat-bubble">
+                        <div class="flex items-center justify-between border-b border-green-200/60 pb-2 mb-2.5">
+                            <span class="text-xs font-bold text-[#06C755] flex items-center gap-1.5">
+                                <i class="fab fa-line text-sm"></i> ข้อความพร้อมส่ง
+                            </span>
+                            <span class="text-[10px] text-slate-400">ซักป่ะ?</span>
+                        </div>
+
+                        <pre id="preview-text" class="font-kanit text-xs leading-relaxed whitespace-pre-wrap select-all text-slate-700"></pre>
+
+                        <div class="mt-2.5 pt-2 border-t border-green-200/50 flex items-center justify-between text-[11px] text-slate-500">
+                            <span>ยอดรวมประเมิน:</span>
+                            <span id="preview-price" class="text-base font-extrabold text-[#06C755]">130 บาท</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Order Bill & Action Card -->
+                <div class="bg-white rounded-3xl border border-slate-200/80 p-5 sm:p-6 shadow-lg space-y-4">
+                    
+                    <!-- Breakdown Header -->
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm font-bold text-slate-700">สรุปยอดบิลประเมิน</span>
+                        <div class="text-right">
+                            <span class="text-3xl font-extrabold text-[#06C755]" id="bill-total">฿130</span>
+                        </div>
+                    </div>
+
+                    <!-- Breakdown Table -->
+                    <div class="bg-slate-50 rounded-xl p-3 text-xs space-y-1.5 border border-slate-100">
+                        <div class="flex justify-between text-slate-600">
+                            <span>ค่าซัก (<span id="bill-size-label">Size S</span>)</span>
+                            <span id="bill-size-price" class="font-semibold text-slate-800">50฿</span>
+                        </div>
+                        <div class="flex justify-between text-slate-600">
+                            <span>ค่าอบ (<span id="bill-dryer-label">อบ 15 kg</span>)</span>
+                            <span id="bill-dryer-price" class="font-semibold text-slate-800">50฿</span>
+                        </div>
+                        <div class="flex justify-between text-slate-600">
+                            <span>น้ำยาซักผ้า/ปรับผ้านุ่ม</span>
+                            <span id="bill-det-price" class="font-semibold text-slate-800">ฟรี</span>
+                        </div>
+                        <div class="flex justify-between text-slate-600">
+                            <span>ค่าจัดส่ง (<span id="bill-zone-label">นอก มจพ.</span>)</span>
+                            <span id="bill-zone-price" class="font-semibold text-slate-800">30฿</span>
+                        </div>
+                    </div>
+
+                    <!-- PromptPay Quick Pay Link -->
+                    <a id="btn-pay-promptpay" href="payment.html?amount=130" target="_blank" rel="noopener noreferrer"
+                        class="w-full py-2.5 px-3 rounded-xl bg-blue-50 hover:bg-blue-100/80 border border-blue-200 text-blue-700 font-bold text-xs flex items-center justify-between transition-all group">
+                        <span class="flex items-center gap-2">
+                            <i class="fas fa-qrcode text-blue-600 text-sm group-hover:scale-110 transition-transform"></i>
+                            <span id="promptpay-btn-text">สแกนจ่ายพร้อมเพย์ (QR ล็อกยอด ฿130)</span>
+                        </span>
+                        <i class="fas fa-arrow-up-right-from-square text-[10px] text-blue-400"></i>
+                    </a>
+
+                    <!-- Main Action: Copy & Open LINE -->
+                    <button type="button" id="btn-copy-and-open"
+                        class="w-full py-4 px-5 rounded-2xl bg-[#06C755] hover:bg-[#05b34c] text-white font-bold text-base sm:text-lg shadow-lg shadow-green-500/25 hover:shadow-green-500/40 active:scale-[0.98] transition-all flex items-center justify-center gap-2.5 group">
+                        <i class="fab fa-line text-2xl group-hover:scale-110 transition-transform"></i>
+                        <span>คัดลอก & ส่งเข้า LINE OpenChat</span>
+                    </button>
+
+                    <!-- Secondary Button: Copy Only -->
+                    <div class="flex gap-2">
+                        <button type="button" id="btn-copy-only"
+                            class="flex-1 py-2.5 px-3 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold text-xs transition-colors flex items-center justify-center gap-1.5">
+                            <i class="far fa-copy text-slate-500"></i>
+                            <span>คัดลอกข้อความ</span>
+                        </button>
+                        <a href="https://line.me/ti/g2/c4n6z-xzaKCXJcKWlGoLYVoxeAxBuZNRcGEg1A?utm_source=invitation&utm_medium=link_copy&utm_campaign=default"
+                            target="_blank" rel="noopener noreferrer"
+                            class="flex-1 py-2.5 px-3 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold text-xs transition-colors flex items-center justify-center gap-1.5">
+                            <i class="fas fa-arrow-up-right-from-square text-slate-500"></i>
+                            <span>เปิด OpenChat</span>
+                        </a>
+                    </div>
+
+                    <!-- QR Code Toggle for Desktop Users -->
+                    <details class="text-xs text-slate-500 group">
+                        <summary class="cursor-pointer hover:text-blue-600 flex items-center justify-between py-1 select-none">
+                            <span>เปิดบนคอม? สแกน QR Code เพื่อเข้ากลุ่ม</span>
+                            <i class="fas fa-chevron-down text-[10px] group-open:rotate-180 transition-transform"></i>
+                        </summary>
+                        <div class="mt-3 text-center p-3 bg-slate-50 rounded-xl border border-slate-200">
+                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&color=06c755&bgcolor=ffffff&data=https%3A%2F%2Fline.me%2Fti%2Fg2%2Fc4n6z-xzaKCXJcKWlGoLYVoxeAxBuZNRcGEg1A%3Futm_source%3Dinvitation%26utm_medium%3Dlink_copy%26utm_campaign%3Ddefault"
+                                alt="QR Code LINE OpenChat" class="w-32 h-32 mx-auto rounded-lg shadow-sm mb-2" />
+                            <p class="text-[11px] text-slate-400">สแกนด้วยกล้องมือถือเพื่อเข้ากลุ่ม LINE OpenChat</p>
+                        </div>
+                    </details>
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-6 text-center text-xs text-slate-400 mt-12">
+        <div class="max-w-4xl mx-auto px-4 space-y-2">
+            <p>© 2026 ซักป่ะ? บริการซัก-อบแห้ง ส่งถึงหอ มจพ.ปราจีนบุรี</p>
+            <div class="flex justify-center items-center gap-4 text-slate-500">
+                <a href="index.html" class="hover:text-blue-600">หน้าหลัก</a>
+                <span>•</span>
+                <a href="index.html#pricing" class="hover:text-blue-600">เรทราคา</a>
+                <span>•</span>
+                <a href="index.html#faq" class="hover:text-blue-600">คำถามที่พบบ่อย</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-slate-900/95 text-white px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-3 backdrop-blur-sm pointer-events-none text-sm font-medium">
+        <div class="w-6 h-6 rounded-full bg-[#06C755] flex items-center justify-center text-white text-xs">
+            <i class="fas fa-check"></i>
+        </div>
+        <span id="toast-text">คัดลอกข้อความสำเร็จแล้ว!</span>
+    </div>
+
+    <!-- Booking Logic Script -->
+    <script src="pricing.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const LINE_URL = "https://line.me/ti/g2/c4n6z-xzaKCXJcKWlGoLYVoxeAxBuZNRcGEg1A?utm_source=invitation&utm_medium=link_copy&utm_campaign=default";
+
+            // State
+            const state = {
+                name: localStorage.getItem('sp_name') || '',
+                phone: localStorage.getItem('sp_phone') || '',
+                dorm: localStorage.getItem('sp_dorm') || '',
+                sizeKey: 's',
+                dryerKey: 'd15',
+                detergentKey: 'own',
+                zoneKey: 'off',
+                notes: ''
+            };
+
+            // DOM Elements
+            const inputName = document.getElementById('input-name');
+            const inputPhone = document.getElementById('input-phone');
+            const inputDorm = document.getElementById('input-dorm');
+            const inputNotes = document.getElementById('input-notes');
+
+            const previewText = document.getElementById('preview-text');
+            const previewPrice = document.getElementById('preview-price');
+            const clockDisplay = document.getElementById('clock-display');
+
+            const billTotal = document.getElementById('bill-total');
+            const billSizeLabel = document.getElementById('bill-size-label');
+            const billSizePrice = document.getElementById('bill-size-price');
+            const billDryerLabel = document.getElementById('bill-dryer-label');
+            const billDryerPrice = document.getElementById('bill-dryer-price');
+            const billDetPrice = document.getElementById('bill-det-price');
+            const billZoneLabel = document.getElementById('bill-zone-label');
+            const billZonePrice = document.getElementById('bill-zone-price');
+
+            const btnCopyAndOpen = document.getElementById('btn-copy-and-open');
+            const btnCopyOnly = document.getElementById('btn-copy-only');
+            const toast = document.getElementById('toast');
+            const toastText = document.getElementById('toast-text');
+
+            // Restore from localStorage
+            if (state.name) inputName.value = state.name;
+            if (state.phone) inputPhone.value = state.phone;
+            if (state.dorm) inputDorm.value = state.dorm;
+
+            // Update Time
+            function updateClock() {
+                const now = new Date();
+                const hh = String(now.getHours()).padStart(2, '0');
+                const mm = String(now.getMinutes()).padStart(2, '0');
+                if (clockDisplay) clockDisplay.textContent = `${hh}:${mm} น.`;
+            }
+            updateClock();
+            setInterval(updateClock, 30000);
+
+            // Format phone number
+            inputPhone.addEventListener('input', (e) => {
+                let digits = e.target.value.replace(/\D/g, '');
+                if (digits.length > 10) digits = digits.slice(0, 10);
+                let formatted = digits;
+                if (digits.length > 6) {
+                    formatted = `${digits.slice(0, 3)}-${digits.slice(3, 6)}-${digits.slice(6)}`;
+                } else if (digits.length > 3) {
+                    formatted = `${digits.slice(0, 3)}-${digits.slice(3)}`;
+                }
+                e.target.value = formatted;
+                state.phone = formatted;
+                localStorage.setItem('sp_phone', formatted);
+                render();
+            });
+
+            // Name & Dorm listener
+            inputName.addEventListener('input', (e) => {
+                state.name = e.target.value;
+                localStorage.setItem('sp_name', e.target.value);
+                render();
+            });
+
+            inputDorm.addEventListener('input', (e) => {
+                state.dorm = e.target.value;
+                localStorage.setItem('sp_dorm', e.target.value);
+                render();
+            });
+
+            inputNotes.addEventListener('input', (e) => {
+                state.notes = e.target.value;
+                render();
+            });
+
+            // Choice card handler
+            function setupCardGroup(containerId, stateKey, textKey) {
+                const container = document.getElementById(containerId);
+                if (!container) return;
+                const cards = container.querySelectorAll('.option-card');
+                cards.forEach(card => {
+                    card.addEventListener('click', () => {
+                        cards.forEach(c => c.classList.remove('active'));
+                        card.classList.add('active');
+
+                        state[stateKey] = card.dataset.value;
+                        if (textKey && card.dataset.text) state[textKey] = card.dataset.text;
+                        render();
+                    });
+                });
+            }
+
+            setupCardGroup('size-options', 'sizeKey');
+            setupCardGroup('dryer-options', 'dryerKey');
+            setupCardGroup('detergent-options', 'detergentKey');
+            setupCardGroup('zone-options', 'zoneKey');
+
+            // Generate message
+            function buildMessage() {
+                return buildSukpaBookingMessage({
+                    name: state.name,
+                    phone: state.phone,
+                    dorm: state.dorm,
+                    notes: state.notes,
+                    sizeKey: state.sizeKey,
+                    dryerKey: state.dryerKey,
+                    detergentKey: state.detergentKey,
+                    zoneKey: state.zoneKey
+                });
+            }
+
+            // Render view
+            function render() {
+                const msg = buildMessage();
+                const calc = calculateSukpaPrice({
+                    sizeKey: state.sizeKey,
+                    dryerKey: state.dryerKey,
+                    detergentKey: state.detergentKey,
+                    zoneKey: state.zoneKey
+                });
+
+                if (previewText) previewText.textContent = msg;
+                if (previewPrice) previewPrice.textContent = `${calc.total} บาท`;
+                if (billTotal) billTotal.textContent = `฿${calc.total}`;
+
+                if (billSizeLabel) billSizeLabel.textContent = calc.sizeInfo.name;
+                if (billSizePrice) billSizePrice.textContent = `${calc.sizePrice}฿`;
+
+                if (billDryerLabel && calc.dryerInfo) billDryerLabel.textContent = calc.dryerInfo.shortText;
+                if (billDryerPrice && calc.dryerInfo) billDryerPrice.textContent = `${calc.dryerPrice}฿`;
+
+                if (billDetPrice) {
+                    billDetPrice.textContent = calc.detergentSurcharge > 0 ? `+${calc.detergentSurcharge}฿` : 'ฟรี';
+                }
+
+                if (billZoneLabel) {
+                    billZoneLabel.textContent = calc.zoneInfo.name;
+                }
+                if (billZonePrice) {
+                    billZonePrice.textContent = calc.zoneSurcharge > 0 ? `+${calc.zoneSurcharge}฿` : 'ฟรี';
+                }
+
+                // Update PromptPay link
+                const btnPayPromptPay = document.getElementById('btn-pay-promptpay');
+                const promptPayBtnText = document.getElementById('promptpay-btn-text');
+                if (btnPayPromptPay) {
+                    btnPayPromptPay.href = `payment.html?amount=${calc.total}`;
+                }
+                if (promptPayBtnText) {
+                    promptPayBtnText.textContent = `สแกนจ่ายพร้อมเพย์ (QR ล็อกยอด ฿${calc.total})`;
+                }
+            }
+
+            // Toast helper
+            let toastTimeout = null;
+            function showToast(msg) {
+                if (!toast) return;
+                if (toastText) toastText.textContent = msg;
+                toast.classList.add('show');
+                clearTimeout(toastTimeout);
+                toastTimeout = setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 3000);
+            }
+
+            // Copy helper
+            async function copyText(text) {
+                try {
+                    if (navigator.clipboard && window.isSecureContext) {
+                        await navigator.clipboard.writeText(text);
+                        return true;
+                    }
+                    // Fallback
+                    const ta = document.createElement('textarea');
+                    ta.value = text;
+                    ta.style.position = 'fixed';
+                    ta.style.left = '-9999px';
+                    document.body.appendChild(ta);
+                    ta.focus();
+                    ta.select();
+                    const successful = document.execCommand('copy');
+                    document.body.removeChild(ta);
+                    return successful;
+                } catch (err) {
+                    console.error('Copy failed', err);
+                    return false;
+                }
+            }
+
+            // Copy & Open LINE Button
+            btnCopyAndOpen.addEventListener('click', async () => {
+                const msg = buildMessage();
+                const ok = await copyText(msg);
+                showToast(ok ? '📋 คัดลอกข้อความแล้ว! กำลังเปิด LINE...' : 'เปิด LINE OpenChat...');
+                setTimeout(() => {
+                    window.open(LINE_URL, '_blank', 'noopener,noreferrer');
+                }, 400);
+            });
+
+            // Copy Only Button
+            btnCopyOnly.addEventListener('click', async () => {
+                const msg = buildMessage();
+                const ok = await copyText(msg);
+                showToast(ok ? '📋 คัดลอกข้อความจองคิวเรียบร้อย!' : 'ไม่สามารถคัดลอกได้');
+            });
+
+            // Initial render
+            render();
+        });
+    </script>
+</body>
+
+</html>
