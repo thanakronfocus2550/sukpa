@@ -87,10 +87,10 @@ const SUKPA_PRICING = {
         far: {
             key: 'far',
             name: 'โซนไกล (>5 km)',
-            desc: 'ระยะเกิน 5 กิโลเมตร (+15฿)',
-            surcharge: 45,
-            fullText: 'โซนไกล ระยะเกิน 5 โล (45฿)',
-            shortText: '45฿ (โซนไกล เกิน 5 โล)',
+            desc: 'ระยะเกิน 5 กิโลเมตร (+55฿)',
+            surcharge: 55,
+            fullText: 'โซนไกล ระยะเกิน 5 โล (55฿)',
+            shortText: '55฿ (โซนไกล เกิน 5 โล)',
         },
     },
 

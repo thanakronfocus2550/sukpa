@@ -5,27 +5,27 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>ซักป่ะ? | บริการซัก-อบแห้ง สำหรับชาว มจพ.ปราจีน</title>
-    <meta name="description"
-        content="ซักป่ะ? บริการซัก-อบแห้งสนิท ราคาถูก ส่งถึงหอ สำหรับนักศึกษา มจพ.ปราจีนบุรี" />
+    <meta name="description" content="ซักป่ะ? บริการซัก-อบแห้งสนิท ราคาถูก ส่งถึงหอ สำหรับนักศึกษา มจพ.ปราจีนบุรี" />
 
     <!-- Open Graph / LINE Preview -->
     <meta property="og:type" content="website" />
     <meta property="og:title" content="ซักป่ะ? | บริการซัก-อบแห้ง ส่งถึงหอ มจพ.ปราจีน" />
-    <meta property="og:description" content="เริ่มต้นแค่ 130฿ — ซักสะอาด อบแห้งสนิท 100% ไม่ง้อแดด ส่งถึงหอพักรอบ มจพ.ปราจีนบุรี จองคิวง่ายๆ ผ่าน LINE OpenChat" />
+    <meta property="og:description"
+        content="เริ่มต้นแค่ 130฿ — ซักสะอาด อบแห้งสนิท 100% ไม่ง้อแดด ส่งถึงหอพักรอบ มจพ.ปราจีนบุรี จองคิวง่ายๆ ผ่าน LINE OpenChat" />
     <meta property="og:image" content="Img/logo/logo.png" />
 
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            fontFamily: {
-              kanit: ['Kanit', 'sans-serif'],
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        kanit: ['Kanit', 'sans-serif'],
+                    },
+                },
             },
-          },
-        },
-      }
+        }
     </script>
 
     <!-- Google Font: Kanit -->
@@ -54,7 +54,8 @@
             <!-- Brand -->
             <a href="#" id="nav-brand" class="flex items-center gap-2.5 group">
                 <div class="relative w-10 h-10 flex-shrink-0">
-                    <img src="Img/logo/logo.png" alt="โลโก้ ซักป่ะ?" class="w-full h-full object-contain filter drop-shadow group-hover:scale-105 transition-transform duration-200" />
+                    <img src="Img/logo/logo.png" alt="โลโก้ ซักป่ะ?"
+                        class="w-full h-full object-contain filter drop-shadow group-hover:scale-105 transition-transform duration-200" />
                 </div>
                 <span
                     class="text-xl font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">ซักป่ะ?</span>
@@ -64,7 +65,8 @@
             <div class="hidden md:flex items-center gap-5 text-sm font-medium text-slate-600">
                 <a href="#how-it-works" class="hover:text-blue-600 transition-colors">วิธีใช้</a>
                 <a href="#laundry-checklist" class="hover:text-blue-600 transition-colors">เช็กลิสต์ก่อนส่ง</a>
-                <a href="booking.html" class="hover:text-green-600 transition-colors flex items-center gap-1.5 text-green-700 font-semibold bg-green-50 px-3 py-1 rounded-full border border-green-200/80 hover:bg-green-100/70">
+                <a href="booking.html"
+                    class="hover:text-green-600 transition-colors flex items-center gap-1.5 text-green-700 font-semibold bg-green-50 px-3 py-1 rounded-full border border-green-200/80 hover:bg-green-100/70">
                     <i class="fab fa-line text-green-600"></i> จองคิวด่วน (หน้าแยก)
                 </a>
                 <a href="#delivery-zones" class="hover:text-blue-600 transition-colors">จุดรับส่ง</a>
@@ -73,8 +75,10 @@
 
             <!-- Live Status + LINE Button -->
             <div class="flex items-center gap-3">
-                <a href="https://line.me/ti/g2/c4n6z-xzaKCXJcKWlGoLYVoxeAxBuZNRcGEg1A?utm_source=invitation&utm_medium=link_copy&utm_campaign=default" target="_blank" rel="noopener noreferrer" id="nav-status"
-                    class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-50 border border-green-200 hover:bg-green-100 hover:border-green-300 transition-all" title="เช็คสถานะคิวใน LINE OpenChat">
+                <a href="https://line.me/ti/g2/c4n6z-xzaKCXJcKWlGoLYVoxeAxBuZNRcGEg1A?utm_source=invitation&utm_medium=link_copy&utm_campaign=default"
+                    target="_blank" rel="noopener noreferrer" id="nav-status"
+                    class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-50 border border-green-200 hover:bg-green-100 hover:border-green-300 transition-all"
+                    title="เช็คสถานะคิวใน LINE OpenChat">
                     <span class="relative flex h-2.5 w-2.5">
                         <span
                             class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
@@ -82,8 +86,7 @@
                     </span>
                     <span class="text-xs font-semibold text-green-700">เช็คคิวใน OpenChat</span>
                 </a>
-                <a href="#booking-generator"
-                    id="nav-line-btn"
+                <a href="#booking-generator" id="nav-line-btn"
                     class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#06C755] text-white text-sm font-semibold shadow-lg shadow-green-500/25 hover:shadow-green-500/40 hover:scale-105 active:scale-95 transition-all duration-200">
                     <i class="fab fa-line text-lg"></i>
                     <span class="hidden sm:inline">จองคิว LINE</span>
@@ -110,8 +113,11 @@
             <!-- Mascot Logo Display -->
             <div class="inline-block mb-4 animate-fade-in-up">
                 <div class="relative w-28 h-28 sm:w-36 sm:h-36 mx-auto group">
-                    <div class="absolute inset-0 bg-gradient-to-tr from-blue-400/30 to-cyan-300/30 rounded-full blur-2xl group-hover:blur-3xl transition-all duration-300"></div>
-                    <img src="Img/logo/logo.png" alt="โลโก้ ซักป่ะ? บริการซักอบแห้ง" class="relative z-10 w-full h-full object-contain filter drop-shadow-xl hover:scale-105 transition-transform duration-300" />
+                    <div
+                        class="absolute inset-0 bg-gradient-to-tr from-blue-400/30 to-cyan-300/30 rounded-full blur-2xl group-hover:blur-3xl transition-all duration-300">
+                    </div>
+                    <img src="Img/logo/logo.png" alt="โลโก้ ซักป่ะ? บริการซักอบแห้ง"
+                        class="relative z-10 w-full h-full object-contain filter drop-shadow-xl hover:scale-105 transition-transform duration-300" />
                 </div>
             </div>
 
@@ -135,7 +141,7 @@
             <p class="text-lg sm:text-xl text-slate-500 max-w-2xl mx-auto mb-8 animate-fade-in-up animation-delay-200">
                 เริ่มต้นแค่ <span class="font-bold text-blue-600">130 บาท</span> — ซักสะอาด อบแห้งสนิท ไม่ต้องรอตากฝน<br
                     class="hidden sm:block" />
-                
+
             </p>
 
             <!-- CTA Buttons -->
@@ -233,20 +239,25 @@
 
                 <!-- Connecting Lines (desktop only) -->
                 <div class="hidden lg:block absolute top-14 left-[calc(12.5%+35px)] right-[calc(12.5%+35px)] h-0.5 z-0">
-                    <div class="w-full h-full bg-gradient-to-r from-blue-400 via-cyan-400 to-green-400 rounded-full"></div>
+                    <div class="w-full h-full bg-gradient-to-r from-blue-400 via-cyan-400 to-green-400 rounded-full">
+                    </div>
                 </div>
 
                 <!-- Step 1: จองคิว & โอนเงิน -->
                 <div class="relative text-center group z-10">
                     <div class="relative mx-auto w-24 h-24 sm:w-28 sm:h-28 mb-5">
                         <!-- Glow -->
-                        <div class="absolute inset-0 bg-blue-400/20 rounded-3xl blur-xl group-hover:bg-blue-400/30 transition-all duration-300"></div>
+                        <div
+                            class="absolute inset-0 bg-blue-400/20 rounded-3xl blur-xl group-hover:bg-blue-400/30 transition-all duration-300">
+                        </div>
                         <!-- Icon Box -->
-                        <div class="relative w-full h-full rounded-3xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-xl shadow-blue-500/25 group-hover:shadow-blue-500/40 group-hover:scale-105 transition-all duration-300">
+                        <div
+                            class="relative w-full h-full rounded-3xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-xl shadow-blue-500/25 group-hover:shadow-blue-500/40 group-hover:scale-105 transition-all duration-300">
                             <i class="fas fa-file-invoice-dollar text-white text-3xl sm:text-4xl"></i>
                         </div>
                         <!-- Step Number -->
-                        <div class="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-white border-2 border-blue-500 flex items-center justify-center shadow-md">
+                        <div
+                            class="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-white border-2 border-blue-500 flex items-center justify-center shadow-md">
                             <span class="text-sm font-bold text-blue-600">1</span>
                         </div>
                     </div>
@@ -265,11 +276,15 @@
                 <!-- Step 2: นัดรับผ้าใต้ตึก -->
                 <div class="relative text-center group z-10">
                     <div class="relative mx-auto w-24 h-24 sm:w-28 sm:h-28 mb-5">
-                        <div class="absolute inset-0 bg-cyan-400/20 rounded-3xl blur-xl group-hover:bg-cyan-400/30 transition-all duration-300"></div>
-                        <div class="relative w-full h-full rounded-3xl bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center shadow-xl shadow-cyan-500/25 group-hover:shadow-cyan-500/40 group-hover:scale-105 transition-all duration-300">
+                        <div
+                            class="absolute inset-0 bg-cyan-400/20 rounded-3xl blur-xl group-hover:bg-cyan-400/30 transition-all duration-300">
+                        </div>
+                        <div
+                            class="relative w-full h-full rounded-3xl bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center shadow-xl shadow-cyan-500/25 group-hover:shadow-cyan-500/40 group-hover:scale-105 transition-all duration-300">
                             <i class="fas fa-hand-holding text-white text-3xl sm:text-4xl"></i>
                         </div>
-                        <div class="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-white border-2 border-cyan-500 flex items-center justify-center shadow-md">
+                        <div
+                            class="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-white border-2 border-cyan-500 flex items-center justify-center shadow-md">
                             <span class="text-sm font-bold text-cyan-600">2</span>
                         </div>
                     </div>
@@ -288,11 +303,15 @@
                 <!-- Step 3: ซัก & อบแห้ง -->
                 <div class="relative text-center group z-10">
                     <div class="relative mx-auto w-24 h-24 sm:w-28 sm:h-28 mb-5">
-                        <div class="absolute inset-0 bg-amber-400/20 rounded-3xl blur-xl group-hover:bg-amber-400/30 transition-all duration-300"></div>
-                        <div class="relative w-full h-full rounded-3xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shadow-xl shadow-amber-500/25 group-hover:shadow-amber-500/40 group-hover:scale-105 transition-all duration-300">
+                        <div
+                            class="absolute inset-0 bg-amber-400/20 rounded-3xl blur-xl group-hover:bg-amber-400/30 transition-all duration-300">
+                        </div>
+                        <div
+                            class="relative w-full h-full rounded-3xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shadow-xl shadow-amber-500/25 group-hover:shadow-amber-500/40 group-hover:scale-105 transition-all duration-300">
                             <i class="fas fa-soap text-white text-3xl sm:text-4xl"></i>
                         </div>
-                        <div class="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-white border-2 border-amber-500 flex items-center justify-center shadow-md">
+                        <div
+                            class="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-white border-2 border-amber-500 flex items-center justify-center shadow-md">
                             <span class="text-sm font-bold text-amber-600">3</span>
                         </div>
                     </div>
@@ -311,11 +330,15 @@
                 <!-- Step 4: ส่งคืนถึงหอ -->
                 <div class="relative text-center group z-10">
                     <div class="relative mx-auto w-24 h-24 sm:w-28 sm:h-28 mb-5">
-                        <div class="absolute inset-0 bg-green-400/20 rounded-3xl blur-xl group-hover:bg-green-400/30 transition-all duration-300"></div>
-                        <div class="relative w-full h-full rounded-3xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center shadow-xl shadow-green-500/25 group-hover:shadow-green-500/40 group-hover:scale-105 transition-all duration-300">
+                        <div
+                            class="absolute inset-0 bg-green-400/20 rounded-3xl blur-xl group-hover:bg-green-400/30 transition-all duration-300">
+                        </div>
+                        <div
+                            class="relative w-full h-full rounded-3xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center shadow-xl shadow-green-500/25 group-hover:shadow-green-500/40 group-hover:scale-105 transition-all duration-300">
                             <i class="fas fa-truck-fast text-white text-3xl sm:text-4xl"></i>
                         </div>
-                        <div class="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-white border-2 border-green-500 flex items-center justify-center shadow-md">
+                        <div
+                            class="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-white border-2 border-green-500 flex items-center justify-center shadow-md">
                             <span class="text-sm font-bold text-green-600">4</span>
                         </div>
                     </div>
@@ -332,30 +355,37 @@
             <!-- ───────────────────────────────────────────── -->
             <div class="mt-16 pt-12 border-t border-slate-100" id="laundry-checklist">
                 <div class="text-center mb-8">
-                    <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-50 border border-amber-200/80 mb-3 shadow-xs">
+                    <div
+                        class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-50 border border-amber-200/80 mb-3 shadow-xs">
                         <span class="text-base">🎒</span>
-                        <span class="text-xs font-bold text-amber-800 uppercase tracking-wider">เพื่อความสะอาดยิ่งขึ้น & ปลอดภัย</span>
+                        <span class="text-xs font-bold text-amber-800 uppercase tracking-wider">เพื่อความสะอาดยิ่งขึ้น &
+                            ปลอดภัย</span>
                     </div>
                     <h3 class="text-2xl sm:text-3xl font-extrabold text-slate-800 mb-2">
                         สิ่งที่ควรเช็คก่อนส่งผ้า 🫧
                     </h3>
                     <p class="text-slate-500 text-sm sm:text-base max-w-xl mx-auto">
-                        เช็กลิสต์ง่ายๆ 4 ข้อ ก่อนนำผ้ามาวางส่ง เพื่อให้ผ้าของคุณได้รับการดูแลอย่างดีที่สุด (แตะการ์ดเพื่อติ๊กเช็คได้เลย)
+                        เช็กลิสต์ง่ายๆ 4 ข้อ ก่อนนำผ้ามาวางส่ง เพื่อให้ผ้าของคุณได้รับการดูแลอย่างดีที่สุด
+                        (แตะการ์ดเพื่อติ๊กเช็คได้เลย)
                     </p>
                 </div>
 
                 <!-- 4 Checklist Cards Grid -->
                 <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 max-w-5xl mx-auto">
-                    
+
                     <!-- Card 1: ล้วงกระเป๋า -->
-                    <div class="checklist-card bg-slate-50/80 hover:bg-white rounded-2xl p-5 border border-slate-200/80 hover:border-amber-300 shadow-sm hover:shadow-md transition-all duration-200 group relative select-none">
+                    <div
+                        class="checklist-card bg-slate-50/80 hover:bg-white rounded-2xl p-5 border border-slate-200/80 hover:border-amber-300 shadow-sm hover:shadow-md transition-all duration-200 group relative select-none">
                         <div class="flex items-center justify-between mb-3">
-                            <div class="w-12 h-12 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
+                            <div
+                                class="w-12 h-12 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
                                 🪙
                             </div>
-                            <label class="custom-chk-container flex items-center gap-1.5 cursor-pointer text-xs font-semibold text-slate-400 group-hover:text-amber-600 transition-colors">
+                            <label
+                                class="custom-chk-container flex items-center gap-1.5 cursor-pointer text-xs font-semibold text-slate-400 group-hover:text-amber-600 transition-colors">
                                 <input type="checkbox" class="checklist-toggle sr-only" />
-                                <span class="chk-box w-6 h-6 rounded-lg border-2 border-slate-300 flex items-center justify-center text-xs text-white transition-all bg-white shadow-xs">
+                                <span
+                                    class="chk-box w-6 h-6 rounded-lg border-2 border-slate-300 flex items-center justify-center text-xs text-white transition-all bg-white shadow-xs">
                                     <i class="fas fa-check opacity-0 transition-opacity"></i>
                                 </span>
                             </label>
@@ -364,7 +394,8 @@
                             1. เคลียร์ของในกระเป๋า
                         </h4>
                         <p class="text-xs text-slate-500 leading-relaxed">
-                            ตรวจเหรียญ, แบงค์, กระดาษทิชชู่, บัตรนักศึกษา, ลิปมัน, หรือหูฟัง เพื่อป้องกันผ้าและเครื่องซักเสียหาย
+                            ตรวจเหรียญ, แบงค์, กระดาษทิชชู่, บัตรนักศึกษา, ลิปมัน, หรือหูฟัง
+                            เพื่อป้องกันผ้าและเครื่องซักเสียหาย
                         </p>
                         <div class="mt-3 text-[11px] font-semibold text-amber-600 flex items-center gap-1">
                             <i class="fas fa-hand-pointer text-[10px]"></i> แตะเพื่อติ๊กเช็ค
@@ -372,14 +403,18 @@
                     </div>
 
                     <!-- Card 2: มัดปากถุงให้มิดชิด -->
-                    <div class="checklist-card bg-slate-50/80 hover:bg-white rounded-2xl p-5 border border-slate-200/80 hover:border-blue-300 shadow-sm hover:shadow-md transition-all duration-200 group relative select-none">
+                    <div
+                        class="checklist-card bg-slate-50/80 hover:bg-white rounded-2xl p-5 border border-slate-200/80 hover:border-blue-300 shadow-sm hover:shadow-md transition-all duration-200 group relative select-none">
                         <div class="flex items-center justify-between mb-3">
-                            <div class="w-12 h-12 rounded-2xl bg-blue-100 text-blue-700 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
+                            <div
+                                class="w-12 h-12 rounded-2xl bg-blue-100 text-blue-700 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
                                 🛍️
                             </div>
-                            <label class="custom-chk-container flex items-center gap-1.5 cursor-pointer text-xs font-semibold text-slate-400 group-hover:text-blue-600 transition-colors">
+                            <label
+                                class="custom-chk-container flex items-center gap-1.5 cursor-pointer text-xs font-semibold text-slate-400 group-hover:text-blue-600 transition-colors">
                                 <input type="checkbox" class="checklist-toggle sr-only" />
-                                <span class="chk-box w-6 h-6 rounded-lg border-2 border-slate-300 flex items-center justify-center text-xs text-white transition-all bg-white shadow-xs">
+                                <span
+                                    class="chk-box w-6 h-6 rounded-lg border-2 border-slate-300 flex items-center justify-center text-xs text-white transition-all bg-white shadow-xs">
                                     <i class="fas fa-check opacity-0 transition-opacity"></i>
                                 </span>
                             </label>
@@ -388,7 +423,8 @@
                             2. มัดปากถุงให้มิดชิด
                         </h4>
                         <p class="text-xs text-slate-500 leading-relaxed">
-                            ใส่ถุงผ้าหรือถุงซิปพร้อมมัดปากถุงให้เรียบร้อย เพื่อความสะดวกในการหยิบยกและป้องกันผ้าตกหล่นระหว่างขนย้าย
+                            ใส่ถุงผ้าหรือถุงซิปพร้อมมัดปากถุงให้เรียบร้อย
+                            เพื่อความสะดวกในการหยิบยกและป้องกันผ้าตกหล่นระหว่างขนย้าย
                         </p>
                         <div class="mt-3 text-[11px] font-semibold text-blue-600 flex items-center gap-1">
                             <i class="fas fa-hand-pointer text-[10px]"></i> แตะเพื่อติ๊กเช็ค
@@ -396,14 +432,18 @@
                     </div>
 
                     <!-- Card 3: วางน้ำยาคู่ถุง -->
-                    <div class="checklist-card bg-slate-50/80 hover:bg-white rounded-2xl p-5 border border-slate-200/80 hover:border-cyan-300 shadow-sm hover:shadow-md transition-all duration-200 group relative select-none">
+                    <div
+                        class="checklist-card bg-slate-50/80 hover:bg-white rounded-2xl p-5 border border-slate-200/80 hover:border-cyan-300 shadow-sm hover:shadow-md transition-all duration-200 group relative select-none">
                         <div class="flex items-center justify-between mb-3">
-                            <div class="w-12 h-12 rounded-2xl bg-cyan-100 text-cyan-700 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
+                            <div
+                                class="w-12 h-12 rounded-2xl bg-cyan-100 text-cyan-700 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
                                 🧴
                             </div>
-                            <label class="custom-chk-container flex items-center gap-1.5 cursor-pointer text-xs font-semibold text-slate-400 group-hover:text-cyan-600 transition-colors">
+                            <label
+                                class="custom-chk-container flex items-center gap-1.5 cursor-pointer text-xs font-semibold text-slate-400 group-hover:text-cyan-600 transition-colors">
                                 <input type="checkbox" class="checklist-toggle sr-only" />
-                                <span class="chk-box w-6 h-6 rounded-lg border-2 border-slate-300 flex items-center justify-center text-xs text-white transition-all bg-white shadow-xs">
+                                <span
+                                    class="chk-box w-6 h-6 rounded-lg border-2 border-slate-300 flex items-center justify-center text-xs text-white transition-all bg-white shadow-xs">
                                     <i class="fas fa-check opacity-0 transition-opacity"></i>
                                 </span>
                             </label>
@@ -412,7 +452,8 @@
                             3. วางน้ำยาคู่กับถุงผ้า
                         </h4>
                         <p class="text-xs text-slate-500 leading-relaxed">
-                            หากเตรียมน้ำยามาเอง ให้วางคู่กันด้านนอก (อย่ายัดใส่ในถุงผ้า) เพื่อป้องกันน้ำยาหกรั่วซึมใส่ผ้า
+                            หากเตรียมน้ำยามาเอง ให้วางคู่กันด้านนอก (อย่ายัดใส่ในถุงผ้า)
+                            เพื่อป้องกันน้ำยาหกรั่วซึมใส่ผ้า
                         </p>
                         <div class="mt-3 text-[11px] font-semibold text-cyan-600 flex items-center gap-1">
                             <i class="fas fa-hand-pointer text-[10px]"></i> แตะเพื่อติ๊กเช็ค
@@ -420,14 +461,18 @@
                     </div>
 
                     <!-- Card 4: แยกผ้าขาว/ผ้าหนา -->
-                    <div class="checklist-card bg-slate-50/80 hover:bg-white rounded-2xl p-5 border border-slate-200/80 hover:border-emerald-300 shadow-sm hover:shadow-md transition-all duration-200 group relative select-none">
+                    <div
+                        class="checklist-card bg-slate-50/80 hover:bg-white rounded-2xl p-5 border border-slate-200/80 hover:border-emerald-300 shadow-sm hover:shadow-md transition-all duration-200 group relative select-none">
                         <div class="flex items-center justify-between mb-3">
-                            <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
+                            <div
+                                class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
                                 🥼
                             </div>
-                            <label class="custom-chk-container flex items-center gap-1.5 cursor-pointer text-xs font-semibold text-slate-400 group-hover:text-emerald-600 transition-colors">
+                            <label
+                                class="custom-chk-container flex items-center gap-1.5 cursor-pointer text-xs font-semibold text-slate-400 group-hover:text-emerald-600 transition-colors">
                                 <input type="checkbox" class="checklist-toggle sr-only" />
-                                <span class="chk-box w-6 h-6 rounded-lg border-2 border-slate-300 flex items-center justify-center text-xs text-white transition-all bg-white shadow-xs">
+                                <span
+                                    class="chk-box w-6 h-6 rounded-lg border-2 border-slate-300 flex items-center justify-center text-xs text-white transition-all bg-white shadow-xs">
                                     <i class="fas fa-check opacity-0 transition-opacity"></i>
                                 </span>
                             </label>
@@ -436,7 +481,8 @@
                             4. แยกผ้าขาว & เช็คชนิดผ้า
                         </h4>
                         <p class="text-xs text-slate-500 leading-relaxed">
-                            หากต้องการซักผ้าขาวควรแยกถุง และร้านรับเฉพาะเสื้อผ้าทั่วไป (งดรับผ้านวม/ผ้าห่ม/ตุ๊กตา/ผ้าหนา)
+                            หากต้องการซักผ้าขาวควรแยกถุง และร้านรับเฉพาะเสื้อผ้าทั่วไป
+                            (งดรับผ้านวม/ผ้าห่ม/ตุ๊กตา/ผ้าหนา)
                         </p>
                         <div class="mt-3 text-[11px] font-semibold text-emerald-600 flex items-center gap-1">
                             <i class="fas fa-hand-pointer text-[10px]"></i> แตะเพื่อติ๊กเช็ค
@@ -447,10 +493,12 @@
 
                 <!-- Interactive Progress Status Bar -->
                 <div class="mt-6 text-center">
-                    <div id="checklist-status-bar" class="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-2xl bg-slate-100 text-slate-600 text-xs font-semibold transition-all duration-300">
+                    <div id="checklist-status-bar"
+                        class="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-2xl bg-slate-100 text-slate-600 text-xs font-semibold transition-all duration-300">
                         <span id="checklist-status-icon" class="text-base">📋</span>
                         <span id="checklist-status-text">เช็คครบ 4 ข้อแล้วกดสร้างข้อความจองคิวด้านล่างได้เลยครับ!</span>
-                        <a href="#booking-generator" class="ml-2 inline-flex items-center gap-1 px-3 py-1 rounded-xl bg-white text-green-700 font-bold hover:bg-green-50 shadow-xs transition">
+                        <a href="#booking-generator"
+                            class="ml-2 inline-flex items-center gap-1 px-3 py-1 rounded-xl bg-white text-green-700 font-bold hover:bg-green-50 shadow-xs transition">
                             <span>ไปที่ฟอร์มจอง</span>
                             <i class="fas fa-arrow-down text-[10px]"></i>
                         </a>
@@ -467,11 +515,14 @@
         <div class="max-w-xs mx-auto px-4">
             <!-- Visitor Counter Card -->
             <div class="relative group">
-                <div class="bg-white rounded-2xl border border-violet-100 shadow-lg p-6 text-center hover:shadow-xl hover:border-violet-300 transition-all duration-300">
-                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-violet-200 group-hover:scale-110 transition-transform duration-300">
+                <div
+                    class="bg-white rounded-2xl border border-violet-100 shadow-lg p-6 text-center hover:shadow-xl hover:border-violet-300 transition-all duration-300">
+                    <div
+                        class="w-14 h-14 rounded-2xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-violet-200 group-hover:scale-110 transition-transform duration-300">
                         <i class="fas fa-eye text-white text-xl"></i>
                     </div>
-                    <div class="text-4xl sm:text-5xl font-extrabold bg-gradient-to-r from-violet-600 to-purple-500 bg-clip-text text-transparent mb-1">
+                    <div
+                        class="text-4xl sm:text-5xl font-extrabold bg-gradient-to-r from-violet-600 to-purple-500 bg-clip-text text-transparent mb-1">
                         <span id="visitor-count">0</span>
                     </div>
                     <p class="text-sm text-slate-500 mt-1">ผู้เข้าชมเว็บ</p>
@@ -483,18 +534,25 @@
     <!-- ═══════════════════════════════════════════════════ -->
     <!-- BOOKING CTA (ทางลัดไปยังหน้าสร้างข้อความจองคิว) -->
     <!-- ═══════════════════════════════════════════════════ -->
-    <section id="booking-generator" class="py-16 sm:py-20 bg-gradient-to-b from-slate-50 via-green-50/30 to-white relative">
+    <section id="booking-generator"
+        class="py-16 sm:py-20 bg-gradient-to-b from-slate-50 via-green-50/30 to-white relative">
         <div class="max-w-4xl mx-auto px-4 sm:px-6">
-            
+
             <!-- Sleek CTA Card -->
-            <div class="relative overflow-hidden rounded-3xl bg-white border border-slate-200/80 shadow-xl shadow-slate-200/50 p-8 sm:p-12 text-center group">
+            <div
+                class="relative overflow-hidden rounded-3xl bg-white border border-slate-200/80 shadow-xl shadow-slate-200/50 p-8 sm:p-12 text-center group">
                 <!-- Background Accent Glows -->
-                <div class="absolute -top-24 -right-24 w-64 h-64 bg-green-200/30 rounded-full blur-3xl group-hover:bg-green-300/40 transition-all duration-500"></div>
-                <div class="absolute -bottom-24 -left-24 w-64 h-64 bg-blue-200/30 rounded-full blur-3xl group-hover:bg-blue-300/40 transition-all duration-500"></div>
+                <div
+                    class="absolute -top-24 -right-24 w-64 h-64 bg-green-200/30 rounded-full blur-3xl group-hover:bg-green-300/40 transition-all duration-500">
+                </div>
+                <div
+                    class="absolute -bottom-24 -left-24 w-64 h-64 bg-blue-200/30 rounded-full blur-3xl group-hover:bg-blue-300/40 transition-all duration-500">
+                </div>
 
                 <div class="relative z-10">
                     <!-- Badge -->
-                    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-green-50 border border-green-200 text-green-700 text-xs sm:text-sm font-semibold mb-5">
+                    <div
+                        class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-green-50 border border-green-200 text-green-700 text-xs sm:text-sm font-semibold mb-5">
                         <i class="fab fa-line text-base text-[#06C755]"></i>
                         <span>จองคิวด่วนผ่าน LINE OpenChat</span>
                     </div>
@@ -506,13 +564,15 @@
 
                     <!-- Subtitle -->
                     <p class="text-slate-500 text-base sm:text-lg max-w-xl mx-auto mb-8 leading-relaxed">
-                        สะดวก รวดเร็ว ใน 1 นาที! แตะเลือกขนาดผ้าและจุดส่ง ระบบจะคำนวณบิลและจัดฟอร์มข้อความให้พร้อมส่งเข้ากลุ่มทันที
+                        สะดวก รวดเร็ว ใน 1 นาที! แตะเลือกขนาดผ้าและจุดส่ง
+                        ระบบจะคำนวณบิลและจัดฟอร์มข้อความให้พร้อมส่งเข้ากลุ่มทันที
                     </p>
 
                     <!-- Feature Highlights -->
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 max-w-2xl mx-auto mb-8 text-left">
                         <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-xl bg-green-100 text-green-600 flex items-center justify-center text-lg flex-shrink-0">
+                            <div
+                                class="w-10 h-10 rounded-xl bg-green-100 text-green-600 flex items-center justify-center text-lg flex-shrink-0">
                                 ⚡
                             </div>
                             <div>
@@ -522,7 +582,8 @@
                         </div>
 
                         <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center text-lg flex-shrink-0">
+                            <div
+                                class="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center text-lg flex-shrink-0">
                                 💵
                             </div>
                             <div>
@@ -532,7 +593,8 @@
                         </div>
 
                         <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center text-lg flex-shrink-0">
+                            <div
+                                class="w-10 h-10 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center text-lg flex-shrink-0">
                                 💾
                             </div>
                             <div>
@@ -565,8 +627,10 @@
     </section>
 
     <!-- Toast Notification (Floating bottom-center) -->
-    <div id="toast-notify" class="toast-msg fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-slate-900/95 backdrop-blur-md text-white px-5 py-3.5 rounded-2xl shadow-2xl flex items-center gap-3 text-sm font-semibold border border-slate-700/80">
-        <div class="w-6 h-6 rounded-full bg-[#06C755] flex items-center justify-center text-white text-xs flex-shrink-0">
+    <div id="toast-notify"
+        class="toast-msg fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-slate-900/95 backdrop-blur-md text-white px-5 py-3.5 rounded-2xl shadow-2xl flex items-center gap-3 text-sm font-semibold border border-slate-700/80">
+        <div
+            class="w-6 h-6 rounded-full bg-[#06C755] flex items-center justify-center text-white text-xs flex-shrink-0">
             <i class="fas fa-check"></i>
         </div>
         <span id="toast-text">คัดลอกข้อความสำเร็จ! นำไปวางใน LINE ได้เลย 📋✨</span>
@@ -619,7 +683,7 @@
                         </div>
                         <h3 class="font-bold text-slate-800 text-lg mb-1">หอในมหาลัย</h3>
                         <p class="text-sm text-slate-500 mb-3">หอพักภายใน มจพ.</p>
-                        <div class="text-2xl font-extrabold text-blue-600">+฿10</div>
+                        <div class="text-2xl font-extrabold text-blue-600">+฿40</div>
                         <p class="text-xs text-slate-400 mt-2">ค่าจัดส่งเพิ่มเติม<br />เข้าในรั้วมหา'ลัย</p>
                     </div>
                 </div>
@@ -635,8 +699,8 @@
                         </div>
                         <h3 class="font-bold text-slate-800 text-lg mb-1">โซนไกล(5km-6km)</h3>
                         <p class="text-sm text-slate-500 mb-3">วงเวียนนเรศวร</p>
-                        <div class="text-2xl font-extrabold text-amber-600">+฿15</div>
-                        <p class="text-xs text-slate-400 mt-2">แนวถนน 3077<br />ระยะไกลกว่า 1.5 กม.</p>
+                        <div class="text-2xl font-extrabold text-amber-600">+฿55</div>
+                        <p class="text-xs text-slate-400 mt-2">ระยะไกลกว่า 5km-6km .</p>
                     </div>
                 </div>
             </div>
@@ -659,7 +723,7 @@
         <div class="max-w-6xl mx-auto px-4 sm:px-6">
             <div class="grid lg:grid-cols-2 gap-12 lg:gap-16">
 
-                
+
                 <!-- FAQ Accordion -->
                 <div>
                     <div
@@ -779,22 +843,26 @@
                             class="faq-item bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden transition-shadow hover:shadow-md">
                             <button class="faq-trigger w-full flex items-center justify-between p-5 text-left"
                                 data-faq="7">
-                                <span class="font-semibold text-slate-800 pr-4">ต้องเตรียมน้ำยาซักผ้า / ปรับผ้านุ่มมาเองไหม?</span>
+                                <span class="font-semibold text-slate-800 pr-4">ต้องเตรียมน้ำยาซักผ้า /
+                                    ปรับผ้านุ่มมาเองไหม?</span>
                                 <i
                                     class="fas fa-chevron-down text-slate-400 transition-transform duration-300 faq-icon"></i>
                             </button>
                             <div class="faq-content hidden px-5 pb-5">
                                 <p class="text-sm text-slate-500 leading-relaxed">
-                                    ลูกค้าสามารถเตรียมน้ำยาของตัวเองมาวางคู่กับถุงผ้าได้เลยครับ (ไม่มีค่าบริการเพิ่ม) หรือหากใครไม่มีน้ำยาซักผ้า/ปรับผ้านุ่ม ทางร้านมีบริการจัดเตรียมน้ำยาซักผ้าและปรับผ้านุ่มเกรดมาตรฐาน หอมสะอาด เพียง <span class="font-semibold text-blue-600">+15 บาท</span> ตามราคามาตรฐานครับ
+                                    ลูกค้าสามารถเตรียมน้ำยาของตัวเองมาวางคู่กับถุงผ้าได้เลยครับ (ไม่มีค่าบริการเพิ่ม)
+                                    หรือหากใครไม่มีน้ำยาซักผ้า/ปรับผ้านุ่ม
+                                    ทางร้านมีบริการจัดเตรียมน้ำยาซักผ้าและปรับผ้านุ่มเกรดมาตรฐาน หอมสะอาด เพียง <span
+                                        class="font-semibold text-blue-600">+15 บาท</span> ตามราคามาตรฐานครับ
                                 </p>
                             </div>
                         </div>
 
-                       
-                        </div>
+
                     </div>
                 </div>
             </div>
+        </div>
         </div>
     </section>
 
@@ -824,8 +892,8 @@
                             <i class="fab fa-line text-2xl"></i>
                             สร้างข้อความจองคิว 🫧
                         </a>
-                        <a href="https://line.me/ti/g2/c4n6z-xzaKCXJcKWlGoLYVoxeAxBuZNRcGEg1A?utm_source=invitation&utm_medium=link_copy&utm_campaign=default" target="_blank" rel="noopener noreferrer"
-                            id="final-line-btn"
+                        <a href="https://line.me/ti/g2/c4n6z-xzaKCXJcKWlGoLYVoxeAxBuZNRcGEg1A?utm_source=invitation&utm_medium=link_copy&utm_campaign=default"
+                            target="_blank" rel="noopener noreferrer" id="final-line-btn"
                             class="inline-flex items-center gap-2 px-6 py-4 rounded-2xl bg-white/10 hover:bg-white/20 text-white text-base font-semibold border border-white/20 transition-all duration-200">
                             <i class="fas fa-arrow-up-right-from-square text-sm"></i>
                             เข้ากลุ่ม LINE OpenChat
@@ -848,7 +916,7 @@
                         <img src="Img/logo/logo.png" alt="โลโก้ ซักป่ะ?" class="w-full h-full object-contain" />
                     </div>
                     <span class="font-bold text-white">ซักป่ะ?</span>
-                    
+
                 </div>
                 <!-- Info -->
                 <div class="flex items-center gap-3 text-xs">
@@ -856,7 +924,8 @@
                     <span>•</span>
                     <a href="payment.html" class="hover:text-white transition-colors">ชำระเงินพร้อมเพย์</a>
                     <span>•</span>
-                    <a href="https://line.me/ti/g2/c4n6z-xzaKCXJcKWlGoLYVoxeAxBuZNRcGEg1A?utm_source=invitation&utm_medium=link_copy&utm_campaign=default" target="_blank" rel="noopener noreferrer"
+                    <a href="https://line.me/ti/g2/c4n6z-xzaKCXJcKWlGoLYVoxeAxBuZNRcGEg1A?utm_source=invitation&utm_medium=link_copy&utm_campaign=default"
+                        target="_blank" rel="noopener noreferrer"
                         class="hover:text-white transition-colors flex items-center gap-1">
                         <i class="fab fa-line text-sm text-[#06C755]"></i> OpenChat
                     </a>
