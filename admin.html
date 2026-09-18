@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>ระบบจัดการหลังบ้าน (Admin) — ซักป่ะ? 🫧</title>
+    <meta name="robots" content="noindex, nofollow" />
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        kanit: ['Kanit', 'sans-serif'],
+                    },
+                },
+            },
+        }
+    </script>
+
+    <!-- Google Font: Kanit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+    <style>
+        body {
+            font-family: 'Kanit', sans-serif;
+            background-color: #0F172A;
+        }
+
+        .glass-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .glass-input {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+    </style>
+</head>
+
+<body class="min-h-screen text-slate-100 flex flex-col justify-between selection:bg-blue-500 selection:text-white">
+
+    <!-- ═══════════════════════════════════════════════════ -->
+    <!-- PIN LOGIN GATEWAY (Default View) -->
+    <!-- ═══════════════════════════════════════════════════ -->
+    <div id="pin-screen" class="fixed inset-0 z-50 bg-slate-950 flex items-center justify-center p-4">
+        <div class="glass-card rounded-3xl max-w-sm w-full p-6 sm:p-8 text-center shadow-2xl space-y-6 relative border border-slate-800">
+            <!-- Brand Logo -->
+            <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-blue-600 to-cyan-400 flex items-center justify-center mx-auto shadow-lg shadow-blue-500/20">
+                <i class="fas fa-lock text-white text-2xl"></i>
+            </div>
+
+            <div>
+                <h1 class="text-2xl font-extrabold text-white">เข้าสู่ระบบหลังบ้าน</h1>
+                <p class="text-xs text-slate-400 mt-1">กรอกรหัส PIN 6 หลักเพื่อปลดล็อก Admin Dashboard</p>
+            </div>
+
+            <!-- PIN Form -->
+            <div class="space-y-4">
+                <div>
+                    <input type="password" id="input-admin-pin" maxlength="6" placeholder="• • • • • •"
+                        class="w-full text-center tracking-widest text-2xl font-mono py-3 rounded-2xl glass-input text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30 transition-all" />
+                </div>
+
+                <button type="button" id="btn-login-pin"
+                    class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white font-bold text-sm shadow-lg shadow-blue-500/25 active:scale-95 transition-all">
+                    ปลดล็อกเข้าสู่ระบบ
+                </button>
+            </div>
+
+            <div class="pt-2 text-xs text-slate-500">
+                <a href="index.html" class="hover:text-slate-300 transition">← กลับสู่หน้าหลักเว็บไซต์</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════ -->
+    <!-- ADMIN DASHBOARD CONTENT (Hidden until PIN verified) -->
+    <!-- ═══════════════════════════════════════════════════ -->
+    <div id="admin-dashboard" class="hidden flex-grow flex flex-col">
+
+        <!-- Header Bar -->
+        <header class="bg-slate-900/90 border-b border-slate-800 sticky top-0 z-40 backdrop-blur-md">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center font-bold text-white shadow-md">
+                        <i class="fas fa-user-shield text-sm"></i>
+                    </div>
+                    <div>
+                        <span class="font-extrabold text-lg text-white">ซักป่ะ? <span class="text-cyan-400 text-xs font-normal">| Admin Panel</span></span>
+                        <span class="text-[10px] text-slate-400 block -mt-0.5">มจพ.ปราจีนบุรี</span>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <button type="button" id="btn-seed-sample-data" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold border border-slate-700 transition flex items-center gap-1.5">
+                        <i class="fas fa-dice text-amber-400"></i>
+                        <span>สุ่มออเดอร์ทดสอบ</span>
+                    </button>
+                    <button type="button" id="btn-logout-admin" class="px-3 py-1.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-semibold border border-red-500/20 transition flex items-center gap-1.5">
+                        <i class="fas fa-right-from-bracket"></i>
+                        <span class="hidden sm:inline">ออก</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Dashboard Content -->
+        <main class="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8 flex-grow w-full space-y-6">
+
+            <!-- KPI OVERVIEW CARDS -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-5">
+
+                <!-- Card 1: รายรับรวม -->
+                <div class="glass-card rounded-2xl p-4 sm:p-5 border border-slate-800 relative overflow-hidden">
+                    <div class="flex items-center justify-between text-xs text-slate-400 mb-2">
+                        <span>รายรับรวมทั้งหมด</span>
+                        <div class="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-sm">
+                            <i class="fas fa-wallet"></i>
+                        </div>
+                    </div>
+                    <div class="text-2xl sm:text-3xl font-extrabold text-emerald-400" id="kpi-total-revenue">฿0</div>
+                    <div class="text-[10px] text-slate-400 mt-1">จากคำสั่งซื้อที่อนุมัติแล้ว</div>
+                </div>
+
+                <!-- Card 2: รายรับวันนี้ -->
+                <div class="glass-card rounded-2xl p-4 sm:p-5 border border-slate-800 relative overflow-hidden">
+                    <div class="flex items-center justify-between text-xs text-slate-400 mb-2">
+                        <span>รายรับวันนี้</span>
+                        <div class="w-8 h-8 rounded-xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-sm">
+                            <i class="fas fa-calendar-day"></i>
+                        </div>
+                    </div>
+                    <div class="text-2xl sm:text-3xl font-extrabold text-cyan-400" id="kpi-today-revenue">฿0</div>
+                    <div class="text-[10px] text-slate-400 mt-1" id="kpi-today-date">วันนี้</div>
+                </div>
+
+                <!-- Card 3: คำสั่งซื้อทั้งหมด -->
+                <div class="glass-card rounded-2xl p-4 sm:p-5 border border-slate-800 relative overflow-hidden">
+                    <div class="flex items-center justify-between text-xs text-slate-400 mb-2">
+                        <span>คำสั่งซื้อทั้งหมด</span>
+                        <div class="w-8 h-8 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center text-sm">
+                            <i class="fas fa-layer-group"></i>
+                        </div>
+                    </div>
+                    <div class="text-2xl sm:text-3xl font-extrabold text-blue-400" id="kpi-total-orders">0</div>
+                    <div class="text-[10px] text-slate-400 mt-1">รายการออเดอร์ในระบบ</div>
+                </div>
+
+                <!-- Card 4: รอตรวจสอบ -->
+                <div class="glass-card rounded-2xl p-4 sm:p-5 border border-slate-800 relative overflow-hidden">
+                    <div class="flex items-center justify-between text-xs text-slate-400 mb-2">
+                        <span>รอตรวจสอบ</span>
+                        <div class="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-sm">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                    </div>
+                    <div class="text-2xl sm:text-3xl font-extrabold text-amber-400" id="kpi-pending-orders">0</div>
+                    <div class="text-[10px] text-amber-400/80 mt-1">ต้องตรวจสลิป/อนุมัติ</div>
+                </div>
+
+            </div>
+
+            <!-- REVENUE BREAKDOWN BY CATEGORY CARD (ความต้องการผู้ใช้: ขอรายรับเพิ่ม แยกหมวด) -->
+            <div class="glass-card rounded-3xl p-5 sm:p-7 border border-slate-800 space-y-5">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-800">
+                    <div>
+                        <h2 class="text-lg font-extrabold text-white flex items-center gap-2">
+                            <i class="fas fa-chart-pie text-cyan-400"></i>
+                            <span>สรุปรายรับแยกตามหมวดหมู่บริการ (Revenue Analytics)</span>
+                        </h2>
+                        <p class="text-xs text-slate-400">วิเคราะห์รายได้แยกตามขนาดเครื่องซักและบริการเสริม</p>
+                    </div>
+                    <div class="text-xs font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 rounded-full w-fit">
+                        อัตราส่วนสร้างรายได้
+                    </div>
+                </div>
+
+                <!-- Categories Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+                    <!-- Sub-Card 1: รายรับตามขนาดเครื่องซัก (Size S, M, L, Jumbo) -->
+                    <div class="bg-slate-900/80 p-4 sm:p-5 rounded-2xl border border-slate-800 space-y-3">
+                        <div class="text-xs font-bold text-slate-300 flex items-center justify-between">
+                            <span>🧺 รายรับจากเครื่องซักผ้า (แยก Size)</span>
+                            <span class="text-blue-400 font-bold" id="cat-wash-total">฿0</span>
+                        </div>
+
+                        <div class="space-y-2.5 text-xs">
+                            <!-- Size S -->
+                            <div>
+                                <div class="flex justify-between text-slate-400 mb-1">
+                                    <span>Size S (50฿)</span>
+                                    <span class="font-bold text-white" id="cat-size-s-amt">฿0</span>
+                                </div>
+                                <div class="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
+                                    <div id="cat-size-s-bar" class="h-full bg-green-500 rounded-full" style="width: 0%;"></div>
+                                </div>
+                            </div>
+
+                            <!-- Size M -->
+                            <div>
+                                <div class="flex justify-between text-slate-400 mb-1">
+                                    <span>Size M (70฿)</span>
+                                    <span class="font-bold text-white" id="cat-size-m-amt">฿0</span>
+                                </div>
+                                <div class="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
+                                    <div id="cat-size-m-bar" class="h-full bg-blue-500 rounded-full" style="width: 0%;"></div>
+                                </div>
+                            </div>
+
+                            <!-- Size L -->
+                            <div>
+                                <div class="flex justify-between text-slate-400 mb-1">
+                                    <span>Size L (80฿)</span>
+                                    <span class="font-bold text-white" id="cat-size-l-amt">฿0</span>
+                                </div>
+                                <div class="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
+                                    <div id="cat-size-l-bar" class="h-full bg-indigo-500 rounded-full" style="width: 0%;"></div>
+                                </div>
+                            </div>
+
+                            <!-- Jumbo -->
+                            <div>
+                                <div class="flex justify-between text-slate-400 mb-1">
+                                    <span>Jumbo (110฿)</span>
+                                    <span class="font-bold text-white" id="cat-size-jumbo-amt">฿0</span>
+                                </div>
+                                <div class="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
+                                    <div id="cat-size-jumbo-bar" class="h-full bg-purple-500 rounded-full" style="width: 0%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sub-Card 2: รายรับบริการเสริม (เครื่องอบ, น้ำยา, ค่าจัดส่ง) -->
+                    <div class="bg-slate-900/80 p-4 sm:p-5 rounded-2xl border border-slate-800 space-y-3">
+                        <div class="text-xs font-bold text-slate-300 flex items-center justify-between">
+                            <span>🛵 รายรับจากบริการเสริม & จัดส่ง</span>
+                            <span class="text-cyan-400 font-bold" id="cat-addon-total">฿0</span>
+                        </div>
+
+                        <div class="space-y-2.5 text-xs">
+                            <!-- ค่าอบผ้า -->
+                            <div>
+                                <div class="flex justify-between text-slate-400 mb-1">
+                                    <span>💨 ค่าเครื่องอบผ้า (15kg/25kg)</span>
+                                    <span class="font-bold text-white" id="cat-dryer-amt">฿0</span>
+                                </div>
+                                <div class="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
+                                    <div id="cat-dryer-bar" class="h-full bg-orange-500 rounded-full" style="width: 0%;"></div>
+                                </div>
+                            </div>
+
+                            <!-- ค่าน้ำยาซัก/ปรับผ้านุ่ม -->
+                            <div>
+                                <div class="flex justify-between text-slate-400 mb-1">
+                                    <span>🧼 ค่าน้ำยาจัดเตรียมให้ (+15฿)</span>
+                                    <span class="font-bold text-white" id="cat-det-amt">฿0</span>
+                                </div>
+                                <div class="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
+                                    <div id="cat-det-bar" class="h-full bg-cyan-500 rounded-full" style="width: 0%;"></div>
+                                </div>
+                            </div>
+
+                            <!-- ค่าจัดส่ง นอก มจพ. (30฿) -->
+                            <div>
+                                <div class="flex justify-between text-slate-400 mb-1">
+                                    <span>📍 ค่าส่ง นอก มจพ. (30฿)</span>
+                                    <span class="font-bold text-white" id="cat-zone30-amt">฿0</span>
+                                </div>
+                                <div class="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
+                                    <div id="cat-zone30-bar" class="h-full bg-emerald-500 rounded-full" style="width: 0%;"></div>
+                                </div>
+                            </div>
+
+                            <!-- ค่าจัดส่ง หอใน มจพ. (40฿) -->
+                            <div>
+                                <div class="flex justify-between text-slate-400 mb-1">
+                                    <span>🏢 ค่าส่ง หอใน มจพ. (40฿)</span>
+                                    <span class="font-bold text-white" id="cat-zone40-amt">฿0</span>
+                                </div>
+                                <div class="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
+                                    <div id="cat-zone40-bar" class="h-full bg-teal-500 rounded-full" style="width: 0%;"></div>
+                                </div>
+                            </div>
+
+                            <!-- ค่าจัดส่ง โซนไกล >5km (55฿) -->
+                            <div>
+                                <div class="flex justify-between text-slate-400 mb-1">
+                                    <span>🚚 ค่าส่ง โซนไกล >5km (55฿)</span>
+                                    <span class="font-bold text-white" id="cat-zone55-amt">฿0</span>
+                                </div>
+                                <div class="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
+                                    <div id="cat-zone55-bar" class="h-full bg-amber-500 rounded-full" style="width: 0%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ORDER MANAGEMENT TABLE & FILTER TABS -->
+            <div class="glass-card rounded-3xl p-5 sm:p-7 border border-slate-800 space-y-5">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                        <h2 class="text-lg font-extrabold text-white flex items-center gap-2">
+                            <i class="fas fa-list-check text-blue-400"></i>
+                            <span>รายการคำสั่งซื้อทั้งหมด (Order Management)</span>
+                        </h2>
+                        <p class="text-xs text-slate-400">คลิกที่ปุ่มเพื่อเปลี่ยนสถานะออเดอร์ ระบบจะซิงค์กับลูกค้าทันที</p>
+                    </div>
+
+                    <!-- Filter Tabs -->
+                    <div class="flex items-center gap-1.5 bg-slate-900/90 p-1 rounded-2xl border border-slate-800 overflow-x-auto text-xs">
+                        <button type="button" class="tab-filter active px-3 py-1.5 rounded-xl font-bold transition text-white bg-blue-600" data-filter="all">ทั้งหมด</button>
+                        <button type="button" class="tab-filter px-3 py-1.5 rounded-xl font-medium transition text-slate-400 hover:text-white" data-filter="pending">รอตรวจ</button>
+                        <button type="button" class="tab-filter px-3 py-1.5 rounded-xl font-medium transition text-slate-400 hover:text-white" data-filter="picked_up">รับผ้าแล้ว</button>
+                        <button type="button" class="tab-filter px-3 py-1.5 rounded-xl font-medium transition text-slate-400 hover:text-white" data-filter="processing">กำลังซัก-อบ</button>
+                        <button type="button" class="tab-filter px-3 py-1.5 rounded-xl font-medium transition text-slate-400 hover:text-white" data-filter="delivered">จัดส่งแล้ว</button>
+                    </div>
+                </div>
+
+                <!-- Orders Table Container -->
+                <div class="space-y-3" id="orders-list-container">
+                    <!-- Dynamic Render Orders -->
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════ -->
+    <!-- SLIP PREVIEW MODAL -->
+    <!-- ═══════════════════════════════════════════════════ -->
+    <div id="slip-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="glass-card rounded-3xl max-w-md w-full p-6 text-center space-y-4 relative border border-slate-700">
+            <button type="button" id="close-slip-modal" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center">
+                <i class="fas fa-xmark"></i>
+            </button>
+            <h3 class="text-lg font-bold text-white flex items-center justify-center gap-2">
+                <i class="fas fa-file-image text-cyan-400"></i>
+                <span>สลิปการโอนเงิน</span>
+            </h3>
+            <div class="p-2 bg-slate-900 rounded-2xl border border-slate-800">
+                <img id="modal-slip-img" src="" alt="สลิปโอนเงิน" class="max-h-[60vh] mx-auto rounded-xl object-contain" />
+            </div>
+            <a id="btn-download-slip-img" href="#" download="slip.png" class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs transition">
+                <i class="fas fa-download"></i>
+                <span>ดาวน์โหลดภาพสลิป</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-slate-900 text-white px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-3 backdrop-blur-sm pointer-events-none text-sm font-medium transition-all duration-300 opacity-0 translate-y-4 border border-slate-700">
+        <div class="w-6 h-6 rounded-full bg-cyan-500 flex items-center justify-center text-white text-xs">
+            <i class="fas fa-check"></i>
+        </div>
+        <span id="toast-text">อัปเดตสถานะสำเร็จ!</span>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════ -->
+    <!-- SCRIPT LOGIC -->
+    <!-- ═══════════════════════════════════════════════════ -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const ADMIN_PIN = "200850"; // Specified PIN
+
+            // DOM Elements
+            const pinScreen = document.getElementById('pin-screen');
+            const adminDashboard = document.getElementById('admin-dashboard');
+            const inputAdminPin = document.getElementById('input-admin-pin');
+            const btnLoginPin = document.getElementById('btn-login-pin');
+            const btnLogoutAdmin = document.getElementById('btn-logout-admin');
+            const btnSeedSampleData = document.getElementById('btn-seed-sample-data');
+
+            const kpiTotalRevenue = document.getElementById('kpi-total-revenue');
+            const kpiTodayRevenue = document.getElementById('kpi-today-revenue');
+            const kpiTotalOrders = document.getElementById('kpi-total-orders');
+            const kpiPendingOrders = document.getElementById('kpi-pending-orders');
+
+            const ordersListContainer = document.getElementById('orders-list-container');
+            const tabFilters = document.querySelectorAll('.tab-filter');
+
+            const slipModal = document.getElementById('slip-modal');
+            const closeSlipModal = document.getElementById('close-slip-modal');
+            const modalSlipImg = document.getElementById('modal-slip-img');
+            const btnDownloadSlipImg = document.getElementById('btn-download-slip-img');
+
+            const toast = document.getElementById('toast');
+            const toastText = document.getElementById('toast-text');
+
+            let currentFilter = 'all';
+
+            // Toast helper
+            let toastTimer = null;
+            function showToast(msg) {
+                if (!toast || !toastText) return;
+                toastText.textContent = msg;
+                toast.classList.remove('opacity-0', 'translate-y-4');
+                toast.classList.add('opacity-100', 'translate-y-0');
+                clearTimeout(toastTimer);
+                toastTimer = setTimeout(() => {
+                    toast.classList.remove('opacity-100', 'translate-y-0');
+                    toast.classList.add('opacity-0', 'translate-y-4');
+                }, 3000);
+            }
+
+            // PIN Authentication Handler
+            function verifyPin() {
+                const val = inputAdminPin.value.trim();
+                if (val === ADMIN_PIN) {
+                    sessionStorage.setItem('sp_admin_authed', 'true');
+                    pinScreen.classList.add('hidden');
+                    adminDashboard.classList.remove('hidden');
+                    renderDashboard();
+                    showToast('🔓 ปลดล็อกเข้าสู่ระบบสำเร็จ!');
+                } else {
+                    showToast('❌ รหัส PIN ไม่ถูกต้อง (200850)');
+                    inputAdminPin.value = '';
+                    inputAdminPin.focus();
+                }
+            }
+
+            btnLoginPin.addEventListener('click', verifyPin);
+            inputAdminPin.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') verifyPin();
+            });
+
+            // Check Session
+            if (sessionStorage.getItem('sp_admin_authed') === 'true') {
+                pinScreen.classList.add('hidden');
+                adminDashboard.classList.remove('hidden');
+                renderDashboard();
+            }
+
+            // Logout Handler
+            btnLogoutAdmin.addEventListener('click', () => {
+                sessionStorage.removeItem('sp_admin_authed');
+                adminDashboard.classList.add('hidden');
+                pinScreen.classList.remove('hidden');
+                inputAdminPin.value = '';
+            });
+
+            // Seed Sample Data for Testing
+            btnSeedSampleData.addEventListener('click', () => {
+                const sampleOrders = [
+                    {
+                        orderId: `SP-20260919-4821`,
+                        name: `กาย (มจพ.ปราจีน)`,
+                        phone: `081-234-5678`,
+                        dorm: `หอมังกือ ตึก A (ห้อง 402)`,
+                        notes: `ฝากวางไว้หน้าลิฟต์`,
+                        serviceName: `Size M (70฿) + อบ 15 kg (50฿)`,
+                        sizeKey: 'm',
+                        dryerKey: 'd15',
+                        detergentKey: 'shop',
+                        zoneKey: 'off',
+                        zoneSurcharge: 30,
+                        total: 165,
+                        slipDataUrl: ``,
+                        createdAt: new Date().toISOString(),
+                        status: `pending`
+                    },
+                    {
+                        orderId: `SP-20260919-3310`,
+                        name: `มิ้นท์`,
+                        phone: `089-876-5432`,
+                        dorm: `หอในหญิง 1`,
+                        notes: `แยกผ้าขาว`,
+                        serviceName: `Size S (50฿) + อบ 15 kg (50฿)`,
+                        sizeKey: 's',
+                        dryerKey: 'd15',
+                        detergentKey: 'own',
+                        zoneKey: 'on',
+                        zoneSurcharge: 40,
+                        total: 140,
+                        slipDataUrl: ``,
+                        createdAt: new Date(Date.now() - 3600000).toISOString(),
+                        status: `processing`
+                    },
+                    {
+                        orderId: `SP-20260919-7712`,
+                        name: `พี่โอม`,
+                        phone: `092-111-2233`,
+                        dorm: `หมู่บ้านสวนสวย (โซนไกล 5.5 กม.)`,
+                        notes: `โทรแจ้งก่อนจัดส่ง`,
+                        serviceName: `Size L (80฿) + อบ 25 kg (70฿)`,
+                        sizeKey: 'l',
+                        dryerKey: 'd25',
+                        detergentKey: 'shop',
+                        zoneKey: 'far',
+                        zoneSurcharge: 55,
+                        total: 220,
+                        slipDataUrl: ``,
+                        createdAt: new Date(Date.now() - 7200000).toISOString(),
+                        status: `delivered`
+                    }
+                ];
+
+                const existing = JSON.parse(localStorage.getItem('sp_orders') || '[]');
+                const merged = [...sampleOrders, ...existing];
+                localStorage.setItem('sp_orders', JSON.stringify(merged));
+                renderDashboard();
+                showToast('🎲 สุ่มเพิ่มออเดอร์ตัวอย่างเรียบร้อย!');
+            });
+
+            // Render Dashboard & Analytics
+            function renderDashboard() {
+                const orders = JSON.parse(localStorage.getItem('sp_orders') || '[]');
+
+                // Calculate KPIs
+                let totalRev = 0;
+                let todayRev = 0;
+                let pendingCount = 0;
+                const todayStr = new Date().toISOString().slice(0, 10);
+
+                // Category Breakdowns
+                let sizeS = 0, sizeM = 0, sizeL = 0, sizeJumbo = 0;
+                let dryerTotal = 0, detTotal = 0;
+                let zone30Total = 0, zone40Total = 0, zone55Total = 0;
+
+                orders.forEach(ord => {
+                    const amt = Number(ord.total) || 0;
+                    totalRev += amt;
+
+                    if (ord.createdAt && ord.createdAt.startsWith(todayStr)) {
+                        todayRev += amt;
+                    }
+
+                    if (ord.status === 'pending' || !ord.status) {
+                        pendingCount++;
+                    }
+
+                    // Wash size breakdown
+                    if (ord.sizeKey) {
+                        if (ord.sizeKey === 's') sizeS += (ord.sizePrice || 50);
+                        else if (ord.sizeKey === 'm') sizeM += (ord.sizePrice || 70);
+                        else if (ord.sizeKey === 'l') sizeL += (ord.sizePrice || 80);
+                        else if (ord.sizeKey === 'jumbo') sizeJumbo += (ord.sizePrice || 110);
+                    } else {
+                        const svc = (ord.serviceName || '').toLowerCase();
+                        if (svc.includes('size s')) sizeS += 50;
+                        else if (svc.includes('size m')) sizeM += 70;
+                        else if (svc.includes('size l')) sizeL += 80;
+                        else if (svc.includes('jumbo')) sizeJumbo += 110;
+                    }
+
+                    // Dryer breakdown
+                    if (ord.dryerPrice !== undefined) {
+                        dryerTotal += ord.dryerPrice;
+                    } else {
+                        const svc = (ord.serviceName || '').toLowerCase();
+                        if (svc.includes('อบ 25')) dryerTotal += 70;
+                        else if (svc.includes('อบ')) dryerTotal += 50;
+                    }
+
+                    // Detergent breakdown
+                    if (ord.detergentSurcharge !== undefined) {
+                        detTotal += ord.detergentSurcharge;
+                    } else {
+                        const svc = (ord.serviceName || '').toLowerCase();
+                        if (svc.includes('+15')) detTotal += 15;
+                    }
+
+                    // Delivery breakdown (30, 40, 55)
+                    if (ord.zoneKey === 'off' || ord.zoneSurcharge === 30) {
+                        zone30Total += 30;
+                    } else if (ord.zoneKey === 'on' || ord.zoneSurcharge === 40) {
+                        zone40Total += 40;
+                    } else if (ord.zoneKey === 'far' || ord.zoneSurcharge === 55) {
+                        zone55Total += 55;
+                    } else {
+                        // Fallback detection for older/seeded records without zoneKey
+                        const dormLower = (ord.dorm || '').toLowerCase();
+                        const svcLower = (ord.serviceName || '').toLowerCase();
+                        if (dormLower.includes('หอใน')) {
+                            zone40Total += 40;
+                        } else if (dormLower.includes('ไกล') || dormLower.includes('5km') || svcLower.includes('55')) {
+                            zone55Total += 55;
+                        } else {
+                            zone30Total += 30; // default off-campus
+                        }
+                    }
+                });
+
+                // Update KPI Elements
+                kpiTotalRevenue.textContent = `฿${totalRev.toLocaleString()}`;
+                kpiTodayRevenue.textContent = `฿${todayRev.toLocaleString()}`;
+                kpiTotalOrders.textContent = orders.length;
+                kpiPendingOrders.textContent = pendingCount;
+
+                // Update Category Breakdown Analytics Elements
+                const washTotal = sizeS + sizeM + sizeL + sizeJumbo;
+                const washMax = Math.max(washTotal, 1);
+                document.getElementById('cat-wash-total').textContent = `฿${washTotal}`;
+                document.getElementById('cat-size-s-amt').textContent = `฿${sizeS}`;
+                document.getElementById('cat-size-m-amt').textContent = `฿${sizeM}`;
+                document.getElementById('cat-size-l-amt').textContent = `฿${sizeL}`;
+                document.getElementById('cat-size-jumbo-amt').textContent = `฿${sizeJumbo}`;
+
+                document.getElementById('cat-size-s-bar').style.width = `${(sizeS / washMax) * 100}%`;
+                document.getElementById('cat-size-m-bar').style.width = `${(sizeM / washMax) * 100}%`;
+                document.getElementById('cat-size-l-bar').style.width = `${(sizeL / washMax) * 100}%`;
+                document.getElementById('cat-size-jumbo-bar').style.width = `${(sizeJumbo / washMax) * 100}%`;
+
+                const zoneTotal = zone30Total + zone40Total + zone55Total;
+                const addonTotal = dryerTotal + detTotal + zoneTotal;
+                const addonMax = Math.max(addonTotal, 1);
+                document.getElementById('cat-addon-total').textContent = `฿${addonTotal}`;
+                document.getElementById('cat-dryer-amt').textContent = `฿${dryerTotal}`;
+                document.getElementById('cat-det-amt').textContent = `฿${detTotal}`;
+                document.getElementById('cat-zone30-amt').textContent = `฿${zone30Total}`;
+                document.getElementById('cat-zone40-amt').textContent = `฿${zone40Total}`;
+                document.getElementById('cat-zone55-amt').textContent = `฿${zone55Total}`;
+
+                document.getElementById('cat-dryer-bar').style.width = `${(dryerTotal / addonMax) * 100}%`;
+                document.getElementById('cat-det-bar').style.width = `${(detTotal / addonMax) * 100}%`;
+                document.getElementById('cat-zone30-bar').style.width = `${(zone30Total / addonMax) * 100}%`;
+                document.getElementById('cat-zone40-bar').style.width = `${(zone40Total / addonMax) * 100}%`;
+                document.getElementById('cat-zone55-bar').style.width = `${(zone55Total / addonMax) * 100}%`;
+
+                // Render Table List
+                renderOrdersList(orders);
+            }
+
+            // Filter Tabs Handler
+            tabFilters.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabFilters.forEach(t => {
+                        t.classList.remove('active', 'bg-blue-600', 'text-white', 'font-bold');
+                        t.classList.add('text-slate-400', 'font-medium');
+                    });
+                    tab.classList.add('active', 'bg-blue-600', 'text-white', 'font-bold');
+                    tab.classList.remove('text-slate-400');
+                    currentFilter = tab.dataset.filter;
+                    renderDashboard();
+                });
+            });
+
+            // Render Orders List
+            function renderOrdersList(orders) {
+                let filtered = orders;
+                if (currentFilter !== 'all') {
+                    filtered = orders.filter(o => (o.status || 'pending') === currentFilter);
+                }
+
+                if (filtered.length === 0) {
+                    ordersListContainer.innerHTML = `
+                        <div class="text-center py-10 glass-card rounded-2xl border border-slate-800 text-slate-400">
+                            <i class="fas fa-inbox text-3xl mb-2 text-slate-500"></i>
+                            <p class="text-sm font-semibold">ไม่มีรายการคำสั่งซื้อในหมวดนี้</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                ordersListContainer.innerHTML = filtered.map((ord, idx) => {
+                    const dt = new Date(ord.createdAt).toLocaleString('th-TH', {
+                        month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+                    });
+
+                    const st = ord.status || 'pending';
+                    let badgeClass = 'bg-amber-500/10 text-amber-400 border-amber-500/20';
+                    let badgeLabel = '🟡 รอตรวจสอบ';
+                    if (st === 'picked_up') { badgeClass = 'bg-blue-500/10 text-blue-400 border-blue-500/20'; badgeLabel = '🔵 รับผ้าแล้ว'; }
+                    else if (st === 'processing') { badgeClass = 'bg-purple-500/10 text-purple-400 border-purple-500/20'; badgeLabel = '🟣 กำลังซัก-อบ'; }
+                    else if (st === 'delivered') { badgeClass = 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'; badgeLabel = '🟢 จัดส่งแล้ว'; }
+
+                    const slipBtn = ord.slipDataUrl ? `
+                        <button type="button" class="btn-view-slip px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-cyan-400 text-xs font-semibold border border-slate-700 transition flex items-center gap-1" data-slip="${ord.slipDataUrl}">
+                            <i class="fas fa-file-image"></i> ดูสลิป
+                        </button>
+                    ` : '<span class="text-[11px] text-slate-500">ไม่มีสลิป</span>';
+
+                    return `
+                        <div class="glass-card p-4 sm:p-5 rounded-2xl border border-slate-800 hover:border-slate-700 transition space-y-3">
+                            <div class="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-slate-800/80">
+                                <div class="flex items-center gap-2">
+                                    <span class="font-extrabold text-blue-400 font-mono text-sm sm:text-base">#${ord.orderId}</span>
+                                    <span class="text-[11px] text-slate-400">${dt}</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="px-2.5 py-0.5 rounded-full text-xs font-bold border ${badgeClass}">
+                                        ${badgeLabel}
+                                    </span>
+                                    ${slipBtn}
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs text-slate-300">
+                                <div>
+                                    <span class="text-slate-400">ลูกค้า:</span> <strong class="text-white">${ord.name}</strong> (${ord.phone})
+                                </div>
+                                <div>
+                                    <span class="text-slate-400">หอพัก:</span> ${ord.dorm}
+                                </div>
+                                <div>
+                                    <span class="text-slate-400">บริการ:</span> ${ord.serviceName}
+                                </div>
+                            </div>
+
+                            <!-- Action Controls -->
+                            <div class="pt-2 border-t border-slate-800/60 flex flex-wrap items-center justify-between gap-2">
+                                <div class="text-sm font-extrabold text-emerald-400">
+                                    ฿${ord.total}
+                                </div>
+
+                                <div class="flex flex-wrap items-center gap-1.5 text-xs">
+                                    <span class="text-[11px] text-slate-400 mr-1">อัปเดตสถานะ:</span>
+                                    <button type="button" class="btn-change-status px-2.5 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 transition" data-id="${ord.orderId}" data-status="pending">🟡 รอตรวจ</button>
+                                    <button type="button" class="btn-change-status px-2.5 py-1 rounded-lg bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 transition" data-id="${ord.orderId}" data-status="picked_up">🔵 รับผ้า</button>
+                                    <button type="button" class="btn-change-status px-2.5 py-1 rounded-lg bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 transition" data-id="${ord.orderId}" data-status="processing">🟣 ซัก-อบ</button>
+                                    <button type="button" class="btn-change-status px-2.5 py-1 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 transition" data-id="${ord.orderId}" data-status="delivered">🟢 จัดส่งแล้ว</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                // Attach event listeners for status change & slip view
+                document.querySelectorAll('.btn-change-status').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const targetId = btn.dataset.id;
+                        const newStatus = btn.dataset.status;
+                        updateOrderStatus(targetId, newStatus);
+                    });
+                });
+
+                document.querySelectorAll('.btn-view-slip').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const slipUrl = btn.dataset.slip;
+                        if (modalSlipImg) modalSlipImg.src = slipUrl;
+                        if (btnDownloadSlipImg) btnDownloadSlipImg.href = slipUrl;
+                        if (slipModal) slipModal.classList.remove('hidden');
+                    });
+                });
+            }
+
+            // Update Order Status in localStorage
+            function updateOrderStatus(orderId, newStatus) {
+                const orders = JSON.parse(localStorage.getItem('sp_orders') || '[]');
+                const idx = orders.findIndex(o => o.orderId === orderId);
+                if (idx !== -1) {
+                    orders[idx].status = newStatus;
+                    localStorage.setItem('sp_orders', JSON.stringify(orders));
+                    renderDashboard();
+                    showToast(`⚡ อัปเดตสถานะออเดอร์ #${orderId} เรียบร้อย!`);
+                }
+            }
+
+            // Close Slip Modal
+            if (closeSlipModal) {
+                closeSlipModal.addEventListener('click', () => {
+                    if (slipModal) slipModal.classList.add('hidden');
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>

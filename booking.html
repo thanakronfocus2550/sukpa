@@ -39,6 +39,9 @@
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 
+    <!-- QRCode.js Library (Client-side EMVCo PromptPay QR Generator) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
     <style>
         body {
             font-family: 'Kanit', sans-serif;
@@ -113,10 +116,16 @@
                 </div>
             </a>
 
-            <a href="index.html" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-semibold text-slate-600 hover:text-blue-600 hover:bg-slate-100 transition-colors">
-                <i class="fas fa-arrow-left text-xs"></i>
-                <span>กลับหน้าหลัก</span>
-            </a>
+            <div class="flex items-center gap-2">
+                <button type="button" id="btn-order-history" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-semibold text-blue-600 bg-blue-50 hover:bg-blue-100 transition-colors">
+                    <i class="fas fa-history text-xs"></i>
+                    <span>ประวัติการจอง</span>
+                </button>
+                <a href="index.html" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-semibold text-slate-600 hover:text-blue-600 hover:bg-slate-100 transition-colors">
+                    <i class="fas fa-arrow-left text-xs"></i>
+                    <span>กลับหน้าหลัก</span>
+                </a>
+            </div>
         </div>
     </header>
 
@@ -466,50 +475,21 @@
                         </div>
                     </div>
 
-                    <!-- PromptPay Quick Pay Link -->
-                    <a id="btn-pay-promptpay" href="payment.html?amount=130" target="_blank" rel="noopener noreferrer"
-                        class="w-full py-2.5 px-3 rounded-xl bg-blue-50 hover:bg-blue-100/80 border border-blue-200 text-blue-700 font-bold text-xs flex items-center justify-between transition-all group">
-                        <span class="flex items-center gap-2">
-                            <i class="fas fa-qrcode text-blue-600 text-sm group-hover:scale-110 transition-transform"></i>
-                            <span id="promptpay-btn-text">สแกนจ่ายพร้อมเพย์ (QR ล็อกยอด ฿130)</span>
-                        </span>
-                        <i class="fas fa-arrow-up-right-from-square text-[10px] text-blue-400"></i>
-                    </a>
-
-                    <!-- Main Action: Copy & Send -->
-                    <button type="button" id="btn-copy-and-open"
+                    <!-- Main Action: Proceed to Payment & Generate Order ID -->
+                    <button type="button" id="btn-proceed-checkout"
                         class="w-full py-4 px-5 rounded-2xl bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white font-bold text-base sm:text-lg shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 active:scale-[0.98] transition-all flex items-center justify-center gap-2.5 group">
-                        <i class="fas fa-paper-plane text-xl group-hover:scale-110 transition-transform"></i>
-                        <span>คัดลอก & ส่งข้อความจองคิว</span>
+                        <i class="fas fa-qrcode text-xl group-hover:scale-110 transition-transform"></i>
+                        <span>สแกนจ่ายเงิน & ออกเลข Order 💳</span>
                     </button>
 
-                    <!-- Secondary Button: Copy Only -->
-                    <div class="flex gap-2">
+                    <!-- Secondary Option: Copy Text -->
+                    <div class="text-center">
                         <button type="button" id="btn-copy-only"
-                            class="flex-1 py-2.5 px-3 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold text-xs transition-colors flex items-center justify-center gap-1.5">
-                            <i class="far fa-copy text-slate-500"></i>
-                            <span>คัดลอกข้อความ</span>
+                            class="w-full py-2.5 px-3 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-600 font-semibold text-xs transition-colors flex items-center justify-center gap-1.5">
+                            <i class="far fa-copy text-slate-400"></i>
+                            <span>คัดลอกข้อความสรุปการจองคิว</span>
                         </button>
-                        <a href="https://line.me/ti/g2/c4n6z-xzaKCXJcKWlGoLYVoxeAxBuZNRcGEg1A?utm_source=invitation&utm_medium=link_copy&utm_campaign=default"
-                            target="_blank" rel="noopener noreferrer"
-                            class="flex-1 py-2.5 px-3 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold text-xs transition-colors flex items-center justify-center gap-1.5">
-                            <i class="fas fa-arrow-up-right-from-square text-slate-500"></i>
-                            <span>เปิด OpenChat</span>
-                        </a>
                     </div>
-
-                    <!-- QR Code Toggle for Desktop Users -->
-                    <details class="text-xs text-slate-500 group">
-                        <summary class="cursor-pointer hover:text-blue-600 flex items-center justify-between py-1 select-none">
-                            <span>เปิดบนคอม? สแกน QR Code เพื่อเข้ากลุ่ม</span>
-                            <i class="fas fa-chevron-down text-[10px] group-open:rotate-180 transition-transform"></i>
-                        </summary>
-                        <div class="mt-3 text-center p-3 bg-slate-50 rounded-xl border border-slate-200">
-                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&color=06c755&bgcolor=ffffff&data=https%3A%2F%2Fline.me%2Fti%2Fg2%2Fc4n6z-xzaKCXJcKWlGoLYVoxeAxBuZNRcGEg1A%3Futm_source%3Dinvitation%26utm_medium%3Dlink_copy%26utm_campaign%3Ddefault"
-                                alt="QR Code LINE OpenChat" class="w-32 h-32 mx-auto rounded-lg shadow-sm mb-2" />
-                            <p class="text-[11px] text-slate-400">สแกนด้วยกล้องมือถือเพื่อเข้ากลุ่ม LINE OpenChat</p>
-                        </div>
-                    </details>
                 </div>
 
             </div>
@@ -533,19 +513,176 @@
     </footer>
 
     <!-- Toast Notification -->
-    <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-slate-900/95 text-white px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-3 backdrop-blur-sm pointer-events-none text-sm font-medium">
+    <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-slate-900/95 text-white px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-3 backdrop-blur-sm pointer-events-none text-sm font-medium transition-all duration-300 opacity-0 translate-y-4">
         <div class="w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs">
             <i class="fas fa-check"></i>
         </div>
         <span id="toast-text">คัดลอกข้อความสำเร็จแล้ว!</span>
     </div>
 
+    <!-- ═══════════════════════════════════════════════════ -->
+    <!-- CHECKOUT MODAL (Step 2: สแกนจ่าย & แนบสลิป) -->
+    <!-- ═══════════════════════════════════════════════════ -->
+    <div id="checkout-modal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl relative overflow-hidden max-h-[90vh] overflow-y-auto">
+            <!-- Close Button -->
+            <button type="button" id="close-checkout-modal" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 flex items-center justify-center transition">
+                <i class="fas fa-xmark text-lg"></i>
+            </button>
+
+            <!-- Order Header -->
+            <div class="text-center mb-6">
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-xs font-bold mb-2">
+                    <i class="fas fa-receipt"></i> ชำระเงิน & ยืนยันคำสั่งซื้อ
+                </span>
+                <div class="flex items-center justify-center gap-2">
+                    <h3 class="text-2xl font-extrabold text-slate-800" id="checkout-order-id">#SP-20260919-0000</h3>
+                    <button type="button" id="btn-copy-checkout-order-id" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-blue-50 text-slate-600 hover:text-blue-600 text-xs font-semibold transition flex items-center gap-1" title="คัดลอกรหัสออเดอร์">
+                        <i class="far fa-copy text-xs"></i>
+                        <span>คัดลอก</span>
+                    </button>
+                </div>
+                <p class="text-xs text-slate-500 mt-1">สแกนจ่ายเงินผ่าน PromptPay QR และแนบสลิปเพื่อบันทึกจองคิว</p>
+            </div>
+
+            <!-- QR Code Card -->
+            <div class="bg-gradient-to-b from-blue-50 to-cyan-50 rounded-2xl p-5 border border-blue-100 text-center mb-5">
+                <div class="text-xs font-semibold text-slate-600 mb-1">ยอดชำระเงินสุทธิ</div>
+                <div class="text-3xl font-extrabold text-blue-600 mb-2" id="checkout-total-price">130฿</div>
+                <div class="text-[11px] text-slate-500 font-mono mb-3">
+                    พร้อมเพย์: 066-132-3388 (นาย ธนกร ชูวงศ์วาลย์)
+                </div>
+                
+                <div class="relative w-52 h-52 mx-auto bg-white p-2 rounded-2xl shadow-md mb-3 border border-slate-200 flex items-center justify-center">
+                    <div id="checkout-qr-container" class="w-48 h-48 flex items-center justify-center overflow-hidden rounded-xl bg-white">
+                        <img id="checkout-qr-img" src="Img/pay/pay.jpg" alt="PromptPay QR Code นาย ธนกร ชูวงศ์วาลย์" class="w-full h-full object-contain rounded-xl" />
+                    </div>
+                </div>
+                
+                <p class="text-[11px] text-slate-500">
+                    <i class="fas fa-shield-alt text-blue-500"></i> สแกนด้วยแอปธนาคารใดก็ได้ (พร้อมเพย์)
+                </p>
+            </div>
+
+            <!-- Slip Upload Input -->
+            <div class="space-y-2 mb-6">
+                <label class="block text-xs font-bold text-slate-700">
+                    แนบหลักฐานการโอนเงิน (สลิป) <span class="text-slate-400 font-normal">(ไม่บังคับ)</span>
+                </label>
+                <div class="relative">
+                    <input type="file" id="slip-file-input" accept="image/*" class="sr-only" />
+                    <label for="slip-file-input" id="slip-dropzone" class="flex flex-col items-center justify-center p-4 border-2 border-dashed border-slate-300 hover:border-blue-500 rounded-2xl bg-slate-50 hover:bg-blue-50/50 cursor-pointer transition text-center group">
+                        <i class="fas fa-cloud-arrow-up text-2xl text-slate-400 group-hover:text-blue-500 mb-1.5 transition-colors"></i>
+                        <span id="slip-filename" class="text-xs font-semibold text-slate-600 group-hover:text-blue-600">คลิกเลือกรูปภาพสลิปโอนเงิน</span>
+                        <span class="text-[10px] text-slate-400 mt-0.5">รองรับไฟล์ JPG, PNG</span>
+                    </label>
+                </div>
+                <!-- Image Preview Thumbnail -->
+                <div id="slip-preview-container" class="hidden text-center mt-3">
+                    <img id="slip-preview-img" src="" alt="สลิปโอนเงิน" class="max-h-40 mx-auto rounded-xl shadow-sm border border-slate-200" />
+                </div>
+            </div>
+
+            <!-- Confirm Button -->
+            <button type="button" id="btn-submit-order" class="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white font-bold text-base shadow-lg shadow-blue-500/25 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+                <i class="fas fa-check-circle text-lg"></i>
+                <span>ยืนยันการโอนเงิน & จองคิว</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════ -->
+    <!-- RECEIPT MODAL (Step 3: ใบเสร็จ / ยืนยันสำเร็จ) -->
+    <!-- ═══════════════════════════════════════════════════ -->
+    <div id="receipt-modal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl relative overflow-hidden text-center max-h-[90vh] overflow-y-auto">
+            <!-- Success Icon Header -->
+            <div class="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-3xl mx-auto mb-4 shadow-lg shadow-emerald-100">
+                <i class="fas fa-check"></i>
+            </div>
+            <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200 text-xs font-bold mb-2">
+                🟡 รอตรวจสอบการชำระเงิน
+            </span>
+            <h3 class="text-2xl font-extrabold text-slate-800">จองคิวสำเร็จแล้ว!</h3>
+            <p class="text-xs text-slate-500 mt-1 mb-6">บันทึกรหัสออเดอร์นี้ไว้สำหรับตรวจสอบการรับผ้า</p>
+
+            <!-- Order Card -->
+            <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200 text-left text-xs space-y-2 mb-6">
+                <div class="flex justify-between items-center pb-2 border-b border-slate-200">
+                    <span class="text-slate-400 font-medium">รหัสออเดอร์:</span>
+                    <span class="font-extrabold text-blue-600 text-sm" id="receipt-order-id">#SP-XXXXXX</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-slate-500">ชื่อผู้จอง:</span>
+                    <span class="font-semibold text-slate-800" id="receipt-name">-</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-slate-500">เบอร์โทรศัพท์:</span>
+                    <span class="font-semibold text-slate-800" id="receipt-phone">-</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-slate-500">จุดรับ-ส่ง:</span>
+                    <span class="font-semibold text-slate-800" id="receipt-dorm">-</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-slate-500">เครื่องซัก/อบ:</span>
+                    <span class="font-semibold text-slate-800" id="receipt-service">-</span>
+                </div>
+                <div class="flex justify-between pt-2 border-t border-slate-200">
+                    <span class="font-bold text-slate-700">ยอดชำระสุทธิ:</span>
+                    <span class="font-extrabold text-base text-blue-600" id="receipt-total">0฿</span>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="space-y-2.5">
+                <a id="btn-track-order-link" href="track.html" class="w-full py-3 px-4 rounded-xl bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-700 font-bold text-xs shadow-xs transition flex items-center justify-center gap-2">
+                    <i class="fas fa-truck-fast text-blue-600"></i>
+                    <span>ติดตามสถานะผ้าเรียลไทม์ 🚚</span>
+                </a>
+                <button type="button" id="btn-copy-receipt" class="w-full py-3 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs flex items-center justify-center gap-2 transition">
+                    <i class="far fa-copy"></i>
+                    <span>คัดลอกรายละเอียดใบเสร็จ</span>
+                </button>
+                <a href="index.html" class="block w-full py-3 px-4 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-bold text-xs shadow-md shadow-blue-500/20 hover:scale-[1.02] active:scale-[0.98] transition text-center">
+                    กลับสู่หน้าหลัก
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════ -->
+    <!-- ORDER HISTORY MODAL (Item 1) -->
+    <!-- ═══════════════════════════════════════════════════ -->
+    <div id="history-modal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl relative overflow-hidden max-h-[85vh] overflow-y-auto">
+            <!-- Close Button -->
+            <button type="button" id="close-history-modal" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 flex items-center justify-center transition">
+                <i class="fas fa-xmark text-lg"></i>
+            </button>
+
+            <!-- Header -->
+            <div class="flex items-center gap-2.5 mb-5 pb-4 border-b border-slate-100">
+                <div class="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg font-bold">
+                    <i class="fas fa-history"></i>
+                </div>
+                <div>
+                    <h3 class="text-xl font-extrabold text-slate-800">ประวัติการจองคิวของฉัน</h3>
+                    <p class="text-xs text-slate-400">รายการจองคิวที่บันทึกไว้ในอุปกรณ์นี้</p>
+                </div>
+            </div>
+
+            <!-- Orders Container -->
+            <div id="history-list-container" class="space-y-3">
+                <!-- Dynamic render from localStorage -->
+            </div>
+        </div>
+    </div>
+
     <!-- Booking Logic Script -->
     <script src="pricing.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const LINE_URL = "https://line.me/ti/g2/c4n6z-xzaKCXJcKWlGoLYVoxeAxBuZNRcGEg1A?utm_source=invitation&utm_medium=link_copy&utm_campaign=default";
-
             // State
             const state = {
                 name: localStorage.getItem('sp_name') || '',
@@ -555,7 +692,9 @@
                 dryerKey: 'd15',
                 detergentKey: 'own',
                 zoneKey: 'off',
-                notes: ''
+                notes: '',
+                currentOrderId: '',
+                slipDataUrl: ''
             };
 
             // DOM Elements
@@ -577,10 +716,31 @@
             const billZoneLabel = document.getElementById('bill-zone-label');
             const billZonePrice = document.getElementById('bill-zone-price');
 
-            const btnCopyAndOpen = document.getElementById('btn-copy-and-open');
+            const btnProceedCheckout = document.getElementById('btn-proceed-checkout');
             const btnCopyOnly = document.getElementById('btn-copy-only');
             const toast = document.getElementById('toast');
             const toastText = document.getElementById('toast-text');
+
+            // Modals & Elements
+            const checkoutModal = document.getElementById('checkout-modal');
+            const closeCheckoutModal = document.getElementById('close-checkout-modal');
+            const checkoutOrderId = document.getElementById('checkout-order-id');
+            const checkoutTotalPrice = document.getElementById('checkout-total-price');
+            const checkoutQrImg = document.getElementById('checkout-qr-img');
+            const slipFileInput = document.getElementById('slip-file-input');
+            const slipFilename = document.getElementById('slip-filename');
+            const slipPreviewContainer = document.getElementById('slip-preview-container');
+            const slipPreviewImg = document.getElementById('slip-preview-img');
+            const btnSubmitOrder = document.getElementById('btn-submit-order');
+
+            const receiptModal = document.getElementById('receipt-modal');
+            const receiptOrderId = document.getElementById('receipt-order-id');
+            const receiptName = document.getElementById('receipt-name');
+            const receiptPhone = document.getElementById('receipt-phone');
+            const receiptDorm = document.getElementById('receipt-dorm');
+            const receiptService = document.getElementById('receipt-service');
+            const receiptTotal = document.getElementById('receipt-total');
+            const btnCopyReceipt = document.getElementById('btn-copy-receipt');
 
             // Restore from localStorage
             if (state.name) inputName.value = state.name;
@@ -697,16 +857,6 @@
                 if (billZonePrice) {
                     billZonePrice.textContent = calc.zoneSurcharge > 0 ? `+${calc.zoneSurcharge}฿` : 'ฟรี';
                 }
-
-                // Update PromptPay link
-                const btnPayPromptPay = document.getElementById('btn-pay-promptpay');
-                const promptPayBtnText = document.getElementById('promptpay-btn-text');
-                if (btnPayPromptPay) {
-                    btnPayPromptPay.href = `payment.html?amount=${calc.total}`;
-                }
-                if (promptPayBtnText) {
-                    promptPayBtnText.textContent = `สแกนจ่ายพร้อมเพย์ (QR ล็อกยอด ฿${calc.total})`;
-                }
             }
 
             // Toast helper
@@ -714,10 +864,12 @@
             function showToast(msg) {
                 if (!toast) return;
                 if (toastText) toastText.textContent = msg;
-                toast.classList.add('show');
+                toast.classList.remove('opacity-0', 'translate-y-4');
+                toast.classList.add('opacity-100', 'translate-y-0');
                 clearTimeout(toastTimeout);
                 toastTimeout = setTimeout(() => {
-                    toast.classList.remove('show');
+                    toast.classList.remove('opacity-100', 'translate-y-0');
+                    toast.classList.add('opacity-0', 'translate-y-4');
                 }, 3000);
             }
 
@@ -728,14 +880,12 @@
                         await navigator.clipboard.writeText(text);
                         return true;
                     }
-                    // Fallback
                     const ta = document.createElement('textarea');
                     ta.value = text;
                     ta.style.position = 'fixed';
                     ta.style.left = '-9999px';
                     document.body.appendChild(ta);
                     ta.focus();
-                    ta.select();
                     const successful = document.execCommand('copy');
                     document.body.removeChild(ta);
                     return successful;
@@ -744,23 +894,313 @@
                     return false;
                 }
             }
+            // PromptPay EMVCo Payload & Dynamic QR Generator
+            function crc16(data) {
+                let crc = 0xFFFF;
+                for (let i = 0; i < data.length; i++) {
+                    crc ^= data.charCodeAt(i) << 8;
+                    for (let j = 0; j < 8; j++) {
+                        if (crc & 0x8000) {
+                            crc = (crc << 1) ^ 0x1021;
+                        } else {
+                            crc = crc << 1;
+                        }
+                    }
+                }
+                return ('0000' + (crc & 0xFFFF).toString(16).toUpperCase()).slice(-4);
+            }
 
-            // Copy & Open LINE Button
-            btnCopyAndOpen.addEventListener('click', async () => {
-                const msg = buildMessage();
-                const ok = await copyText(msg);
-                showToast(ok ? '📋 คัดลอกข้อความแล้ว! กำลังเปิด LINE...' : 'เปิด LINE OpenChat...');
-                setTimeout(() => {
-                    window.open(LINE_URL, '_blank', 'noopener,noreferrer');
-                }, 400);
+            function generatePromptPayPayload(target, amount) {
+                const cleanTarget = target.replace(/\D/g, '');
+                let targetFormatted = '';
+                let targetTag = '';
+
+                if (cleanTarget.length === 10) {
+                    targetFormatted = '0066' + cleanTarget.substring(1);
+                    targetTag = '01';
+                } else if (cleanTarget.length === 13) {
+                    targetFormatted = cleanTarget;
+                    targetTag = '02';
+                } else {
+                    return null;
+                }
+
+                const aid = 'A000000677010111';
+                const tag29_aid = '00' + ('0' + aid.length).slice(-2) + aid;
+                const tag29_target = targetTag + ('0' + targetFormatted.length).slice(-2) + targetFormatted;
+                const tag29_val = tag29_aid + tag29_target;
+                const tag29 = '29' + ('0' + tag29_val.length).slice(-2) + tag29_val;
+
+                let poi = '010211';
+                let amountTag = '';
+                if (amount !== undefined && amount !== null && Number(amount) > 0) {
+                    poi = '010212';
+                    const amtStr = Number(amount).toFixed(2);
+                    amountTag = '54' + ('0' + amtStr.length).slice(-2) + amtStr;
+                }
+
+                const country = '5802TH';
+                const currency = '5303764';
+
+                const raw = '000201' + poi + tag29 + country + currency + amountTag + '6304';
+                return raw + crc16(raw);
+            }
+
+            function updateCheckoutQrCode(amount) {
+                const qrContainer = document.getElementById('checkout-qr-container');
+                if (!qrContainer) return;
+                try {
+                    const promptPayId = '0661323388';
+                    const payload = generatePromptPayPayload(promptPayId, amount);
+                    if (!payload || typeof QRCode === 'undefined') {
+                        qrContainer.innerHTML = '<img id="checkout-qr-img" src="Img/pay/pay.jpg" alt="PromptPay QR Code" class="w-full h-full object-contain rounded-xl" />';
+                        return;
+                    }
+                    qrContainer.innerHTML = '';
+                    new QRCode(qrContainer, {
+                        text: payload,
+                        width: 192,
+                        height: 192,
+                        colorDark: "#0b2341",
+                        colorLight: "#ffffff",
+                        correctLevel: QRCode.CorrectLevel.M
+                    });
+                } catch (err) {
+                    console.error('Error generating dynamic QR:', err);
+                    qrContainer.innerHTML = '<img id="checkout-qr-img" src="Img/pay/pay.jpg" alt="PromptPay QR Code" class="w-full h-full object-contain rounded-xl" />';
+                }
+            }
+
+            // Generate Order ID helper
+            function generateOrderId() {
+                const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+                const randomCode = Math.floor(1000 + Math.random() * 9000);
+                return `SP-${dateStr}-${randomCode}`;
+            }
+
+            // Handle Proceed Checkout Button
+            btnProceedCheckout.addEventListener('click', () => {
+                if (!state.name.trim()) {
+                    inputName.focus();
+                    showToast('⚠️ กรุณากรอก ชื่อ/ชื่อเล่น ก่อนดำเนินการ');
+                    return;
+                }
+                if (!state.phone.trim()) {
+                    inputPhone.focus();
+                    showToast('⚠️ กรุณากรอก เบอร์โทรศัพท์ ก่อนดำเนินการ');
+                    return;
+                }
+                if (!state.dorm.trim()) {
+                    inputDorm.focus();
+                    showToast('⚠️ กรุณากรอก ชื่อหอพัก/จุดนัดรับ ก่อนดำเนินการ');
+                    return;
+                }
+
+                const calc = calculateSukpaPrice({
+                    sizeKey: state.sizeKey,
+                    dryerKey: state.dryerKey,
+                    detergentKey: state.detergentKey,
+                    zoneKey: state.zoneKey
+                });
+
+                state.currentOrderId = generateOrderId();
+                state.slipDataUrl = '';
+
+                if (checkoutOrderId) checkoutOrderId.textContent = `#${state.currentOrderId}`;
+                if (checkoutTotalPrice) checkoutTotalPrice.textContent = `${calc.total}฿`;
+
+                // Render Dynamic PromptPay QR Code with locked amount
+                updateCheckoutQrCode(calc.total);
+
+                // Reset slip inputs
+                if (slipFileInput) slipFileInput.value = '';
+                if (slipFilename) slipFilename.textContent = 'คลิกเลือกรูปภาพสลิปโอนเงิน';
+                if (slipPreviewContainer) slipPreviewContainer.classList.add('hidden');
+
+                if (checkoutModal) checkoutModal.classList.remove('hidden');
             });
 
-            // Copy Only Button
-            btnCopyOnly.addEventListener('click', async () => {
-                const msg = buildMessage();
-                const ok = await copyText(msg);
-                showToast(ok ? '📋 คัดลอกข้อความจองคิวเรียบร้อย!' : 'ไม่สามารถคัดลอกได้');
-            });
+            // Close modal handler
+            if (closeCheckoutModal) {
+                closeCheckoutModal.addEventListener('click', () => {
+                    if (checkoutModal) checkoutModal.classList.add('hidden');
+                });
+            }
+
+            // Slip file selection preview
+            if (slipFileInput) {
+                slipFileInput.addEventListener('change', (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+
+                    if (slipFilename) slipFilename.textContent = file.name;
+
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        state.slipDataUrl = event.target.result;
+                        if (slipPreviewImg) slipPreviewImg.src = event.target.result;
+                        if (slipPreviewContainer) slipPreviewContainer.classList.remove('hidden');
+                    };
+                    reader.readAsDataURL(file);
+                });
+            }
+
+            // Submit Booking Order Handler
+            if (btnSubmitOrder) {
+                btnSubmitOrder.addEventListener('click', () => {
+                    const calc = calculateSukpaPrice({
+                        sizeKey: state.sizeKey,
+                        dryerKey: state.dryerKey,
+                        detergentKey: state.detergentKey,
+                        zoneKey: state.zoneKey
+                    });
+
+                    const orderRecord = {
+                        orderId: state.currentOrderId,
+                        name: state.name,
+                        phone: state.phone,
+                        dorm: state.dorm,
+                        notes: state.notes,
+                        serviceName: `${calc.sizeInfo.name} + ${calc.dryerInfo.name}`,
+                        sizeKey: state.sizeKey,
+                        dryerKey: state.dryerKey,
+                        detergentKey: state.detergentKey,
+                        zoneKey: state.zoneKey,
+                        sizePrice: calc.sizePrice,
+                        dryerPrice: calc.dryerPrice,
+                        detergentSurcharge: calc.detergentSurcharge,
+                        zoneSurcharge: calc.zoneSurcharge,
+                        total: calc.total,
+                        slipDataUrl: state.slipDataUrl,
+                        createdAt: new Date().toISOString(),
+                        status: 'pending'
+                    };
+
+                    // Save order to localStorage
+                    const existingOrders = JSON.parse(localStorage.getItem('sp_orders') || '[]');
+                    existingOrders.unshift(orderRecord);
+                    localStorage.setItem('sp_orders', JSON.stringify(existingOrders));
+
+                    // Close checkout modal
+                    if (checkoutModal) checkoutModal.classList.add('hidden');
+
+                    // Populate Receipt Modal
+                    if (receiptOrderId) receiptOrderId.textContent = `#${orderRecord.orderId}`;
+                    if (receiptName) receiptName.textContent = orderRecord.name;
+                    if (receiptPhone) receiptPhone.textContent = orderRecord.phone;
+                    if (receiptDorm) receiptDorm.textContent = orderRecord.dorm;
+                    if (receiptService) receiptService.textContent = orderRecord.serviceName;
+                    const btnTrackOrderLink = document.getElementById('btn-track-order-link');
+                    if (btnTrackOrderLink) btnTrackOrderLink.href = `track.html?id=${orderRecord.orderId}`;
+
+                    // Show Receipt Modal
+                    if (receiptModal) receiptModal.classList.remove('hidden');
+                });
+            }
+
+            // Copy Receipt Button Handler
+            if (btnCopyReceipt) {
+                btnCopyReceipt.addEventListener('click', async () => {
+                    const calc = calculateSukpaPrice({
+                        sizeKey: state.sizeKey,
+                        dryerKey: state.dryerKey,
+                        detergentKey: state.detergentKey,
+                        zoneKey: state.zoneKey
+                    });
+
+                    const receiptText =
+                        `🧾 ใบเสร็จรับเงินจองคิว — ซักป่ะ? 🫧\n` +
+                        `รหัสออเดอร์: #${state.currentOrderId}\n` +
+                        `สถานะ: 🟡 รอตรวจสอบการชำระเงิน\n` +
+                        `ชื่อผู้จอง: ${state.name}\n` +
+                        `เบอร์โทรศัพท์: ${state.phone}\n` +
+                        `หอพัก/จุดรับส่ง: ${state.dorm}\n` +
+                        `บริการ: ${calc.sizeInfo.name} + ${calc.dryerInfo.name}\n` +
+                        `ยอดรวมสุทธิ: ${calc.total} บาท\n` +
+                        `ขอบคุณครับ/ค่ะ 🙏`;
+
+                    const ok = await copyText(receiptText);
+                    showToast(ok ? '📋 คัดลอกรายละเอียดใบเสร็จแล้ว!' : 'คัดลอกไม่สำเร็จ');
+                });
+            }
+
+            // Copy Only Button (Secondary)
+            if (btnCopyOnly) {
+                btnCopyOnly.addEventListener('click', async () => {
+                    const msg = buildMessage();
+                    const ok = await copyText(msg);
+                    showToast(ok ? '📋 คัดลอกข้อความสรุปเรียบร้อย!' : 'ไม่สามารถคัดลอกได้');
+                });
+            }
+
+            // 1-Click Copy Order ID Button (Item 3)
+            const btnCopyCheckoutOrderId = document.getElementById('btn-copy-checkout-order-id');
+            if (btnCopyCheckoutOrderId) {
+                btnCopyCheckoutOrderId.addEventListener('click', async () => {
+                    if (!state.currentOrderId) return;
+                    const ok = await copyText(`#${state.currentOrderId}`);
+                    showToast(ok ? `📋 คัดลอกรหัสออเดอร์ #${state.currentOrderId} แล้ว!` : 'คัดลอกไม่สำเร็จ');
+                });
+            }
+
+            // History Modal Elements (Item 1)
+            const btnOrderHistory = document.getElementById('btn-order-history');
+            const historyModal = document.getElementById('history-modal');
+            const closeHistoryModal = document.getElementById('close-history-modal');
+            const historyListContainer = document.getElementById('history-list-container');
+
+            function renderHistoryList() {
+                if (!historyListContainer) return;
+                const orders = JSON.parse(localStorage.getItem('sp_orders') || '[]');
+                if (orders.length === 0) {
+                    historyListContainer.innerHTML = `
+                        <div class="text-center py-8 text-slate-400">
+                            <div class="text-4xl mb-2">📜</div>
+                            <p class="text-sm font-semibold">ยังไม่มีประวัติการจองคิว</p>
+                            <p class="text-xs text-slate-400 mt-0.5">จองคิวบนเว็บเพื่อบันทึกประวัติไว้ดูย้อนหลังที่นี่</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                historyListContainer.innerHTML = orders.map(ord => {
+                    const dateFormatted = new Date(ord.createdAt).toLocaleString('th-TH', {
+                        year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+                    });
+                    return `
+                        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 hover:border-blue-200 transition">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="font-extrabold text-blue-600 text-sm">#${ord.orderId}</span>
+                                <span class="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">
+                                    🟡 รอตรวจสอบชำระเงิน
+                                </span>
+                            </div>
+                            <div class="text-xs text-slate-600 space-y-1">
+                                <div><span class="text-slate-400">ชื่อ:</span> ${ord.name} (${ord.phone})</div>
+                                <div><span class="text-slate-400">จุดส่ง:</span> ${ord.dorm}</div>
+                                <div><span class="text-slate-400">บริการ:</span> ${ord.serviceName}</div>
+                            </div>
+                            <div class="mt-3 pt-2.5 border-t border-slate-200/60 flex items-center justify-between text-xs">
+                                <span class="text-[11px] text-slate-400">${dateFormatted}</span>
+                                <span class="font-extrabold text-slate-800 text-sm">฿${ord.total}</span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            if (btnOrderHistory) {
+                btnOrderHistory.addEventListener('click', () => {
+                    renderHistoryList();
+                    if (historyModal) historyModal.classList.remove('hidden');
+                });
+            }
+
+            if (closeHistoryModal) {
+                closeHistoryModal.addEventListener('click', () => {
+                    if (historyModal) historyModal.classList.add('hidden');
+                });
+            }
 
             // Initial render
             render();
