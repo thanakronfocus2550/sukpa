@@ -504,7 +504,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (checklistStatusText && checklistStatusBar) {
       if (checkedCount === 0) {
-        checklistStatusText.textContent = 'เช็คครบ 4 ข้อแล้วกดสร้างข้อความจองคิวด้านล่างได้เลยครับ!';
+        checklistStatusText.textContent = 'เช็คครบ 4 ข้อแล้วกดจองคิวผ่านเว็บด้านล่างได้เลยครับ!';
         if (checklistStatusIcon) checklistStatusIcon.textContent = '📋';
         checklistStatusBar.className = 'inline-flex items-center gap-2.5 px-5 py-2.5 rounded-2xl bg-slate-100 text-slate-600 text-xs font-semibold transition-all duration-300';
       } else if (checkedCount < total) {
@@ -515,7 +515,7 @@ document.addEventListener('DOMContentLoaded', () => {
         checklistStatusText.textContent = '✨ เช็คครบ 4 ข้อแล้ว ผ้าพร้อมส่งซักเรียบร้อยครับ!';
         if (checklistStatusIcon) checklistStatusIcon.textContent = '🎉';
         checklistStatusBar.className = 'inline-flex items-center gap-2.5 px-5 py-2.5 rounded-2xl bg-green-50 text-green-700 border border-green-200 shadow-sm text-xs font-bold transition-all duration-300';
-        showToast('ยอดเยี่ยม! เช็คครบทุกข้อแล้ว ไปสร้างข้อความจองคิวกันได้เลย 🧺✨');
+        showToast('ยอดเยี่ยม! เช็คครบทุกข้อแล้ว ไปจองคิวผ่านเว็บกันได้เลย 🧺✨');
       }
     }
   }
