@@ -40,7 +40,8 @@
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 
-    <!-- Static QR Code from bank (pay.jpg) - no JS library needed -->
+    <!-- QRCode.js Library (Client-side EMVCo PromptPay QR Generator) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <style>
         body {
@@ -63,6 +64,15 @@
         #toast.show {
             transform: translateY(0);
             opacity: 1;
+        }
+
+        #qrcode-container img,
+        #qrcode-container canvas {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+            border-radius: 8px;
         }
     </style>
 </head>
@@ -148,15 +158,17 @@
                     </div>
                 </div>
 
-                <!-- QR Code Static Image (จากธนาคาร) -->
+                <!-- QR Code Dynamic Container -->
                 <div class="relative py-2 flex flex-col items-center justify-center">
-                    <div class="p-3 bg-white border-2 border-slate-200/80 rounded-2xl shadow-inner inline-block">
-                        <img id="qr-img" src="Img/pay/pay.jpg" alt="QR Code พร้อมเพย์ นาย ธนกร ชูวงศ์วาลย์"
-                            class="w-52 h-52 object-contain rounded-lg" />
+                    <div class="p-3 bg-white border-2 border-slate-200/80 rounded-2xl shadow-inner inline-flex items-center justify-center min-h-[232px] min-w-[232px]">
+                        <div id="qrcode-container" class="w-52 h-52 flex items-center justify-center overflow-hidden rounded-lg bg-white">
+                            <img id="qr-img" src="Img/pay/pay.jpg" alt="QR Code พร้อมเพย์ นาย ธนกร ชูวงศ์วาลย์"
+                                class="w-52 h-52 object-contain rounded-lg" />
+                        </div>
                     </div>
-                    <div class="text-[10px] text-slate-400 mt-2 flex items-center justify-center gap-1.5">
-                        <i class="fas fa-shield-halved text-green-500 text-xs"></i>
-                        <span>QR Code จากธนาคาร • มาตรฐาน Thai QR Payment</span>
+                    <div class="text-[11px] text-slate-500 mt-2 flex items-center justify-center gap-1.5 font-medium">
+                        <i class="fas fa-shield-halved text-emerald-500 text-xs"></i>
+                        <span id="qr-status-text">QR ล็อกยอดเงินอัตโนมัติ • มาตรฐาน Thai QR Payment</span>
                     </div>
                 </div>
             </div>
@@ -267,8 +279,112 @@
             const copyBtnLabel = document.getElementById('copy-btn-label');
             const customAmountInput = document.getElementById('custom-amount-input');
             const btnApplyCustom = document.getElementById('btn-apply-custom');
+            const qrcodeContainer = document.getElementById('qrcode-container');
+            const qrStatusText = document.getElementById('qr-status-text');
+            const btnDownloadQr = document.getElementById('btn-download-qr');
             const toast = document.getElementById('toast');
             const toastText = document.getElementById('toast-text');
+
+            // ─────────────────────────────────────────────
+            // EMVCo PromptPay Generator (BOT Standard)
+            // ─────────────────────────────────────────────
+            function crc16(data) {
+                let crc = 0xFFFF;
+                for (let i = 0; i < data.length; i++) {
+                    crc ^= (data.charCodeAt(i) << 8);
+                    for (let j = 0; j < 8; j++) {
+                        if ((crc & 0x8000) !== 0) {
+                            crc = ((crc << 1) ^ 0x1021) & 0xFFFF;
+                        } else {
+                            crc = (crc << 1) & 0xFFFF;
+                        }
+                    }
+                }
+                return ('0000' + crc.toString(16).toUpperCase()).slice(-4);
+            }
+
+            function generatePromptPayPayload(target, amount) {
+                const cleanTarget = target.replace(/\D/g, '');
+                let targetFormatted = '';
+                let targetTag = '';
+
+                if (cleanTarget.length === 10) {
+                    targetFormatted = '0066' + cleanTarget.substring(1);
+                    targetTag = '01';
+                } else if (cleanTarget.length === 13) {
+                    targetFormatted = cleanTarget;
+                    targetTag = '02';
+                } else {
+                    return null;
+                }
+
+                const aid = 'A000000677010111';
+                const tag29_aid = '00' + ('0' + aid.length).slice(-2) + aid;
+                const tag29_target = targetTag + ('0' + targetFormatted.length).slice(-2) + targetFormatted;
+                const tag29_val = tag29_aid + tag29_target;
+                const tag29 = '29' + ('0' + tag29_val.length).slice(-2) + tag29_val;
+
+                let poi = '010211';
+                let amountTag = '';
+                if (amount !== undefined && amount !== null && Number(amount) > 0) {
+                    poi = '010212';
+                    const amtStr = Number(amount).toFixed(2);
+                    amountTag = '54' + ('0' + amtStr.length).slice(-2) + amtStr;
+                }
+
+                const country = '5802TH';
+                const currency = '5303764';
+
+                const raw = '000201' + poi + tag29 + country + currency + amountTag + '6304';
+                return raw + crc16(raw);
+            }
+
+            function updateQrCode(amount) {
+                if (!qrcodeContainer) return;
+                try {
+                    const payload = generatePromptPayPayload(promptPayId, amount);
+                    if (!payload || typeof QRCode === 'undefined') {
+                        // Fallback to static image
+                        qrcodeContainer.innerHTML = '<img id="qr-img" src="Img/pay/pay.jpg" alt="QR Code พร้อมเพย์ นาย ธนกร ชูวงศ์วาลย์" class="w-52 h-52 object-contain rounded-lg" />';
+                        if (qrStatusText) qrStatusText.textContent = 'QR Code จากธนาคาร • กรุณาระบุยอดเงินในแอป';
+                        if (btnDownloadQr) {
+                            btnDownloadQr.href = 'Img/pay/pay.jpg';
+                            btnDownloadQr.download = 'sukpa-promptpay-qr.jpg';
+                        }
+                        return;
+                    }
+
+                    qrcodeContainer.innerHTML = '';
+                    new QRCode(qrcodeContainer, {
+                        text: payload,
+                        width: 208,
+                        height: 208,
+                        colorDark: "#0b2341",
+                        colorLight: "#ffffff",
+                        correctLevel: QRCode.CorrectLevel.M
+                    });
+
+                    if (qrStatusText) {
+                        qrStatusText.textContent = `QR ล็อกยอด ฿${amount.toFixed(2)} อัตโนมัติ • มาตรฐาน Thai QR`;
+                    }
+
+                    // Sync download button with generated QR
+                    setTimeout(() => {
+                        const canvas = qrcodeContainer.querySelector('canvas');
+                        const img = qrcodeContainer.querySelector('img');
+                        if (canvas) {
+                            btnDownloadQr.href = canvas.toDataURL('image/png');
+                            btnDownloadQr.download = `PromptPay-Sukpa-฿${amount.toFixed(0)}.png`;
+                        } else if (img && img.src) {
+                            btnDownloadQr.href = img.src;
+                            btnDownloadQr.download = `PromptPay-Sukpa-฿${amount.toFixed(0)}.png`;
+                        }
+                    }, 100);
+                } catch (err) {
+                    console.error('Error generating QR code:', err);
+                    qrcodeContainer.innerHTML = '<img id="qr-img" src="Img/pay/pay.jpg" alt="QR Code พร้อมเพย์ นาย ธนกร ชูวงศ์วาลย์" class="w-52 h-52 object-contain rounded-lg" />';
+                }
+            }
 
             // Thai Baht Text Helper (Simplified for standard laundry rates)
             function thaiBahtText(num) {
@@ -321,6 +437,9 @@
                     formattedId = `${cleanId.slice(0, 1)}-${cleanId.slice(1, 5)}-${cleanId.slice(5, 10)}-${cleanId.slice(10, 12)}-${cleanId.slice(12)}`;
                 }
                 displayPromptpayId.textContent = `พร้อมเพย์: ${formattedId} (นาย ธนกร ชูวงศ์วาลย์)`;
+
+                // Update Dynamic QR Code
+                updateQrCode(currentAmount);
             }
 
             // ─────────────────────────────────────────────
@@ -367,6 +486,21 @@
                     console.error('Copy failed', err);
                 }
             });
+
+            // Download QR Handler
+            if (btnDownloadQr) {
+                btnDownloadQr.addEventListener('click', () => {
+                    const canvas = qrcodeContainer.querySelector('canvas');
+                    const img = qrcodeContainer.querySelector('img');
+                    if (canvas) {
+                        btnDownloadQr.href = canvas.toDataURL('image/png');
+                        btnDownloadQr.download = `PromptPay-Sukpa-฿${currentAmount.toFixed(0)}.png`;
+                    } else if (img && img.src && !img.src.endsWith('pay.jpg')) {
+                        btnDownloadQr.href = img.src;
+                        btnDownloadQr.download = `PromptPay-Sukpa-฿${currentAmount.toFixed(0)}.png`;
+                    }
+                });
+            }
 
             // Toast Helper
             let toastTimer = null;
