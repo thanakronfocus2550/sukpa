@@ -127,7 +127,86 @@ const SUKPA_PRICING = {
             fullText: 'ผ้าทั่วไป',
         },
     },
+
+    // คูปองส่วนลดตั้งต้น
+    coupons: {
+        'WELCOME10': { code: 'WELCOME10', type: 'flat', amount: 10, label: 'ส่วนลดต้อนรับ 10฿' },
+        'SUKPA20': { code: 'SUKPA20', type: 'flat', amount: 20, label: 'ส่วนลดพิเศษ 20฿' },
+        'FREEDRY': { code: 'FREEDRY', type: 'flat', amount: 50, label: 'ส่วนลดค่าอบแห้ง 50฿' },
+        'FREEDELIVERY': { code: 'FREEDELIVERY', type: 'flat', amount: 40, label: 'ฟรีค่าจัดส่ง (สะสมครบ 10 ครั้ง)' },
+        'STUDENT10': { code: 'STUDENT10', type: 'percent', amount: 10, label: 'ส่วนลดนักศึกษา 10%' },
+    }
 };
+
+/**
+ * ดึงรายการคูปองส่วนลดทั้งหมด (รวมคูปองที่ Admin เพิ่มใหม่)
+ */
+function getSukpaCoupons() {
+    const defaultCoupons = {
+        'WELCOME10': { code: 'WELCOME10', type: 'flat', amount: 10, label: 'ส่วนลดต้อนรับ 10฿' },
+        'SUKPA20': { code: 'SUKPA20', type: 'flat', amount: 20, label: 'ส่วนลดพิเศษ 20฿' },
+        'FREEDRY': { code: 'FREEDRY', type: 'flat', amount: 50, label: 'ส่วนลดค่าอบแห้ง 50฿' },
+        'FREEDELIVERY': { code: 'FREEDELIVERY', type: 'flat', amount: 40, label: 'ฟรีค่าจัดส่ง (สะสมครบ 10 ครั้ง)' },
+        'STUDENT10': { code: 'STUDENT10', type: 'percent', amount: 10, label: 'ส่วนลดนักศึกษา 10%' },
+    };
+    try {
+        const raw = localStorage.getItem('sp_coupons');
+        if (raw !== null) {
+            const parsed = JSON.parse(raw);
+            if (parsed && typeof parsed === 'object') {
+                return parsed;
+            }
+        }
+    } catch (e) {
+        console.error('Error reading sp_coupons:', e);
+    }
+    localStorage.setItem('sp_coupons', JSON.stringify(defaultCoupons));
+    return defaultCoupons;
+}
+
+/**
+ * บันทึกรายการคูปองส่วนลดทั้งหมด
+ */
+function saveSukpaCoupons(couponsObj) {
+    try {
+        localStorage.setItem('sp_coupons', JSON.stringify(couponsObj || {}));
+        return true;
+    } catch (e) {
+        console.error('Error saving sp_coupons:', e);
+        return false;
+    }
+}
+
+/**
+ * ตรวจสอบและคำนวณส่วนลดจากคูปอง
+ * @param {string} rawCode 
+ * @param {number} subtotal 
+ */
+function validateCoupon(rawCode, subtotal = 0) {
+    if (!rawCode || typeof rawCode !== 'string') {
+        return { valid: false, message: 'กรุณากรอกโค้ดส่วนลด', discountAmount: 0 };
+    }
+    const code = rawCode.trim().toUpperCase();
+    const activeCoupons = getSukpaCoupons();
+    const coupon = activeCoupons[code];
+    if (!coupon) {
+        return { valid: false, message: 'ไม่พบโค้ดส่วนลดนี้ หรือโค้ดหมดอายุ', discountAmount: 0 };
+    }
+    let discount = 0;
+    if (coupon.type === 'flat') {
+        discount = Number(coupon.amount) || 0;
+    } else if (coupon.type === 'percent') {
+        discount = Math.round((subtotal * (Number(coupon.amount) || 0)) / 100);
+    }
+    discount = Math.min(discount, subtotal);
+    return {
+        valid: true,
+        code: coupon.code,
+        label: coupon.label || coupon.code,
+        discountAmount: discount,
+        message: `ใช้โค้ดสำเร็จ! ${coupon.label || coupon.code} (-${discount}฿)`
+    };
+}
 
 /**
  * คำนวณราคารวมพร้อมรายละเอียดแต่ละส่วน
@@ -136,11 +215,16 @@ const SUKPA_PRICING = {
  * @param {string} [options.dryerKey='d15'] - เครื่องอบ ('d15' | 'd25')
  * @param {string} [options.detergentKey='own'] - น้ำยา ('own' | 'shop')
  * @param {string} [options.zoneKey='off'] - จุดรับส่ง ('off' | 'on' | 'far')
+ * @param {string} [options.couponCode=''] - โค้ดส่วนลด
  * @returns {{
  *   sizePrice: number,
  *   dryerPrice: number,
  *   detergentSurcharge: number,
  *   zoneSurcharge: number,
+ *   subtotal: number,
+ *   discountAmount: number,
+ *   couponCode: string,
+ *   couponInfo: Object,
  *   total: number,
  *   sizeInfo: Object,
  *   dryerInfo: Object,
@@ -148,7 +232,7 @@ const SUKPA_PRICING = {
  *   zoneInfo: Object
  * }}
  */
-function calculateSukpaPrice({ sizeKey = 's', dryerKey = 'd15', detergentKey = 'own', zoneKey = 'off' } = {}) {
+function calculateSukpaPrice({ sizeKey = 's', dryerKey = 'd15', detergentKey = 'own', zoneKey = 'off', couponCode = '' } = {}) {
     const sizeInfo = SUKPA_PRICING.sizes[sizeKey] || SUKPA_PRICING.sizes.s;
     const dryerInfo = SUKPA_PRICING.dryers[dryerKey] || SUKPA_PRICING.dryers.d15;
     const detergentInfo = SUKPA_PRICING.detergents[detergentKey] || SUKPA_PRICING.detergents.own;
@@ -158,13 +242,21 @@ function calculateSukpaPrice({ sizeKey = 's', dryerKey = 'd15', detergentKey = '
     const dryerPrice = dryerInfo ? dryerInfo.price : 0;
     const detergentSurcharge = detergentInfo.surcharge;
     const zoneSurcharge = zoneInfo.surcharge;
-    const total = sizePrice + dryerPrice + detergentSurcharge + zoneSurcharge;
+    const subtotal = sizePrice + dryerPrice + detergentSurcharge + zoneSurcharge;
+
+    const couponRes = couponCode ? validateCoupon(couponCode, subtotal) : { valid: false, discountAmount: 0 };
+    const discountAmount = couponRes.discountAmount || 0;
+    const total = Math.max(0, subtotal - discountAmount);
 
     return {
         sizePrice,
         dryerPrice,
         detergentSurcharge,
         zoneSurcharge,
+        subtotal,
+        discountAmount,
+        couponCode: couponRes.valid ? couponRes.code : '',
+        couponInfo: couponRes,
         total,
         sizeInfo,
         dryerInfo,
@@ -175,16 +267,6 @@ function calculateSukpaPrice({ sizeKey = 's', dryerKey = 'd15', detergentKey = '
 
 /**
  * สร้างข้อความจองคิวมาตรฐาน สำหรับส่งเข้า LINE OpenChat
- * @param {Object} data
- * @param {string} [data.name] - ชื่อผู้จอง
- * @param {string} [data.phone] - เบอร์ติดต่อ
- * @param {string} [data.dorm] - หอพัก/ตึก
- * @param {string} [data.notes] - หมายเหตุ
- * @param {string} [data.sizeKey] - เครื่องซัก
- * @param {string} [data.dryerKey] - เครื่องอบ
- * @param {string} [data.detergentKey] - น้ำยา
- * @param {string} [data.zoneKey] - จุดรับส่ง
- * @returns {string}
  */
 function buildSukpaBookingMessage({
     name = '',
@@ -195,8 +277,9 @@ function buildSukpaBookingMessage({
     dryerKey = 'd15',
     detergentKey = 'own',
     zoneKey = 'off',
+    couponCode = ''
 } = {}) {
-    const calc = calculateSukpaPrice({ sizeKey, dryerKey, detergentKey, zoneKey });
+    const calc = calculateSukpaPrice({ sizeKey, dryerKey, detergentKey, zoneKey, couponCode });
 
     const nameVal = name.trim() || 'กาย (ตัวอย่าง)';
     const phoneVal = phone.trim() || '08X-XXX-XXXX';
@@ -205,6 +288,7 @@ function buildSukpaBookingMessage({
 
     const dryerLine = calc.dryerInfo ? `💨 เครื่องอบผ้า : ${calc.dryerInfo.fullText}\n` : '';
     const dryerBillLine = calc.dryerInfo ? `  • ค่าอบ : ${calc.dryerInfo.shortText}\n` : '';
+    const discountLine = calc.discountAmount > 0 ? `  • ส่วนลด (${calc.couponCode}) : -${calc.discountAmount}฿\n` : '';
 
     return (
         `🧺 แจ้งจองคิวซักผ้า — ซักป่ะ? 🫧\n` +
@@ -223,6 +307,7 @@ function buildSukpaBookingMessage({
         dryerBillLine +
         `  • น้ำยาซัก/ปรับผ้านุ่ม : ${calc.detergentInfo.shortText}\n` +
         `  • ค่าจัดส่ง : ${calc.zoneInfo.shortText}\n` +
+        discountLine +
         `  💰 รวมยอดชำระสุทธิ : ${calc.total} บาท\n` +
         `━━━━━━━━━━━━━━━━━━\n` +
         `📍 นัดรับชั้นล่างใต้ตึก ขอบคุณครับ/ค่ะ 🙏`
@@ -233,6 +318,9 @@ function buildSukpaBookingMessage({
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
         SUKPA_PRICING,
+        getSukpaCoupons,
+        saveSukpaCoupons,
+        validateCoupon,
         calculateSukpaPrice,
         buildSukpaBookingMessage,
     };

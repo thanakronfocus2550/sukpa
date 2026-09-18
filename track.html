@@ -35,6 +35,10 @@
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 
+    <!-- Supabase JS Client & Database Layer -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="db.js"></script>
+
     <style>
         body {
             font-family: 'Kanit', sans-serif;
@@ -239,6 +243,15 @@
                     <div class="text-xs font-semibold text-slate-500 mb-2">หลักฐานการโอนเงินที่แนบไว้</div>
                     <img id="track-slip-img" src="" alt="สลิปการโอนเงิน" class="max-h-48 mx-auto rounded-2xl border border-slate-200 shadow-sm" />
                 </div>
+
+                <!-- Proof of Delivery Photo View if present -->
+                <div id="track-delivery-photo-container" class="hidden pt-2 text-center border-t border-slate-100 mt-3">
+                    <div class="text-xs font-bold text-emerald-600 mb-2 flex items-center justify-center gap-1.5">
+                        <i class="fas fa-camera"></i>
+                        <span>รูปถ่ายยืนยันการจัดส่งผ้า (Proof of Delivery)</span>
+                    </div>
+                    <img id="track-delivery-photo-img" src="" alt="รูปถ่ายยืนยันการจัดส่งผ้า" class="max-h-64 mx-auto rounded-2xl border-2 border-emerald-300 shadow-md object-cover" />
+                </div>
             </div>
 
         </div>
@@ -327,23 +340,35 @@
                 }, 3000);
             }
 
+            let currentTrackingId = null;
+
             // Search Order Handler
-            function performSearch(targetId) {
+            async function performSearch(targetId) {
                 let cleanId = targetId.trim().toUpperCase().replace(/^#/, '');
                 if (!cleanId) {
                     showToast('⚠️ กรุณากรอกรหัส Order ID ที่ต้องการค้นหา');
                     return;
                 }
 
-                // If user typed just numbers (e.g. 4821), try to match partial ID
-                const orders = JSON.parse(localStorage.getItem('sp_orders') || '[]');
-                let matchedOrder = orders.find(ord => 
-                    ord.orderId.toUpperCase() === cleanId || ord.orderId.toUpperCase().endsWith(cleanId)
-                );
+                // First try direct lookup from SukpaDB (Cloud + Local)
+                let matchedOrder = null;
+                if (window.SukpaDB) {
+                    matchedOrder = await window.SukpaDB.getOrderById(cleanId);
+                }
+
+                if (!matchedOrder) {
+                    // Try partial match in local or fetched orders list
+                    const allOrders = window.SukpaDB ? await window.SukpaDB.getOrders() : JSON.parse(localStorage.getItem('sp_orders') || '[]');
+                    matchedOrder = allOrders.find(ord => 
+                        ord.orderId.toUpperCase() === cleanId || ord.orderId.toUpperCase().endsWith(cleanId)
+                    );
+                }
 
                 if (matchedOrder) {
+                    currentTrackingId = matchedOrder.orderId;
                     displayOrder(matchedOrder);
                 } else {
+                    currentTrackingId = null;
                     // Not found
                     if (trackResultSection) trackResultSection.classList.add('hidden');
                     if (trackNotFoundSection) trackNotFoundSection.classList.remove('hidden');
@@ -352,6 +377,7 @@
 
             // Display Order Helper
             function displayOrder(ord) {
+                if (!ord) return;
                 if (trackNotFoundSection) trackNotFoundSection.classList.add('hidden');
                 if (trackResultSection) trackResultSection.classList.remove('hidden');
 
@@ -380,6 +406,16 @@
                     trackSlipContainer.classList.remove('hidden');
                 } else if (trackSlipContainer) {
                     trackSlipContainer.classList.add('hidden');
+                }
+
+                // Delivery Photo preview
+                const trackDeliveryPhotoContainer = document.getElementById('track-delivery-photo-container');
+                const trackDeliveryPhotoImg = document.getElementById('track-delivery-photo-img');
+                if (ord.deliveryPhotoUrl && trackDeliveryPhotoContainer && trackDeliveryPhotoImg) {
+                    trackDeliveryPhotoImg.src = ord.deliveryPhotoUrl;
+                    trackDeliveryPhotoContainer.classList.remove('hidden');
+                } else if (trackDeliveryPhotoContainer) {
+                    trackDeliveryPhotoContainer.classList.add('hidden');
                 }
 
                 // Update Status Stepper (Default step 1 for pending)
@@ -446,16 +482,30 @@
             });
 
             // Quick Load My Latest Listener
-            btnLoadMyLatest.addEventListener('click', () => {
-                const orders = JSON.parse(localStorage.getItem('sp_orders') || '[]');
+            btnLoadMyLatest.addEventListener('click', async () => {
+                const orders = window.SukpaDB ? await window.SukpaDB.getOrders() : JSON.parse(localStorage.getItem('sp_orders') || '[]');
                 if (orders.length > 0) {
                     inputTrackId.value = orders[0].orderId;
+                    currentTrackingId = orders[0].orderId;
                     displayOrder(orders[0]);
                     showToast(`🔍 โหลดออเดอร์ล่าสุด #${orders[0].orderId} แล้ว`);
                 } else {
                     showToast('ℹ️ ไม่พบประวัติการจองคิวในอุปกรณ์นี้');
                 }
             });
+
+            // Realtime Sync Subscription for track.html
+            if (window.SukpaDB) {
+                window.SukpaDB.subscribeOrders(async (orders, payload) => {
+                    if (currentTrackingId) {
+                        const updated = orders.find(o => o.orderId === currentTrackingId) || await window.SukpaDB.getOrderById(currentTrackingId);
+                        if (updated) {
+                            displayOrder(updated);
+                            showToast(`⚡ สถานะออเดอร์ #${currentTrackingId} ถูกอัปเดตแบบ Realtime!`);
+                        }
+                    }
+                });
+            }
 
             // Check URL Query Param e.g. track.html?id=SP-20260919-4821
             const urlParams = new URLSearchParams(window.location.search);
@@ -465,11 +515,14 @@
                 performSearch(queryId);
             } else {
                 // Auto load latest order if present
-                const orders = JSON.parse(localStorage.getItem('sp_orders') || '[]');
-                if (orders.length > 0) {
-                    inputTrackId.value = orders[0].orderId;
-                    displayOrder(orders[0]);
-                }
+                (async () => {
+                    const orders = window.SukpaDB ? await window.SukpaDB.getOrders() : JSON.parse(localStorage.getItem('sp_orders') || '[]');
+                    if (orders.length > 0) {
+                        inputTrackId.value = orders[0].orderId;
+                        currentTrackingId = orders[0].orderId;
+                        displayOrder(orders[0]);
+                    }
+                })();
             }
         });
     </script>

@@ -29,6 +29,14 @@
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 
+    <!-- Chart.js CDN for Analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Supabase JS Client & Database Layer -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="db.js"></script>
+    <script src="pricing.js"></script>
+
     <style>
         body {
             font-family: 'Kanit', sans-serif;
@@ -44,6 +52,32 @@
         .glass-input {
             background: rgba(15, 23, 42, 0.6);
             border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #printable-tag-area, #printable-tag-area * {
+                visibility: visible;
+            }
+            #tag-modal {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: auto;
+                background: white !important;
+                backdrop-filter: none !important;
+            }
+            #printable-tag-area {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 80mm;
+                border: none !important;
+                box-shadow: none !important;
+            }
         }
     </style>
 </head>
@@ -102,10 +136,30 @@
                     </div>
                 </div>
 
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-1.5 sm:gap-2">
+                    <button type="button" id="btn-export-csv" class="px-3 py-1.5 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 text-xs font-semibold border border-emerald-500/30 transition flex items-center gap-1.5" title="ส่งออกรายงานเป็นไฟล์ Excel (CSV)">
+                        <i class="fas fa-file-excel"></i>
+                        <span class="hidden sm:inline">Export Excel</span>
+                    </button>
+                    <button type="button" id="btn-toggle-sound" class="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-400 text-xs font-semibold border border-slate-700 transition flex items-center gap-1" title="เปิด/ปิด เสียงแจ้งเตือน">
+                        <i class="fas fa-bell text-xs" id="sound-icon"></i>
+                    </button>
+                    <button type="button" id="btn-open-config" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-cyan-400 text-xs font-semibold border border-slate-700 transition flex items-center gap-1.5">
+                        <i class="fas fa-cloud text-cyan-400"></i>
+                        <span class="hidden md:inline">Cloud DB</span>
+                        <span id="cloud-status-dot" class="w-2.5 h-2.5 rounded-full bg-slate-500 inline-block"></span>
+                    </button>
+                    <button type="button" id="btn-open-coupon-modal" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-emerald-400 text-xs font-semibold border border-slate-700 transition flex items-center gap-1.5" title="จัดการโค้ดส่วนลด">
+                        <i class="fas fa-ticket text-emerald-400"></i>
+                        <span class="hidden md:inline">จัดการคูปอง</span>
+                    </button>
+                    <button type="button" id="btn-open-pin-modal" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-purple-400 text-xs font-semibold border border-slate-700 transition flex items-center gap-1.5" title="เปลี่ยนรหัส PIN">
+                        <i class="fas fa-key text-purple-400"></i>
+                        <span class="hidden lg:inline">เปลี่ยน PIN</span>
+                    </button>
                     <button type="button" id="btn-seed-sample-data" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold border border-slate-700 transition flex items-center gap-1.5">
                         <i class="fas fa-dice text-amber-400"></i>
-                        <span>สุ่มออเดอร์ทดสอบ</span>
+                        <span class="hidden md:inline">สุ่มออเดอร์</span>
                     </button>
                     <button type="button" id="btn-logout-admin" class="px-3 py-1.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-semibold border border-red-500/20 transition flex items-center gap-1.5">
                         <i class="fas fa-right-from-bracket"></i>
@@ -117,6 +171,26 @@
 
         <!-- Main Dashboard Content -->
         <main class="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8 flex-grow w-full space-y-6">
+
+            <!-- Navigation View Switcher Tabs -->
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div class="flex items-center gap-2">
+                    <button type="button" id="nav-tab-orders" class="px-4 py-2 rounded-xl bg-blue-600 text-white font-bold text-xs shadow-md transition flex items-center gap-2">
+                        <i class="fas fa-list-check"></i>
+                        <span>รายการคำสั่งซื้อ (Orders)</span>
+                    </button>
+                    <button type="button" id="nav-tab-analytics" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs transition flex items-center gap-2">
+                        <i class="fas fa-chart-line text-cyan-400"></i>
+                        <span>แดชบอร์ดวิเคราะห์ (Analytics Charts)</span>
+                    </button>
+                </div>
+                <span class="text-[11px] text-slate-400 hidden sm:inline-block">
+                    <i class="fas fa-shield-halved text-emerald-400"></i> Auto lock 15 น.
+                </span>
+            </div>
+
+            <!-- VIEW 1: ORDERS SECTION -->
+            <div id="view-orders-section" class="space-y-6">
 
             <!-- KPI OVERVIEW CARDS -->
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-5">
@@ -337,8 +411,144 @@
                     <!-- Dynamic Render Orders -->
                 </div>
             </div>
+            </div> <!-- End of view-orders-section -->
+
+            <!-- VIEW 2: ANALYTICS DASHBOARD SECTION -->
+            <div id="view-analytics-section" class="space-y-6 hidden">
+
+                <!-- Advanced Analytics KPI Summary -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="glass-card rounded-2xl p-5 border border-slate-800">
+                        <div class="flex items-center justify-between text-xs text-slate-400 mb-2">
+                            <span>ยอดขายเฉลี่ยต่อออเดอร์ (AOV)</span>
+                            <div class="w-8 h-8 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center text-sm">
+                                <i class="fas fa-calculator"></i>
+                            </div>
+                        </div>
+                        <div class="text-2xl font-extrabold text-purple-400" id="analytics-aov">฿0</div>
+                        <div class="text-[10px] text-slate-400 mt-1">Average Order Value</div>
+                    </div>
+
+                    <div class="glass-card rounded-2xl p-5 border border-slate-800">
+                        <div class="flex items-center justify-between text-xs text-slate-400 mb-2">
+                            <span>ส่วนลดคูปองทั้งหมดที่ใช้ไป</span>
+                            <div class="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-sm">
+                                <i class="fas fa-ticket"></i>
+                            </div>
+                        </div>
+                        <div class="text-2xl font-extrabold text-emerald-400" id="analytics-discounts">฿0</div>
+                        <div class="text-[10px] text-slate-400 mt-1">ยอดคูปองที่ลูกค้าประหยัดได้</div>
+                    </div>
+
+                    <div class="glass-card rounded-2xl p-5 border border-slate-800">
+                        <div class="flex items-center justify-between text-xs text-slate-400 mb-2">
+                            <span>อัตราจัดส่งสำเร็จ (Completion Rate)</span>
+                            <div class="w-8 h-8 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center text-sm">
+                                <i class="fas fa-circle-check"></i>
+                            </div>
+                        </div>
+                        <div class="text-2xl font-extrabold text-blue-400" id="analytics-completion-rate">0%</div>
+                        <div class="text-[10px] text-slate-400 mt-1">เทียบจากออเดอร์ทั้งหมดในระบบ</div>
+                    </div>
+                </div>
+
+                <!-- Charts Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+                    <!-- Chart 1: Daily Revenue Trend -->
+                    <div class="glass-card rounded-3xl p-5 border border-slate-800 space-y-3">
+                        <h3 class="text-base font-bold text-white flex items-center gap-2">
+                            <i class="fas fa-chart-bar text-cyan-400"></i>
+                            <span>แนวโน้มรายรับย้อนหลัง 7 วัน (Daily Revenue)</span>
+                        </h3>
+                        <div class="h-64 relative">
+                            <canvas id="chart-daily-revenue"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Chart 2: Top Dormitories -->
+                    <div class="glass-card rounded-3xl p-5 border border-slate-800 space-y-3">
+                        <h3 class="text-base font-bold text-white flex items-center gap-2">
+                            <i class="fas fa-building text-blue-400"></i>
+                            <span>จัดอันดับหอพักที่ใช้บริการบ่อยที่สุด (Top Dormitories)</span>
+                        </h3>
+                        <div class="h-64 relative">
+                            <canvas id="chart-top-dorms"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Chart 3: Wash Sizes Share -->
+                    <div class="glass-card rounded-3xl p-5 border border-slate-800 space-y-3 lg:col-span-2">
+                        <h3 class="text-base font-bold text-white flex items-center gap-2">
+                            <i class="fas fa-chart-pie text-purple-400"></i>
+                            <span>สัดส่วนขนาดถุงผ้าซัก (S / M / L / Jumbo)</span>
+                        </h3>
+                        <div class="h-64 relative max-w-md mx-auto">
+                            <canvas id="chart-wash-sizes"></canvas>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div> <!-- End of view-analytics-section -->
 
         </main>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════ -->
+    <!-- THERMAL RECEIPT / LAUNDRY BAG TAG PRINT MODAL (Option 2) -->
+    <!-- ═══════════════════════════════════════════════════ -->
+    <div id="tag-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="glass-card rounded-3xl max-w-sm w-full p-6 text-center space-y-4 relative border border-slate-700 shadow-2xl">
+            <button type="button" id="close-tag-modal" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center print:hidden">
+                <i class="fas fa-xmark"></i>
+            </button>
+
+            <h3 class="text-base font-bold text-white flex items-center justify-center gap-2 print:hidden">
+                <i class="fas fa-print text-blue-400"></i>
+                <span>ตัวอย่างแท็กติดถุงผ้า (80mm Tag)</span>
+            </h3>
+
+            <!-- Thermal Tag Ticket Card (Printable Area) -->
+            <div id="printable-tag-area" class="bg-white text-slate-900 rounded-2xl p-4 font-mono text-left text-xs border border-slate-200 shadow-inner space-y-2 select-all">
+                <div class="text-center pb-2 border-b-2 border-dashed border-slate-300">
+                    <div class="text-lg font-black tracking-tight text-blue-600">ซักป่ะ? 🫧</div>
+                    <div class="text-[10px] text-slate-500 font-semibold">บริการซัก-อบแห้ง มจพ.ปราจีนบุรี</div>
+                    <div class="text-xs font-bold text-slate-800 mt-1 bg-slate-100 py-0.5 rounded" id="tag-order-id">#SP-20260919-0000</div>
+                </div>
+
+                <div class="space-y-1 pt-1 border-b border-dashed border-slate-200 pb-2">
+                    <div><strong>👤 ลูกค้า:</strong> <span id="tag-name">-</span></div>
+                    <div><strong>📞 เบอร์โทร:</strong> <span id="tag-phone">-</span></div>
+                    <div><strong>📍 จุดส่งผ้า:</strong> <span id="tag-dorm">-</span></div>
+                    <div><strong>🕒 เวลาจอง:</strong> <span id="tag-time">-</span></div>
+                </div>
+
+                <div class="space-y-1 border-b border-dashed border-slate-200 pb-2">
+                    <div class="font-bold text-slate-700">📦 รายการบริการ:</div>
+                    <div id="tag-service" class="pl-2 font-semibold text-blue-700">-</div>
+                    <div id="tag-notes" class="pl-2 text-[11px] text-amber-700 font-sans italic">หมายเหตุ: -</div>
+                </div>
+
+                <div class="flex justify-between items-center pt-1 font-bold text-sm">
+                    <span>ยอดรวมชำระ:</span>
+                    <span id="tag-total" class="text-blue-600 text-base">0฿</span>
+                </div>
+
+                <div class="text-center pt-2 text-[9px] text-slate-400 border-t border-dashed border-slate-300 font-sans">
+                    ขอบคุณที่ใช้บริการซักป่ะ? 🫧<br/>
+                    สแกน QR / เช็คสถานะได้ตลอด 24 ชม.
+                </div>
+            </div>
+
+            <!-- Print Trigger Button -->
+            <div class="flex gap-2 print:hidden">
+                <button type="button" id="btn-trigger-print" class="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-lg transition flex items-center justify-center gap-2">
+                    <i class="fas fa-print text-sm"></i>
+                    <span>สั่งพิมพ์แท็กสลิป (Print 80mm Tag)</span>
+                </button>
+            </div>
+        </div>
     </div>
 
     <!-- ═══════════════════════════════════════════════════ -->
@@ -363,6 +573,144 @@
         </div>
     </div>
 
+    <!-- Supabase Cloud DB Config Modal -->
+    <div id="config-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="glass-card rounded-3xl max-w-md w-full p-6 space-y-5 border border-slate-800 shadow-2xl relative">
+            <button type="button" id="close-config-modal" class="absolute top-4 right-4 text-slate-400 hover:text-white transition">
+                <i class="fas fa-times text-lg"></i>
+            </button>
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-xl font-bold border border-cyan-500/30">
+                    <i class="fas fa-database"></i>
+                </div>
+                <div>
+                    <h3 class="font-extrabold text-white text-lg">ตั้งค่า Cloud DB (Supabase)</h3>
+                    <p class="text-xs text-slate-400">เชื่อมต่อคลาวด์เพื่อซิงค์ออเดอร์เรียลไทม์ข้ามเครื่อง</p>
+                </div>
+            </div>
+
+            <div class="space-y-4 text-sm">
+                <div>
+                    <label class="block text-xs text-slate-300 font-semibold mb-1">Supabase Project URL</label>
+                    <input type="text" id="input-supabase-url" placeholder="https://xxxx.supabase.co" class="w-full px-3.5 py-2.5 rounded-xl glass-input text-white text-xs font-mono focus:outline-none focus:border-cyan-500" />
+                </div>
+
+                <div>
+                    <label class="block text-xs text-slate-300 font-semibold mb-1">Supabase Anon Public Key</label>
+                    <input type="password" id="input-supabase-key" placeholder="eyJhbGciOiJIUzI..." class="w-full px-3.5 py-2.5 rounded-xl glass-input text-white text-xs font-mono focus:outline-none focus:border-cyan-500" />
+                </div>
+            </div>
+
+            <div class="flex gap-2">
+                <button type="button" id="btn-save-config" class="flex-1 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs shadow-lg transition flex items-center justify-center gap-1.5">
+                    <i class="fas fa-save"></i> บันทึก & เชื่อมต่อ Cloud
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin PIN Security Change Modal -->
+    <div id="pin-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="glass-card rounded-3xl max-w-md w-full p-6 space-y-5 border border-slate-800 shadow-2xl relative">
+            <button type="button" id="close-pin-modal" class="absolute top-4 right-4 text-slate-400 hover:text-white transition">
+                <i class="fas fa-times text-lg"></i>
+            </button>
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center text-xl font-bold border border-purple-500/30">
+                    <i class="fas fa-key"></i>
+                </div>
+                <div>
+                    <h3 class="font-extrabold text-white text-lg">ตั้งค่ารหัส PIN ใหม่</h3>
+                    <p class="text-xs text-slate-400">เปลี่ยนรหัสผ่านเข้าสู่ระบบหลังบ้าน Admin</p>
+                </div>
+            </div>
+
+            <div class="space-y-3 text-xs">
+                <div>
+                    <label class="block text-slate-300 font-semibold mb-1">รหัส PIN เดิม</label>
+                    <input type="password" id="input-pin-old" maxlength="6" placeholder="• • • • • •" class="w-full px-3.5 py-2.5 rounded-xl glass-input text-white text-base font-mono text-center focus:outline-none focus:border-purple-500" />
+                </div>
+                <div>
+                    <label class="block text-slate-300 font-semibold mb-1">รหัส PIN ใหม่ (6 หลัก)</label>
+                    <input type="password" id="input-pin-new" maxlength="6" placeholder="• • • • • •" class="w-full px-3.5 py-2.5 rounded-xl glass-input text-white text-base font-mono text-center focus:outline-none focus:border-purple-500" />
+                </div>
+                <div>
+                    <label class="block text-slate-300 font-semibold mb-1">ยืนยันรหัส PIN ใหม่</label>
+                    <input type="password" id="input-pin-confirm" maxlength="6" placeholder="• • • • • •" class="w-full px-3.5 py-2.5 rounded-xl glass-input text-white text-base font-mono text-center focus:outline-none focus:border-purple-500" />
+                </div>
+            </div>
+
+            <button type="button" id="btn-save-pin" class="w-full py-3 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs shadow-lg transition flex items-center justify-center gap-1.5">
+                <i class="fas fa-check-circle"></i> บันทึกรหัส PIN ใหม่
+            </button>
+        </div>
+    </div>
+
+    <!-- Admin Coupon Management Modal -->
+    <div id="coupon-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="glass-card rounded-3xl max-w-xl w-full p-6 space-y-5 border border-slate-800 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+            <button type="button" id="close-coupon-modal" class="absolute top-4 right-4 text-slate-400 hover:text-white transition">
+                <i class="fas fa-times text-lg"></i>
+            </button>
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xl font-bold border border-emerald-500/30">
+                    <i class="fas fa-ticket-alt"></i>
+                </div>
+                <div>
+                    <h3 class="font-extrabold text-white text-lg">จัดการโค้ดส่วนลด (Coupon Manager)</h3>
+                    <p class="text-xs text-slate-400">เพิ่ม หรือลบโค้ดส่วนลดสำหรับลูกค้าได้ทันที</p>
+                </div>
+            </div>
+
+            <!-- Create New Coupon Form -->
+            <div class="bg-slate-900/90 rounded-2xl p-4 border border-slate-800 space-y-3">
+                <h4 class="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
+                    <i class="fas fa-plus-circle"></i> สร้างโค้ดส่วนลดใหม่
+                </h4>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                    <div>
+                        <label class="block text-slate-400 mb-1">รหัสโค้ด (เช่น SUMMER30)</label>
+                        <input type="text" id="input-coupon-code" placeholder="SUKPA50" class="uppercase w-full glass-input px-3 py-2 rounded-xl text-white font-mono focus:outline-none focus:border-emerald-500" />
+                    </div>
+                    <div>
+                        <label class="block text-slate-400 mb-1">ประเภทส่วนลด</label>
+                        <select id="select-coupon-type" class="w-full glass-input px-3 py-2 rounded-xl text-white bg-slate-900 focus:outline-none focus:border-emerald-500">
+                            <option value="flat">ลดเป็นบาท (฿)</option>
+                            <option value="percent">ลดเป็นเปอร์เซ็นต์ (%)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-slate-400 mb-1">จำนวนเงิน / เปอร์เซ็นต์</label>
+                        <input type="number" id="input-coupon-amount" placeholder="30" min="1" class="w-full glass-input px-3 py-2 rounded-xl text-white font-mono focus:outline-none focus:border-emerald-500" />
+                    </div>
+                    <div>
+                        <label class="block text-slate-400 mb-1">คำอธิบายแสดงลูกค้า</label>
+                        <input type="text" id="input-coupon-label" placeholder="ส่วนลดพิเศษ 30 บาท" class="w-full glass-input px-3 py-2 rounded-xl text-white focus:outline-none focus:border-emerald-500" />
+                    </div>
+                </div>
+                <button type="button" id="btn-add-coupon" class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md transition flex items-center justify-center gap-1.5">
+                    <i class="fas fa-check"></i> เพิ่มโค้ดส่วนลดใหม่
+                </button>
+            </div>
+
+            <!-- Existing Coupons List -->
+            <div class="space-y-2">
+                <div class="flex items-center justify-between pb-1 border-b border-slate-800/80">
+                    <div class="flex items-center gap-2">
+                        <h4 class="text-xs font-bold text-slate-300">รายการโค้ดส่วนลดในระบบ</h4>
+                        <span id="coupon-count-badge" class="text-[10px] bg-slate-800 text-slate-400 px-2.5 py-0.5 rounded-full font-mono">0 โค้ด</span>
+                    </div>
+                    <button type="button" id="btn-reset-default-coupons" class="text-[11px] text-slate-400 hover:text-cyan-400 transition flex items-center gap-1 font-medium">
+                        <i class="fas fa-rotate-right"></i> คืนค่าโค้ดเริ่มต้น
+                    </button>
+                </div>
+                <div id="coupons-list-container" class="space-y-2 max-h-56 overflow-y-auto">
+                    <!-- Dynamic Render -->
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast Notification -->
     <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-slate-900 text-white px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-3 backdrop-blur-sm pointer-events-none text-sm font-medium transition-all duration-300 opacity-0 translate-y-4 border border-slate-700">
         <div class="w-6 h-6 rounded-full bg-cyan-500 flex items-center justify-center text-white text-xs">
@@ -376,7 +724,10 @@
     <!-- ═══════════════════════════════════════════════════ -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const ADMIN_PIN = "200850"; // Specified PIN
+            // Helper to get active Admin PIN
+            function getAdminPin() {
+                return localStorage.getItem('sp_admin_pin') || "200850";
+            }
 
             // DOM Elements
             const pinScreen = document.getElementById('pin-screen');
@@ -399,8 +750,51 @@
             const modalSlipImg = document.getElementById('modal-slip-img');
             const btnDownloadSlipImg = document.getElementById('btn-download-slip-img');
 
+            const tagModal = document.getElementById('tag-modal');
+            const closeTagModal = document.getElementById('close-tag-modal');
+            const btnTriggerPrint = document.getElementById('btn-trigger-print');
+
+            if (closeTagModal) {
+                closeTagModal.addEventListener('click', () => {
+                    if (tagModal) tagModal.classList.add('hidden');
+                });
+            }
+
+            if (btnTriggerPrint) {
+                btnTriggerPrint.addEventListener('click', () => {
+                    window.print();
+                });
+            }
+
             const toast = document.getElementById('toast');
             const toastText = document.getElementById('toast-text');
+
+            // View Switcher Elements
+            const navTabOrders = document.getElementById('nav-tab-orders');
+            const navTabAnalytics = document.getElementById('nav-tab-analytics');
+            const viewOrdersSection = document.getElementById('view-orders-section');
+            const viewAnalyticsSection = document.getElementById('view-analytics-section');
+
+            // PIN Modal Elements
+            const pinModal = document.getElementById('pin-modal');
+            const btnOpenPinModal = document.getElementById('btn-open-pin-modal');
+            const closePinModal = document.getElementById('close-pin-modal');
+            const inputPinOld = document.getElementById('input-pin-old');
+            const inputPinNew = document.getElementById('input-pin-new');
+            const inputPinConfirm = document.getElementById('input-pin-confirm');
+            const btnSavePin = document.getElementById('btn-save-pin');
+
+            // Coupon Modal Elements
+            const couponModal = document.getElementById('coupon-modal');
+            const btnOpenCouponModal = document.getElementById('btn-open-coupon-modal');
+            const closeCouponModal = document.getElementById('close-coupon-modal');
+            const inputCouponCode = document.getElementById('input-coupon-code');
+            const selectCouponType = document.getElementById('select-coupon-type');
+            const inputCouponAmount = document.getElementById('input-coupon-amount');
+            const inputCouponLabel = document.getElementById('input-coupon-label');
+            const btnAddCoupon = document.getElementById('btn-add-coupon');
+            const couponsListContainer = document.getElementById('coupons-list-container');
+            const couponCountBadge = document.getElementById('coupon-count-badge');
 
             let currentFilter = 'all';
 
@@ -421,14 +815,15 @@
             // PIN Authentication Handler
             function verifyPin() {
                 const val = inputAdminPin.value.trim();
-                if (val === ADMIN_PIN) {
+                if (val === getAdminPin()) {
                     sessionStorage.setItem('sp_admin_authed', 'true');
                     pinScreen.classList.add('hidden');
                     adminDashboard.classList.remove('hidden');
                     renderDashboard();
+                    resetInactivityTimer();
                     showToast('🔓 ปลดล็อกเข้าสู่ระบบสำเร็จ!');
                 } else {
-                    showToast('❌ รหัส PIN ไม่ถูกต้อง (200850)');
+                    showToast('❌ รหัส PIN ไม่ถูกต้อง');
                     inputAdminPin.value = '';
                     inputAdminPin.focus();
                 }
@@ -444,6 +839,7 @@
                 pinScreen.classList.add('hidden');
                 adminDashboard.classList.remove('hidden');
                 renderDashboard();
+                resetInactivityTimer();
             }
 
             // Logout Handler
@@ -453,6 +849,408 @@
                 pinScreen.classList.remove('hidden');
                 inputAdminPin.value = '';
             });
+
+            // Change PIN Modal Handlers
+            if (btnOpenPinModal) {
+                btnOpenPinModal.addEventListener('click', () => {
+                    if (inputPinOld) inputPinOld.value = '';
+                    if (inputPinNew) inputPinNew.value = '';
+                    if (inputPinConfirm) inputPinConfirm.value = '';
+                    if (pinModal) pinModal.classList.remove('hidden');
+                });
+            }
+
+            if (closePinModal) {
+                closePinModal.addEventListener('click', () => {
+                    if (pinModal) pinModal.classList.add('hidden');
+                });
+            }
+
+            if (btnSavePin) {
+                btnSavePin.addEventListener('click', () => {
+                    const oldVal = inputPinOld ? inputPinOld.value.trim() : '';
+                    const newVal = inputPinNew ? inputPinNew.value.trim() : '';
+                    const confirmVal = inputPinConfirm ? inputPinConfirm.value.trim() : '';
+
+                    if (oldVal !== getAdminPin()) {
+                        showToast('❌ รหัส PIN เดิมไม่ถูกต้อง');
+                        return;
+                    }
+                    if (!/^\d{6}$/.test(newVal)) {
+                        showToast('⚠️ กรุณากรอกรหัส PIN ใหม่เป็นตัวเลข 6 หลัก');
+                        return;
+                    }
+                    if (newVal !== confirmVal) {
+                        showToast('⚠️ รหัส PIN ใหม่และการยืนยันไม่ตรงกัน');
+                        return;
+                    }
+
+                    localStorage.setItem('sp_admin_pin', newVal);
+                    if (pinModal) pinModal.classList.add('hidden');
+                    showToast('🔑 บันทึกรหัส PIN ใหม่สำเร็จ!');
+                });
+            }
+
+            // Coupon Management Logic
+            function renderCouponsList() {
+                if (!couponsListContainer) return;
+                const couponsMap = typeof getSukpaCoupons === 'function' ? getSukpaCoupons() : (function() {
+                    const raw = localStorage.getItem('sp_coupons');
+                    if (raw !== null) {
+                        try {
+                            const p = JSON.parse(raw);
+                            if (p && typeof p === 'object') return p;
+                        } catch(e){}
+                    }
+                    const defaults = {
+                        'WELCOME10': { code: 'WELCOME10', type: 'flat', amount: 10, label: 'ส่วนลดต้อนรับ 10฿' },
+                        'SUKPA20': { code: 'SUKPA20', type: 'flat', amount: 20, label: 'ส่วนลดพิเศษ 20฿' },
+                        'FREEDRY': { code: 'FREEDRY', type: 'flat', amount: 50, label: 'ส่วนลดค่าอบแห้ง 50฿' },
+                        'FREEDELIVERY': { code: 'FREEDELIVERY', type: 'flat', amount: 40, label: 'ฟรีค่าจัดส่ง (สะสมครบ 10 ครั้ง)' },
+                        'STUDENT10': { code: 'STUDENT10', type: 'percent', amount: 10, label: 'ส่วนลดนักศึกษา 10%' },
+                    };
+                    localStorage.setItem('sp_coupons', JSON.stringify(defaults));
+                    return defaults;
+                })();
+
+                const couponKeys = Object.keys(couponsMap);
+
+                if (couponCountBadge) couponCountBadge.textContent = `${couponKeys.length} โค้ด`;
+
+                if (couponKeys.length === 0) {
+                    couponsListContainer.innerHTML = `
+                        <div class="text-center py-6 text-xs text-slate-500 glass-card rounded-xl border border-slate-800">
+                            ไม่มีโค้ดส่วนลดในระบบ
+                        </div>
+                    `;
+                    return;
+                }
+
+                couponsListContainer.innerHTML = couponKeys.map(key => {
+                    const c = couponsMap[key];
+                    const typeBadge = c.type === 'percent' ? `${c.amount}%` : `${c.amount}฿`;
+                    return `
+                        <div class="flex items-center justify-between p-3 rounded-xl bg-slate-900 border border-slate-800 text-xs">
+                            <div class="flex items-center gap-2.5">
+                                <span class="font-mono font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20">${c.code}</span>
+                                <div>
+                                    <div class="font-semibold text-white">${c.label || c.code}</div>
+                                    <div class="text-[10px] text-slate-400">ลด ${typeBadge}</div>
+                                </div>
+                            </div>
+                            <button type="button" class="btn-delete-coupon text-red-400 hover:text-red-300 px-2.5 py-1 rounded-lg hover:bg-red-500/10 transition border border-red-500/20 flex items-center gap-1 font-semibold text-xs" data-code="${c.code}">
+                                <i class="fas fa-trash-can text-xs"></i> ลบ
+                            </button>
+                        </div>
+                    `;
+                }).join('');
+
+                couponsListContainer.querySelectorAll('.btn-delete-coupon').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const targetCode = btn.dataset.code;
+                        deleteCoupon(targetCode);
+                    });
+                });
+            }
+
+            function deleteCoupon(code) {
+                const couponsMap = typeof getSukpaCoupons === 'function' ? getSukpaCoupons() : JSON.parse(localStorage.getItem('sp_coupons') || '{}');
+                if (couponsMap[code]) {
+                    delete couponsMap[code];
+                    if (typeof saveSukpaCoupons === 'function') {
+                        saveSukpaCoupons(couponsMap);
+                    } else {
+                        localStorage.setItem('sp_coupons', JSON.stringify(couponsMap));
+                    }
+                    renderCouponsList();
+                    showToast(`🗑️ ลบโค้ดส่วนลด ${code} เรียบร้อยแล้ว`);
+                }
+            }
+
+            if (btnOpenCouponModal) {
+                btnOpenCouponModal.addEventListener('click', () => {
+                    renderCouponsList();
+                    if (couponModal) couponModal.classList.remove('hidden');
+                });
+            }
+
+            if (closeCouponModal) {
+                closeCouponModal.addEventListener('click', () => {
+                    if (couponModal) couponModal.classList.add('hidden');
+                });
+            }
+
+            if (btnAddCoupon) {
+                btnAddCoupon.addEventListener('click', () => {
+                    const rawCode = inputCouponCode ? inputCouponCode.value.trim().toUpperCase() : '';
+                    const type = selectCouponType ? selectCouponType.value : 'flat';
+                    const amount = inputCouponAmount ? Number(inputCouponAmount.value) : 0;
+                    const label = inputCouponLabel ? inputCouponLabel.value.trim() : '';
+
+                    if (!rawCode) {
+                        showToast('⚠️ กรุณากรอกรหัสโค้ดคูปอง');
+                        return;
+                    }
+                    if (!amount || amount <= 0) {
+                        showToast('⚠️ กรุณากรอกจำนวนเงินส่วนลดให้มากกว่า 0');
+                        return;
+                    }
+
+                    const couponsMap = typeof getSukpaCoupons === 'function' ? getSukpaCoupons() : JSON.parse(localStorage.getItem('sp_coupons') || '{}');
+                    couponsMap[rawCode] = {
+                        code: rawCode,
+                        type: type,
+                        amount: amount,
+                        label: label || (type === 'percent' ? `ส่วนลด ${amount}%` : `ส่วนลด ${amount}฿`)
+                    };
+
+                    if (typeof saveSukpaCoupons === 'function') {
+                        saveSukpaCoupons(couponsMap);
+                    } else {
+                        localStorage.setItem('sp_coupons', JSON.stringify(couponsMap));
+                    }
+
+                    if (inputCouponCode) inputCouponCode.value = '';
+                    if (inputCouponAmount) inputCouponAmount.value = '';
+                    if (inputCouponLabel) inputCouponLabel.value = '';
+
+                    renderCouponsList();
+                    showToast(`🎉 เพิ่มโค้ดส่วนลด ${rawCode} เรียบร้อยแล้ว!`);
+                });
+            }
+
+            const btnResetDefaultCoupons = document.getElementById('btn-reset-default-coupons');
+            if (btnResetDefaultCoupons) {
+                btnResetDefaultCoupons.addEventListener('click', () => {
+                    const defaults = {
+                        'WELCOME10': { code: 'WELCOME10', type: 'flat', amount: 10, label: 'ส่วนลดต้อนรับ 10฿' },
+                        'SUKPA20': { code: 'SUKPA20', type: 'flat', amount: 20, label: 'ส่วนลดพิเศษ 20฿' },
+                        'FREEDRY': { code: 'FREEDRY', type: 'flat', amount: 50, label: 'ส่วนลดค่าอบแห้ง 50฿' },
+                        'FREEDELIVERY': { code: 'FREEDELIVERY', type: 'flat', amount: 40, label: 'ฟรีค่าจัดส่ง (สะสมครบ 10 ครั้ง)' },
+                        'STUDENT10': { code: 'STUDENT10', type: 'percent', amount: 10, label: 'ส่วนลดนักศึกษา 10%' },
+                    };
+                    if (typeof saveSukpaCoupons === 'function') {
+                        saveSukpaCoupons(defaults);
+                    } else {
+                        localStorage.setItem('sp_coupons', JSON.stringify(defaults));
+                    }
+                    renderCouponsList();
+                    showToast('🔄 คืนค่าโค้ดส่วนลดเริ่มต้นเรียบร้อยแล้ว!');
+                });
+            }
+
+            // Session Auto-Logout Inactivity Timer (15 mins)
+            let inactivityTimer = null;
+            const INACTIVITY_LIMIT_MS = 15 * 60 * 1000;
+
+            function resetInactivityTimer() {
+                if (sessionStorage.getItem('sp_admin_authed') !== 'true') return;
+                clearTimeout(inactivityTimer);
+                inactivityTimer = setTimeout(() => {
+                    sessionStorage.removeItem('sp_admin_authed');
+                    adminDashboard.classList.add('hidden');
+                    pinScreen.classList.remove('hidden');
+                    inputAdminPin.value = '';
+                    showToast('🔒 เซสชันหมดอายุเนื่องจากไม่มีการใช้งานเป็นเวลานาน');
+                }, INACTIVITY_LIMIT_MS);
+            }
+
+            ['mousemove', 'keydown', 'click', 'scroll', 'touchstart'].forEach(evtName => {
+                window.addEventListener(evtName, resetInactivityTimer, { passive: true });
+            });
+
+            // View Tab Switching (Orders vs Analytics)
+            if (navTabOrders && navTabAnalytics) {
+                navTabOrders.addEventListener('click', () => {
+                    navTabOrders.className = 'px-4 py-2 rounded-xl bg-blue-600 text-white font-bold text-xs shadow-md transition flex items-center gap-2';
+                    navTabAnalytics.className = 'px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs transition flex items-center gap-2';
+                    if (viewOrdersSection) viewOrdersSection.classList.remove('hidden');
+                    if (viewAnalyticsSection) viewAnalyticsSection.classList.add('hidden');
+                });
+
+                navTabAnalytics.addEventListener('click', () => {
+                    navTabAnalytics.className = 'px-4 py-2 rounded-xl bg-cyan-600 text-white font-bold text-xs shadow-md transition flex items-center gap-2';
+                    navTabOrders.className = 'px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs transition flex items-center gap-2';
+                    if (viewOrdersSection) viewOrdersSection.classList.add('hidden');
+                    if (viewAnalyticsSection) viewAnalyticsSection.classList.remove('hidden');
+                    const orders = JSON.parse(localStorage.getItem('sp_orders') || '[]');
+                    renderAnalyticsCharts(orders);
+                });
+            }
+
+            // Chart.js Instances
+            let chartDailyRev = null;
+            let chartTopDorms = null;
+            let chartWashSizes = null;
+
+            function renderAnalyticsCharts(orders) {
+                if (typeof Chart === 'undefined') return;
+
+                // KPI Computations
+                const totalCount = orders.length;
+                let totalRev = 0;
+                let totalDiscounts = 0;
+                let deliveredCount = 0;
+
+                orders.forEach(o => {
+                    totalRev += Number(o.total) || 0;
+                    totalDiscounts += Number(o.discountAmount) || 0;
+                    if (o.status === 'delivered') deliveredCount++;
+                });
+
+                const aov = totalCount > 0 ? Math.round(totalRev / totalCount) : 0;
+                const completionRate = totalCount > 0 ? Math.round((deliveredCount / totalCount) * 100) : 0;
+
+                const elAov = document.getElementById('analytics-aov');
+                const elDisc = document.getElementById('analytics-discounts');
+                const elComp = document.getElementById('analytics-completion-rate');
+
+                if (elAov) elAov.textContent = `฿${aov.toLocaleString()}`;
+                if (elDisc) elDisc.textContent = `฿${totalDiscounts.toLocaleString()}`;
+                if (elComp) elComp.textContent = `${completionRate}%`;
+
+                // 1. Daily Revenue Chart (Last 7 Days)
+                const last7Days = [];
+                const revenueMap = {};
+                for (let i = 6; i >= 0; i--) {
+                    const d = new Date();
+                    d.setDate(d.getDate() - i);
+                    const dateStr = d.toISOString().slice(0, 10);
+                    last7Days.push(dateStr);
+                    revenueMap[dateStr] = 0;
+                }
+
+                orders.forEach(o => {
+                    if (o.createdAt) {
+                        const dateStr = o.createdAt.slice(0, 10);
+                        if (revenueMap[dateStr] !== undefined) {
+                            revenueMap[dateStr] += Number(o.total) || 0;
+                        }
+                    }
+                });
+
+                const dailyLabels = last7Days.map(d => {
+                    const parts = d.split('-');
+                    return `${parts[2]}/${parts[1]}`;
+                });
+                const dailyData = last7Days.map(d => revenueMap[d]);
+
+                const ctxDaily = document.getElementById('chart-daily-revenue');
+                if (ctxDaily) {
+                    if (chartDailyRev) chartDailyRev.destroy();
+                    chartDailyRev = new Chart(ctxDaily, {
+                        type: 'bar',
+                        data: {
+                            labels: dailyLabels,
+                            datasets: [{
+                                label: 'รายรับ (บาท)',
+                                data: dailyData,
+                                backgroundColor: 'rgba(6, 182, 212, 0.7)',
+                                borderColor: 'rgba(6, 182, 212, 1)',
+                                borderWidth: 1,
+                                borderRadius: 8
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: { legend: { display: false } },
+                            scales: {
+                                y: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+                                x: { ticks: { color: '#94a3b8' }, grid: { display: false } }
+                            }
+                        }
+                    });
+                }
+
+                // 2. Top Dormitories Chart
+                const dormCountMap = {};
+                orders.forEach(o => {
+                    let dormName = (o.dorm || 'ไม่ระบุหอพัก').trim();
+                    dormName = dormName.split('(')[0].trim();
+                    if (dormName.length > 18) dormName = dormName.slice(0, 18) + '...';
+                    dormCountMap[dormName] = (dormCountMap[dormName] || 0) + 1;
+                });
+
+                const sortedDorms = Object.entries(dormCountMap).sort((a, b) => b[1] - a[1]).slice(0, 5);
+                const dormLabels = sortedDorms.map(item => item[0]);
+                const dormData = sortedDorms.map(item => item[1]);
+
+                const ctxDorms = document.getElementById('chart-top-dorms');
+                if (ctxDorms) {
+                    if (chartTopDorms) chartTopDorms.destroy();
+                    chartTopDorms = new Chart(ctxDorms, {
+                        type: 'bar',
+                        data: {
+                            labels: dormLabels.length > 0 ? dormLabels : ['ไม่มีข้อมูล'],
+                            datasets: [{
+                                label: 'จำนวนออเดอร์',
+                                data: dormData.length > 0 ? dormData : [0],
+                                backgroundColor: 'rgba(59, 130, 246, 0.7)',
+                                borderColor: 'rgba(59, 130, 246, 1)',
+                                borderWidth: 1,
+                                borderRadius: 8
+                            }]
+                        },
+                        options: {
+                            indexAxis: 'y',
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: { legend: { display: false } },
+                            scales: {
+                                x: { ticks: { color: '#94a3b8', precision: 0 }, grid: { color: 'rgba(255,255,255,0.05)' } },
+                                y: { ticks: { color: '#94a3b8' }, grid: { display: false } }
+                            }
+                        }
+                    });
+                }
+
+                // 3. Wash Sizes Share Chart
+                let sizeS = 0, sizeM = 0, sizeL = 0, sizeJumbo = 0;
+                orders.forEach(o => {
+                    const k = o.sizeKey || '';
+                    if (k === 's') sizeS++;
+                    else if (k === 'm') sizeM++;
+                    else if (k === 'l') sizeL++;
+                    else if (k === 'jumbo') sizeJumbo++;
+                    else {
+                        const svc = (o.serviceName || '').toLowerCase();
+                        if (svc.includes('size s')) sizeS++;
+                        else if (svc.includes('size m')) sizeM++;
+                        else if (svc.includes('size l')) sizeL++;
+                        else if (svc.includes('jumbo')) sizeJumbo++;
+                    }
+                });
+
+                const ctxSizes = document.getElementById('chart-wash-sizes');
+                if (ctxSizes) {
+                    if (chartWashSizes) chartWashSizes.destroy();
+                    chartWashSizes = new Chart(ctxSizes, {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['Size S (9kg)', 'Size M (14kg)', 'Size L (18kg)', 'Jumbo (28kg)'],
+                            datasets: [{
+                                data: [sizeS, sizeM, sizeL, sizeJumbo],
+                                backgroundColor: [
+                                    'rgba(59, 130, 246, 0.8)',
+                                    'rgba(6, 182, 212, 0.8)',
+                                    'rgba(168, 85, 247, 0.8)',
+                                    'rgba(245, 158, 11, 0.8)'
+                                ],
+                                borderWidth: 2,
+                                borderColor: '#0f172a'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { labels: { color: '#94a3b8' }, position: 'bottom' }
+                            }
+                        }
+                    });
+                }
+            }
 
             // Seed Sample Data for Testing
             btnSeedSampleData.addEventListener('click', () => {
@@ -469,7 +1267,9 @@
                         detergentKey: 'shop',
                         zoneKey: 'off',
                         zoneSurcharge: 30,
-                        total: 165,
+                        couponCode: 'WELCOME10',
+                        discountAmount: 10,
+                        total: 155,
                         slipDataUrl: ``,
                         createdAt: new Date().toISOString(),
                         status: `pending`
@@ -486,6 +1286,8 @@
                         detergentKey: 'own',
                         zoneKey: 'on',
                         zoneSurcharge: 40,
+                        couponCode: '',
+                        discountAmount: 0,
                         total: 140,
                         slipDataUrl: ``,
                         createdAt: new Date(Date.now() - 3600000).toISOString(),
@@ -503,7 +1305,9 @@
                         detergentKey: 'shop',
                         zoneKey: 'far',
                         zoneSurcharge: 55,
-                        total: 220,
+                        couponCode: 'FREEDRY',
+                        discountAmount: 50,
+                        total: 170,
                         slipDataUrl: ``,
                         createdAt: new Date(Date.now() - 7200000).toISOString(),
                         status: `delivered`
@@ -583,7 +1387,6 @@
                     } else if (ord.zoneKey === 'far' || ord.zoneSurcharge === 55) {
                         zone55Total += 55;
                     } else {
-                        // Fallback detection for older/seeded records without zoneKey
                         const dormLower = (ord.dorm || '').toLowerCase();
                         const svcLower = (ord.serviceName || '').toLowerCase();
                         if (dormLower.includes('หอใน')) {
@@ -591,7 +1394,7 @@
                         } else if (dormLower.includes('ไกล') || dormLower.includes('5km') || svcLower.includes('55')) {
                             zone55Total += 55;
                         } else {
-                            zone30Total += 30; // default off-campus
+                            zone30Total += 30;
                         }
                     }
                 });
@@ -634,6 +1437,11 @@
 
                 // Render Table List
                 renderOrdersList(orders);
+
+                // If currently viewing analytics tab, update charts
+                if (viewAnalyticsSection && !viewAnalyticsSection.classList.contains('hidden')) {
+                    renderAnalyticsCharts(orders);
+                }
             }
 
             // Filter Tabs Handler
@@ -667,7 +1475,7 @@
                     return;
                 }
 
-                ordersListContainer.innerHTML = filtered.map((ord, idx) => {
+                ordersListContainer.innerHTML = filtered.map((ord) => {
                     const dt = new Date(ord.createdAt).toLocaleString('th-TH', {
                         month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
                     });
@@ -685,17 +1493,38 @@
                         </button>
                     ` : '<span class="text-[11px] text-slate-500">ไม่มีสลิป</span>';
 
+                    const deliveryPhotoBtn = ord.deliveryPhotoUrl ? `
+                        <button type="button" class="btn-view-slip px-2.5 py-1 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 text-xs font-semibold border border-emerald-500/30 transition flex items-center gap-1" data-slip="${ord.deliveryPhotoUrl}">
+                            <i class="fas fa-camera"></i> รูปส่งผ้า
+                        </button>
+                    ` : '';
+
+                    const uploadDeliveryPhotoBtn = `
+                        <label class="px-2.5 py-1 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 text-xs font-semibold border border-emerald-500/20 cursor-pointer transition flex items-center gap-1" title="แนบรูปถ่ายยืนยันการจัดส่งผ้า">
+                            <i class="fas fa-cloud-arrow-up"></i> ${ord.deliveryPhotoUrl ? 'เปลี่ยนรูปส่งผ้า' : '📸 แนบรูปส่งผ้า'}
+                            <input type="file" accept="image/*" class="sr-only delivery-photo-input" data-id="${ord.orderId}" />
+                        </label>
+                    `;
+
+                    const couponTag = ord.couponCode ? `
+                        <span class="text-[10px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-md border border-emerald-500/30">
+                            🎟️ ${ord.couponCode} (-${ord.discountAmount}฿)
+                        </span>
+                    ` : '';
+
                     return `
                         <div class="glass-card p-4 sm:p-5 rounded-2xl border border-slate-800 hover:border-slate-700 transition space-y-3">
                             <div class="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-slate-800/80">
                                 <div class="flex items-center gap-2">
                                     <span class="font-extrabold text-blue-400 font-mono text-sm sm:text-base">#${ord.orderId}</span>
                                     <span class="text-[11px] text-slate-400">${dt}</span>
+                                    ${couponTag}
                                 </div>
                                 <div class="flex items-center gap-2">
                                     <span class="px-2.5 py-0.5 rounded-full text-xs font-bold border ${badgeClass}">
                                         ${badgeLabel}
                                     </span>
+                                    ${deliveryPhotoBtn}
                                     ${slipBtn}
                                 </div>
                             </div>
@@ -714,8 +1543,17 @@
 
                             <!-- Action Controls -->
                             <div class="pt-2 border-t border-slate-800/60 flex flex-wrap items-center justify-between gap-2">
-                                <div class="text-sm font-extrabold text-emerald-400">
-                                    ฿${ord.total}
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <div class="text-sm font-extrabold text-emerald-400">
+                                        ฿${ord.total}
+                                    </div>
+                                    ${uploadDeliveryPhotoBtn}
+                                    <button type="button" class="btn-print-tag px-2.5 py-1 rounded-lg bg-cyan-600/20 hover:bg-cyan-600/30 text-cyan-300 text-xs font-semibold border border-cyan-500/30 transition flex items-center gap-1" data-id="${ord.orderId}" title="พิมพ์แท็ก 80mm แปะถุงผ้า">
+                                        <i class="fas fa-print"></i> แท็กถุงผ้า
+                                    </button>
+                                    <button type="button" class="btn-notify-openchat px-2.5 py-1 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 text-xs font-semibold border border-emerald-500/30 transition flex items-center gap-1" data-id="${ord.orderId}" title="คัดลอกข้อความ & เปิด LINE OpenChat">
+                                        <i class="fab fa-line text-emerald-400"></i> แจ้ง OpenChat
+                                    </button>
                                 </div>
 
                                 <div class="flex flex-wrap items-center gap-1.5 text-xs">
@@ -730,12 +1568,86 @@
                     `;
                 }).join('');
 
-                // Attach event listeners for status change & slip view
+                // Attach event listeners for status change, slip view, print tag, openchat notify & delivery photo upload
                 document.querySelectorAll('.btn-change-status').forEach(btn => {
                     btn.addEventListener('click', () => {
                         const targetId = btn.dataset.id;
                         const newStatus = btn.dataset.status;
                         updateOrderStatus(targetId, newStatus);
+                    });
+                });
+
+                document.querySelectorAll('.btn-print-tag').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const targetId = btn.dataset.id;
+                        const ord = orders.find(o => o.orderId === targetId);
+                        if (!ord) return;
+
+                        const dt = new Date(ord.createdAt).toLocaleString('th-TH', {
+                            month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+                        });
+
+                        const tagOrderId = document.getElementById('tag-order-id');
+                        const tagName = document.getElementById('tag-name');
+                        const tagPhone = document.getElementById('tag-phone');
+                        const tagDorm = document.getElementById('tag-dorm');
+                        const tagTime = document.getElementById('tag-time');
+                        const tagService = document.getElementById('tag-service');
+                        const tagNotes = document.getElementById('tag-notes');
+                        const tagTotal = document.getElementById('tag-total');
+                        const tagModal = document.getElementById('tag-modal');
+
+                        if (tagOrderId) tagOrderId.textContent = `#${ord.orderId}`;
+                        if (tagName) tagName.textContent = ord.name;
+                        if (tagPhone) tagPhone.textContent = ord.phone;
+                        if (tagDorm) tagDorm.textContent = ord.dorm;
+                        if (tagTime) tagTime.textContent = dt;
+                        if (tagService) tagService.textContent = ord.serviceName;
+                        if (tagNotes) tagNotes.textContent = `หมายเหตุ: ${ord.notes || '-'}`;
+                        if (tagTotal) tagTotal.textContent = `฿${ord.total}`;
+
+                        if (tagModal) tagModal.classList.remove('hidden');
+                    });
+                });
+
+                document.querySelectorAll('.btn-notify-openchat').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const targetId = btn.dataset.id;
+                        const ord = orders.find(o => o.orderId === targetId);
+                        if (!ord) return;
+
+                        const statusMap = {
+                            'pending': '🟡 รอตรวจสอบชำระเงิน',
+                            'picked_up': '🔵 รับผ้าใต้ตึกเรียบร้อยแล้ว',
+                            'processing': '🟣 กำลังซัก-อบผ้า',
+                            'delivered': '🟢 จัดส่งผ้าเรียบร้อยแล้ว'
+                        };
+
+                        const currentStatusText = statusMap[ord.status || 'pending'] || '🟡 รอตรวจสอบชำระเงิน';
+                        const trackUrl = `${window.location.origin}${window.location.pathname.replace('admin.html', 'track.html')}?id=${ord.orderId}`;
+                        
+                        let msg = `🫧 [ซักป่ะ? อัปเดตสถานะผ้า]\n`;
+                        msg += `📌 ออเดอร์: #${ord.orderId}\n`;
+                        msg += `👤 คุณ: ${ord.name}\n`;
+                        msg += `📍 จุดรับ-ส่ง: ${ord.dorm}\n`;
+                        msg += `สถานะ: ${currentStatusText}\n`;
+                        if (ord.deliveryPhotoUrl) {
+                            msg += `📸 แนบรูปถ่ายยืนยันการจัดส่งเรียบร้อยแล้ว\n`;
+                        }
+                        msg += `🔗 เช็คสถานะเรียลไทม์: ${trackUrl}`;
+
+                        if (navigator.clipboard && navigator.clipboard.writeText) {
+                            navigator.clipboard.writeText(msg).then(() => {
+                                showToast('📋 คัดลอกข้อความสถานะแล้ว! กำลังเปิด LINE OpenChat');
+                            }).catch(() => {
+                                showToast('กำลังเปิด LINE OpenChat...');
+                            });
+                        } else {
+                            showToast('กำลังเปิด LINE OpenChat...');
+                        }
+
+                        const OPENCHAT_URL = 'https://line.me/ti/g2/c4n6z-xzaKCXJcKWlGoLYVoxeAxBuZNRcGEg1A?utm_source=invitation&utm_medium=link_copy&utm_campaign=default';
+                        window.open(OPENCHAT_URL, '_blank', 'noopener,noreferrer');
                     });
                 });
 
@@ -747,6 +1659,35 @@
                         if (slipModal) slipModal.classList.remove('hidden');
                     });
                 });
+
+                document.querySelectorAll('.delivery-photo-input').forEach(input => {
+                    input.addEventListener('change', (e) => {
+                        const file = e.target.files[0];
+                        if (!file) return;
+                        const targetId = input.dataset.id;
+                        const reader = new FileReader();
+                        reader.onload = (event) => {
+                            const dataUrl = event.target.result;
+                            updateOrderDeliveryPhoto(targetId, dataUrl);
+                        };
+                        reader.readAsDataURL(file);
+                    });
+                });
+            }
+
+            function updateOrderDeliveryPhoto(orderId, photoUrl) {
+                const orders = JSON.parse(localStorage.getItem('sp_orders') || '[]');
+                const idx = orders.findIndex(o => o.orderId === orderId);
+                if (idx !== -1) {
+                    orders[idx].deliveryPhotoUrl = photoUrl;
+                    orders[idx].status = 'delivered'; // Auto set to delivered when photo attached!
+                    localStorage.setItem('sp_orders', JSON.stringify(orders));
+                    if (window.SukpaDB) {
+                        window.SukpaDB.saveOrder(orders[idx]);
+                    }
+                    renderDashboard();
+                    showToast(`📸 แนบรูปยืนยันส่งผ้า #${orderId} เรียบร้อยแล้ว!`);
+                }
             }
 
             // Update Order Status in localStorage
@@ -759,6 +1700,124 @@
                     renderDashboard();
                     showToast(`⚡ อัปเดตสถานะออเดอร์ #${orderId} เรียบร้อย!`);
                 }
+            }
+
+            // Web Audio Chime Sound Synthesizer
+            let soundMuted = localStorage.getItem('sp_admin_mute') === 'true';
+            const btnToggleSound = document.getElementById('btn-toggle-sound');
+            const soundIcon = document.getElementById('sound-icon');
+
+            function updateSoundUI() {
+                if (!soundIcon) return;
+                if (soundMuted) {
+                    soundIcon.className = 'fas fa-bell-slash text-slate-500';
+                } else {
+                    soundIcon.className = 'fas fa-bell text-amber-400';
+                }
+            }
+            updateSoundUI();
+
+            if (btnToggleSound) {
+                btnToggleSound.addEventListener('click', () => {
+                    soundMuted = !soundMuted;
+                    localStorage.setItem('sp_admin_mute', soundMuted ? 'true' : 'false');
+                    updateSoundUI();
+                    if (!soundMuted) playOrderChime();
+                    showToast(soundMuted ? '🔕 ปิดเสียงแจ้งเตือนแล้ว' : '🔔 เปิดเสียงแจ้งเตือนแล้ว');
+                });
+            }
+
+            function playOrderChime() {
+                if (soundMuted) return;
+                try {
+                    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                    if (!AudioCtx) return;
+                    const ctx = new AudioCtx();
+                    if (ctx.state === 'suspended') ctx.resume();
+
+                    const now = ctx.currentTime;
+                    const osc1 = ctx.createOscillator();
+                    const osc2 = ctx.createOscillator();
+                    const gain = ctx.createGain();
+
+                    osc1.type = 'sine';
+                    osc1.frequency.setValueAtTime(587.33, now);
+                    osc1.frequency.exponentialRampToValueAtTime(880, now + 0.15);
+
+                    osc2.type = 'triangle';
+                    osc2.frequency.setValueAtTime(880, now);
+                    osc2.frequency.exponentialRampToValueAtTime(1174.66, now + 0.2);
+
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+
+                    osc1.connect(gain);
+                    osc2.connect(gain);
+                    gain.connect(ctx.destination);
+
+                    osc1.start(now);
+                    osc2.start(now);
+                    osc1.stop(now + 0.6);
+                    osc2.stop(now + 0.6);
+                } catch (e) {
+                    console.warn('Audio play error:', e);
+                }
+            }
+
+            // Export Orders Report to Excel CSV (UTF-8 BOM)
+            const btnExportCsv = document.getElementById('btn-export-csv');
+            if (btnExportCsv) {
+                btnExportCsv.addEventListener('click', async () => {
+                    const orders = window.SukpaDB ? await window.SukpaDB.getOrders() : JSON.parse(localStorage.getItem('sp_orders') || '[]');
+                    if (!orders || orders.length === 0) {
+                        showToast('⚠️ ไม่มีข้อมูลออเดอร์ให้ Export');
+                        return;
+                    }
+
+                    const headers = [
+                        'Order ID', 'วันที่-เวลา', 'ชื่อลูกค้า', 'เบอร์โทร', 'หอพัก/จุดนัดรับ', 
+                        'รายการบริการ', 'ค่าซัก (บาท)', 'ค่าอบ (บาท)', 'ค่าน้ำยา (บาท)', 
+                        'ค่าจัดส่ง (บาท)', 'โค้ดส่วนลด', 'ส่วนลด (บาท)', 'ราคารวม (บาท)', 'สถานะ', 'หมายเหตุ'
+                    ];
+
+                    const rows = orders.map(ord => {
+                        const dt = ord.createdAt ? new Date(ord.createdAt).toLocaleString('th-TH') : '-';
+                        let statusText = 'รอตรวจสอบ';
+                        if (ord.status === 'picked_up') statusText = 'รับผ้าแล้ว';
+                        else if (ord.status === 'processing') statusText = 'กำลังซัก-อบ';
+                        else if (ord.status === 'delivered') statusText = 'จัดส่งแล้ว';
+
+                        return [
+                            `"${ord.orderId || ''}"`,
+                            `"${dt}"`,
+                            `"${(ord.name || '').replace(/"/g, '""')}"`,
+                            `"${(ord.phone || '').replace(/"/g, '""')}"`,
+                            `"${(ord.dorm || '').replace(/"/g, '""')}"`,
+                            `"${(ord.serviceName || '').replace(/"/g, '""')}"`,
+                            ord.sizePrice || 0,
+                            ord.dryerPrice || 0,
+                            ord.detergentSurcharge || 0,
+                            ord.zoneSurcharge || 30,
+                            `"${ord.couponCode || ''}"`,
+                            ord.discountAmount || 0,
+                            ord.total || 0,
+                            `"${statusText}"`,
+                            `"${(ord.notes || '').replace(/"/g, '""')}"`
+                        ].join(',');
+                    });
+
+                    const csvContent = '\uFEFF' + [headers.join(','), ...rows].join('\n');
+                    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    const todayStr = new Date().toISOString().slice(0, 10);
+                    link.setAttribute('href', url);
+                    link.setAttribute('download', `sukpa_revenue_report_${todayStr}.csv`);
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    showToast('📊 ส่งออกรายงาน Excel (CSV) เรียบร้อยแล้ว!');
+                });
             }
 
             // Close Slip Modal
