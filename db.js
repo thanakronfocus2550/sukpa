@@ -119,8 +119,8 @@
                 coupon_code: order.couponCode || '',
                 discount_amount: order.discountAmount || 0,
                 total: order.total || 0,
-                slip_url: order.slipDataUrl || '',
-                delivery_photo_url: order.deliveryPhotoUrl || '',
+                slip_url: order.slipDataUrl || order.slipUrl || order.slip_url || '',
+                delivery_photo_url: order.deliveryPhotoUrl || order.delivery_photo_url || '',
                 status: order.status || 'pending',
                 created_at: order.createdAt || new Date().toISOString()
             };
@@ -175,17 +175,19 @@
         async getOrderById(orderId) {
             if (!orderId) return null;
             const cleanId = orderId.replace(/^#/, '').trim();
+            const upperCleanId = cleanId.toUpperCase();
 
             if (this.isCloudEnabled()) {
                 try {
+                    // Try exact match or ilike ending match
                     const { data, error } = await supabaseClient
                         .from('orders')
                         .select('*')
-                        .eq('order_id', cleanId)
-                        .single();
+                        .ilike('order_id', `%${cleanId}`)
+                        .limit(1);
 
-                    if (!error && data) {
-                        return this._mapFromDb(data);
+                    if (!error && Array.isArray(data) && data.length > 0) {
+                        return this._mapFromDb(data[0]);
                     }
                 } catch (err) {
                     console.warn('⚠️ Supabase getOrderById error:', err);
@@ -193,7 +195,11 @@
             }
 
             const localOrders = this.getLocalOrders();
-            return localOrders.find(o => o.orderId === cleanId) || null;
+            return localOrders.find(o => {
+                if (!o.orderId) return false;
+                const oId = o.orderId.toUpperCase();
+                return oId === upperCleanId || oId.endsWith(upperCleanId);
+            }) || null;
         },
 
         /**
@@ -261,6 +267,38 @@
         },
 
         /**
+         * Delete order by Order ID
+         */
+        async deleteOrder(orderId) {
+            if (!orderId) return false;
+            const cleanId = orderId.replace(/^#/, '').trim();
+
+            // 1. Remove from LocalStorage
+            const localOrders = this.getLocalOrders();
+            const filtered = localOrders.filter(o => o.orderId !== cleanId);
+            this.setLocalOrders(filtered);
+
+            // 2. Delete from Supabase Cloud DB
+            if (this.isCloudEnabled()) {
+                try {
+                    const { error } = await supabaseClient
+                        .from('orders')
+                        .delete()
+                        .eq('order_id', cleanId);
+
+                    if (error) {
+                        console.error('❌ Supabase delete order error:', error.message);
+                    } else {
+                        console.log(`✅ Supabase order deleted: #${cleanId}`);
+                    }
+                } catch (err) {
+                    console.error('❌ Exception deleting Supabase order:', err);
+                }
+            }
+            return true;
+        },
+
+        /**
          * Subscribe to changes (Realtime Cloud Sync)
          */
         subscribeOrders(onUpdateCallback) {
@@ -301,15 +339,161 @@
                     window.removeEventListener('storage', storageHandler);
                 }
             };
+        },
+
+        /**
+         * Test Cloud DB Connection
+         */
+        async testCloudConnection() {
+            if (!this.isCloudEnabled()) {
+                return { success: false, message: 'ไม่ได้ตั้งค่า Supabase URL / API Key' };
+            }
+            try {
+                const { count, error } = await supabaseClient
+                    .from('orders')
+                    .select('*', { count: 'exact', head: true });
+
+                if (error) {
+                    return { success: false, message: error.message };
+                }
+                return { success: true, message: 'เชื่อมต่อ Supabase สำเร็จ!', count: count || 0 };
+            } catch (err) {
+                return { success: false, message: err.message || 'ไม่สามารถเชื่อมต่อได้' };
+            }
+        },
+
+        /**
+         * Get Orders By Status
+         */
+        async getOrdersByStatus(status) {
+            if (!status || status === 'all') return this.getOrders();
+
+            if (this.isCloudEnabled()) {
+                try {
+                    const { data, error } = await supabaseClient
+                        .from('orders')
+                        .select('*')
+                        .eq('status', status)
+                        .order('created_at', { ascending: false });
+
+                    if (!error && Array.isArray(data)) {
+                        return data.map(row => this._mapFromDb(row));
+                    }
+                } catch (err) {
+                    console.warn('⚠️ getOrdersByStatus error:', err);
+                }
+            }
+
+            const local = this.getLocalOrders();
+            return local.filter(o => (o.status || 'pending') === status);
+        },
+
+        /**
+         * Get Orders By Customer Phone Number
+         */
+        async getOrdersByPhone(phone) {
+            if (!phone) return [];
+            const cleanPhone = phone.replace(/\D/g, '');
+            if (!cleanPhone) return [];
+
+            const allOrders = await this.getOrders();
+            return allOrders.filter(o => (o.phone || '').replace(/\D/g, '').includes(cleanPhone));
+        },
+
+        /**
+         * Export Backup as JSON String
+         */
+        async exportBackupJSON() {
+            const orders = await this.getOrders();
+            const backup = {
+                app: 'Sukpa Laundry',
+                version: '2.0.0',
+                exportedAt: new Date().toISOString(),
+                totalOrders: orders.length,
+                orders: orders
+            };
+            return JSON.stringify(backup, null, 2);
+        },
+
+        /**
+         * Import Backup JSON String
+         */
+        async importBackupJSON(jsonString) {
+            try {
+                const parsed = JSON.parse(jsonString);
+                const ordersToImport = Array.isArray(parsed) ? parsed : (parsed.orders || []);
+
+                if (!Array.isArray(ordersToImport) || ordersToImport.length === 0) {
+                    return { success: false, message: 'ไม่พบรายการออเดอร์ในไฟล์ข้อมูลสำรอง' };
+                }
+
+                let importedCount = 0;
+                for (const ord of ordersToImport) {
+                    if (ord.orderId) {
+                        await this.saveOrder(ord);
+                        importedCount++;
+                    }
+                }
+
+                return { success: true, message: `นำเข้าออเดอร์สำเร็จ ${importedCount} รายการ`, count: importedCount };
+            } catch (err) {
+                return { success: false, message: `ไฟล์ JSON ไม่ถูกต้อง: ${err.message}` };
+            }
+        },
+
+        /**
+         * Clear All Orders (Reset DB)
+         */
+        async clearAllOrders() {
+            this.setLocalOrders([]);
+            if (this.isCloudEnabled()) {
+                try {
+                    await supabaseClient.from('orders').delete().neq('order_id', '');
+                } catch (err) {
+                    console.warn('⚠️ Clear cloud DB error:', err);
+                }
+            }
+            return true;
+        },
+
+        /**
+         * Sync Offline Queue to Supabase Cloud DB
+         */
+        async syncOfflineQueue() {
+            const STORAGE_KEY_QUEUE = 'sp_offline_queue';
+            try {
+                const queue = JSON.parse(localStorage.getItem(STORAGE_KEY_QUEUE) || '[]');
+                if (queue.length === 0 || !this.isCloudEnabled()) return;
+
+                console.log(`🔄 Syncing ${queue.length} offline tasks to Supabase...`);
+                const remaining = [];
+                for (const task of queue) {
+                    try {
+                        if (task.type === 'save') {
+                            await this.saveOrder(task.order);
+                        } else if (task.type === 'status') {
+                            await this.updateOrderStatus(task.orderId, task.status);
+                        } else if (task.type === 'delete') {
+                            await this.deleteOrder(task.orderId);
+                        }
+                    } catch (e) {
+                        remaining.push(task);
+                    }
+                }
+                localStorage.setItem(STORAGE_KEY_QUEUE, JSON.stringify(remaining));
+            } catch (err) {
+                console.warn('⚠️ Offline sync error:', err);
+            }
         }
     };
 
-    // Auto-init on script load
+    // Auto-init on script load & listen to online reconnect
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', () => SukpaDB.init());
     } else {
         SukpaDB.init();
     }
+    window.addEventListener('online', () => SukpaDB.syncOfflineQueue());
 
     window.SukpaDB = SukpaDB;
 })(window);
