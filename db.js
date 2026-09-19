@@ -765,6 +765,147 @@
             } catch (err) {
                 console.warn('⚠️ Offline sync error:', err);
             }
+        },
+
+        /**
+         * Get All Customer Reviews
+         */
+        async getReviews() {
+            const STORAGE_KEY_REVIEWS = 'sp_reviews';
+            const defaultReviews = [
+                {
+                    id: 'REV-101',
+                    orderId: 'SP-20260918-1001',
+                    name: 'น้องมายด์',
+                    dorm: 'หอวันสยา แกรนด์ มาสเตอร์',
+                    rating: 5,
+                    comment: 'บริการเร็วมาก ผ้าหอมสะอาด อบแห้งพับเรียบร้อยพร้อมใส่เลยค่ะ ❤️',
+                    createdAt: '2026-09-18T14:20:00.000Z'
+                },
+                {
+                    id: 'REV-102',
+                    orderId: 'SP-20260917-1002',
+                    name: 'พี่พงษ์',
+                    dorm: 'หอทรัพย์ไพศาล',
+                    rating: 5,
+                    comment: 'แอดมินมารับผ้าไวมาก พับผ้าสวยงาม บริการประทับใจส่งถึงหน้าห้องเลยครับ ⭐⭐⭐⭐⭐',
+                    createdAt: '2026-09-17T11:45:00.000Z'
+                },
+                {
+                    id: 'REV-103',
+                    orderId: 'SP-20260915-1003',
+                    name: 'คุณมิ้นต์',
+                    dorm: 'หอบ้านสวน',
+                    rating: 5,
+                    comment: 'ใช้บริการสะสมแต้มแสตมป์แลกส่งฟรีได้จริง คุ้มค่ามากค่ะ ชอบความตรงเวลา',
+                    createdAt: '2026-09-15T09:10:00.000Z'
+                }
+            ];
+
+            let localReviews = [];
+            try {
+                localReviews = JSON.parse(localStorage.getItem(STORAGE_KEY_REVIEWS) || '[]');
+            } catch (e) {
+                localReviews = [];
+            }
+
+            if (localReviews.length === 0) {
+                localReviews = defaultReviews;
+                localStorage.setItem(STORAGE_KEY_REVIEWS, JSON.stringify(localReviews));
+            }
+
+            if (this.isCloudEnabled()) {
+                try {
+                    const { data, error } = await supabaseClient
+                        .from('reviews')
+                        .select('*')
+                        .order('created_at', { ascending: false });
+
+                    if (!error && Array.isArray(data) && data.length > 0) {
+                        const mapped = data.map(r => ({
+                            id: r.id || r.review_id,
+                            orderId: r.order_id || r.orderId || '',
+                            name: r.name || 'ลูกค้า',
+                            dorm: r.dorm || '',
+                            rating: Number(r.rating || 5),
+                            comment: r.comment || '',
+                            createdAt: r.created_at || new Date().toISOString()
+                        }));
+                        localStorage.setItem(STORAGE_KEY_REVIEWS, JSON.stringify(mapped));
+                        return mapped;
+                    }
+                } catch (err) {
+                    console.warn('⚠️ Fetch cloud reviews error:', err);
+                }
+            }
+
+            return localReviews;
+        },
+
+        /**
+         * Save Customer Review
+         */
+        async saveReview(reviewObj) {
+            if (!reviewObj) return null;
+            const STORAGE_KEY_REVIEWS = 'sp_reviews';
+            const reviews = await this.getReviews();
+            const existingIdx = reviews.findIndex(r => r.orderId === reviewObj.orderId || r.id === reviewObj.id);
+
+            const newReview = {
+                id: reviewObj.id || `REV-${Date.now()}`,
+                orderId: reviewObj.orderId || '',
+                name: reviewObj.name || 'ลูกค้า',
+                dorm: reviewObj.dorm || '',
+                rating: Number(reviewObj.rating || 5),
+                comment: reviewObj.comment || '',
+                createdAt: reviewObj.createdAt || new Date().toISOString()
+            };
+
+            if (existingIdx !== -1) {
+                reviews[existingIdx] = newReview;
+            } else {
+                reviews.unshift(newReview);
+            }
+
+            localStorage.setItem(STORAGE_KEY_REVIEWS, JSON.stringify(reviews));
+
+            if (this.isCloudEnabled()) {
+                try {
+                    const dbRow = {
+                        id: newReview.id,
+                        order_id: newReview.orderId,
+                        name: newReview.name,
+                        dorm: newReview.dorm,
+                        rating: newReview.rating,
+                        comment: newReview.comment,
+                        created_at: newReview.createdAt
+                    };
+                    await supabaseClient.from('reviews').upsert([dbRow]);
+                } catch (err) {
+                    console.warn('⚠️ Save cloud review error:', err);
+                }
+            }
+
+            return newReview;
+        },
+
+        /**
+         * Delete Customer Review
+         */
+        async deleteReview(reviewId) {
+            const STORAGE_KEY_REVIEWS = 'sp_reviews';
+            let reviews = await this.getReviews();
+            reviews = reviews.filter(r => r.id !== reviewId);
+            localStorage.setItem(STORAGE_KEY_REVIEWS, JSON.stringify(reviews));
+
+            if (this.isCloudEnabled()) {
+                try {
+                    await supabaseClient.from('reviews').delete().eq('id', reviewId);
+                } catch (err) {
+                    console.warn('⚠️ Delete cloud review error:', err);
+                }
+            }
+            return true;
         }
     };
 

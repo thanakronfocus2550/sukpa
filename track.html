@@ -252,6 +252,44 @@
                     </div>
                     <img id="track-delivery-photo-img" src="" alt="รูปถ่ายยืนยันการจัดส่งผ้า" class="max-h-64 mx-auto rounded-2xl border-2 border-emerald-300 shadow-md object-cover" />
                 </div>
+
+                <!-- Customer Review & Rating Form Card (Appears when status = delivered) -->
+                <div id="track-review-card" class="hidden pt-4 mt-4 border-t border-slate-200/80 space-y-3 bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl p-4 sm:p-5 border border-amber-200/60 shadow-sm">
+                    <div class="text-center space-y-1">
+                        <h4 class="text-sm font-extrabold text-slate-800 flex items-center justify-center gap-1.5">
+                            <span class="text-amber-500">⭐</span> ความประทับใจและรีวิวบริการ
+                        </h4>
+                        <p class="text-xs text-slate-500">ให้คะแนนการบริการซักป่ะ? เพื่อนำไปปรับปรุงให้ดียิ่งขึ้นครับ</p>
+                    </div>
+
+                    <!-- Submitted Review View -->
+                    <div id="review-submitted-view" class="hidden bg-white rounded-xl p-3.5 border border-amber-200 text-center space-y-1 shadow-xs">
+                        <div class="text-xs font-bold text-emerald-600 flex items-center justify-center gap-1">
+                            <i class="fas fa-circle-check"></i>
+                            <span>ขอบคุณสำหรับความประทับใจและรีวิวครับ!</span>
+                        </div>
+                        <div class="text-amber-400 text-lg tracking-widest" id="review-submitted-stars">⭐⭐⭐⭐⭐</div>
+                        <p class="text-xs text-slate-700 italic font-medium" id="review-submitted-comment">"บริการดีเยี่ยม ผ้าหอมตรงเวลามาก"</p>
+                    </div>
+
+                    <!-- Review Input Form -->
+                    <form id="review-form" class="space-y-3">
+                        <div class="flex justify-center items-center gap-2 text-2xl text-slate-300" id="star-rating-selector">
+                            <button type="button" class="star-btn hover:scale-125 transition-transform cursor-pointer focus:outline-none" data-rating="1">★</button>
+                            <button type="button" class="star-btn hover:scale-125 transition-transform cursor-pointer focus:outline-none" data-rating="2">★</button>
+                            <button type="button" class="star-btn hover:scale-125 transition-transform cursor-pointer focus:outline-none" data-rating="3">★</button>
+                            <button type="button" class="star-btn hover:scale-125 transition-transform cursor-pointer focus:outline-none" data-rating="4">★</button>
+                            <button type="button" class="star-btn hover:scale-125 transition-transform cursor-pointer focus:outline-none" data-rating="5">★</button>
+                        </div>
+                        <div class="text-center text-[11px] font-bold text-amber-600" id="star-rating-label">5 ดาว — ประทับใจมากที่สุด!</div>
+                        
+                        <textarea id="input-review-comment" rows="2" placeholder="เขียนความรู้สึก ความประทับใจ หรือข้อเสนอแนะเพิ่มเติม..." class="w-full text-xs rounded-xl border border-slate-300 p-2.5 focus:ring-2 focus:ring-amber-400 focus:outline-none bg-white shadow-inner resize-none"></textarea>
+                        
+                        <button type="submit" id="btn-submit-review" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-extrabold text-xs shadow-md transition flex items-center justify-center gap-1.5">
+                            <span>⭐ ส่งรีวิวความประทับใจ</span>
+                        </button>
+                    </form>
+                </div>
             </div>
 
         </div>
@@ -424,6 +462,36 @@
                 // Update Status Stepper (Default step 1 for pending)
                 const status = ord.status || 'pending';
                 updateStepper(status);
+
+                // Customer Review Card Handling
+                const trackReviewCard = document.getElementById('track-review-card');
+                const reviewSubmittedView = document.getElementById('review-submitted-view');
+                const reviewForm = document.getElementById('review-form');
+                const reviewSubmittedStars = document.getElementById('review-submitted-stars');
+                const reviewSubmittedComment = document.getElementById('review-submitted-comment');
+
+                if (trackReviewCard) {
+                    if (status === 'delivered') {
+                        trackReviewCard.classList.remove('hidden');
+                        (async () => {
+                            const reviews = window.SukpaDB ? await window.SukpaDB.getReviews() : [];
+                            const existing = reviews.find(r => r.orderId === ord.orderId);
+                            if (existing) {
+                                if (reviewForm) reviewForm.classList.add('hidden');
+                                if (reviewSubmittedView) {
+                                    reviewSubmittedView.classList.remove('hidden');
+                                    if (reviewSubmittedStars) reviewSubmittedStars.textContent = '⭐'.repeat(existing.rating || 5);
+                                    if (reviewSubmittedComment) reviewSubmittedComment.textContent = `"${existing.comment || 'บริการดีเยี่ยม'}"`;
+                                }
+                            } else {
+                                if (reviewSubmittedView) reviewSubmittedView.classList.add('hidden');
+                                if (reviewForm) reviewForm.classList.remove('hidden');
+                            }
+                        })();
+                    } else {
+                        trackReviewCard.classList.add('hidden');
+                    }
+                }
             }
 
             function updateStepper(status) {
@@ -496,6 +564,82 @@
                     showToast('ℹ️ ไม่พบประวัติการจองคิวในอุปกรณ์นี้');
                 }
             });
+
+            // Star Rating Interactive Selection Logic
+            let selectedRating = 5;
+            const starBtns = document.querySelectorAll('#star-rating-selector .star-btn');
+            const starRatingLabel = document.getElementById('star-rating-label');
+            const ratingLabels = {
+                1: '1 ดาว — ต้องปรับปรุง',
+                2: '2 ดาว — พอใช้ได้',
+                3: '3 ดาว — ปานกลาง',
+                4: '4 ดาว — บริการดีมาก',
+                5: '5 ดาว — ประทับใจมากที่สุด!'
+            };
+
+            function updateStarUI(rating) {
+                selectedRating = rating;
+                starBtns.forEach(btn => {
+                    const r = Number(btn.dataset.rating);
+                    if (r <= rating) {
+                        btn.classList.remove('text-slate-300');
+                        btn.classList.add('text-amber-400');
+                    } else {
+                        btn.classList.remove('text-amber-400');
+                        btn.classList.add('text-slate-300');
+                    }
+                });
+                if (starRatingLabel) {
+                    starRatingLabel.textContent = ratingLabels[rating] || `${rating} ดาว`;
+                }
+            }
+            updateStarUI(5);
+
+            starBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    updateStarUI(Number(btn.dataset.rating));
+                });
+            });
+
+            // Review Form Submit Handler
+            const reviewFormElement = document.getElementById('review-form');
+            if (reviewFormElement) {
+                reviewFormElement.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    if (!currentTrackingId) return;
+
+                    const orders = window.SukpaDB ? await window.SukpaDB.getOrders() : JSON.parse(localStorage.getItem('sp_orders') || '[]');
+                    const activeOrd = orders.find(o => o.orderId === currentTrackingId) || await window.SukpaDB.getOrderById(currentTrackingId);
+                    
+                    const commentInput = document.getElementById('input-review-comment');
+                    const commentText = commentInput ? commentInput.value.trim() : '';
+
+                    const reviewData = {
+                        orderId: currentTrackingId,
+                        name: activeOrd ? activeOrd.name : 'ลูกค้า มจพ.',
+                        dorm: activeOrd ? activeOrd.dorm : 'หอพักนักศึกษา',
+                        rating: selectedRating,
+                        comment: commentText || 'บริการเร็วมาก ผ้าหอมประทับใจที่สุดค่ะ'
+                    };
+
+                    if (window.SukpaDB) {
+                        await window.SukpaDB.saveReview(reviewData);
+                    }
+
+                    showToast('⭐ ขอบคุณสำหรับความประทับใจและรีวิวบริการครับ!');
+
+                    const reviewSubmittedView = document.getElementById('review-submitted-view');
+                    const reviewSubmittedStars = document.getElementById('review-submitted-stars');
+                    const reviewSubmittedComment = document.getElementById('review-submitted-comment');
+
+                    reviewFormElement.classList.add('hidden');
+                    if (reviewSubmittedView) {
+                        reviewSubmittedView.classList.remove('hidden');
+                        if (reviewSubmittedStars) reviewSubmittedStars.textContent = '⭐'.repeat(selectedRating);
+                        if (reviewSubmittedComment) reviewSubmittedComment.textContent = `"${reviewData.comment}"`;
+                    }
+                });
+            }
 
             // Realtime Sync Subscription for track.html
             if (window.SukpaDB) {

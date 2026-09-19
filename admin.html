@@ -175,6 +175,12 @@
                         <i class="fas fa-ticket text-emerald-400"></i>
                         <span class="hidden md:inline">จัดการคูปอง</span>
                     </button>
+                    <button type="button" id="btn-open-reviews-modal"
+                        class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-400 text-xs font-semibold border border-slate-700 transition flex items-center gap-1.5"
+                        title="จัดการรีวิวลูกค้า">
+                        <i class="fas fa-star text-amber-400"></i>
+                        <span class="hidden md:inline">รีวิวลูกค้า</span>
+                    </button>
                     <button type="button" id="btn-open-pin-modal"
                         class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-purple-400 text-xs font-semibold border border-slate-700 transition flex items-center gap-1.5"
                         title="เปลี่ยนรหัส PIN">
@@ -867,6 +873,34 @@
         </div>
     </div>
 
+    <!-- Customer Reviews Management Modal -->
+    <div id="reviews-modal"
+        class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+        <div
+            class="bg-slate-900 border border-slate-800 rounded-3xl p-6 max-w-lg w-full shadow-2xl space-y-4 max-h-[85vh] flex flex-col">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-sm">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-extrabold text-white text-base">จัดการรีวิวความประทับใจลูกค้า</h3>
+                        <p class="text-xs text-slate-400">รายการรีวิว ให้ดาว และความคิดเห็นจากลูกค้า มจพ.</p>
+                    </div>
+                </div>
+                <button type="button" id="close-reviews-modal"
+                    class="w-8 h-8 rounded-xl bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition">
+                    <i class="fas fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Reviews List Container -->
+            <div id="admin-reviews-list-container" class="space-y-3 overflow-y-auto flex-grow pr-1">
+                <!-- Dynamic Render -->
+            </div>
+        </div>
+    </div>
+
     <!-- Payment Slip Verification Modal -->
     <div id="slip-modal"
         class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md hidden flex items-center justify-center p-4">
@@ -1129,6 +1163,68 @@
                     localStorage.setItem('sp_admin_pin', newVal);
                     if (pinModal) pinModal.classList.add('hidden');
                     showToast('🔑 บันทึกรหัส PIN ใหม่สำเร็จ!');
+                });
+            }
+
+            // Customer Reviews Modal Logic
+            const btnOpenReviewsModal = document.getElementById('btn-open-reviews-modal');
+            const reviewsModal = document.getElementById('reviews-modal');
+            const closeReviewsModal = document.getElementById('close-reviews-modal');
+            const adminReviewsListContainer = document.getElementById('admin-reviews-list-container');
+
+            async function renderAdminReviews() {
+                if (!adminReviewsListContainer) return;
+                const reviews = window.SukpaDB ? await window.SukpaDB.getReviews() : [];
+                if (reviews.length === 0) {
+                    adminReviewsListContainer.innerHTML = '<div class="text-center text-xs text-slate-500 py-6">ยังไม่มีรีวิวจากลูกค้า</div>';
+                    return;
+                }
+
+                adminReviewsListContainer.innerHTML = reviews.map(r => {
+                    const dt = new Date(r.createdAt).toLocaleDateString('th-TH', { month: 'short', day: 'numeric', year: 'numeric' });
+                    const stars = '⭐'.repeat(r.rating || 5);
+                    return `
+                        <div class="bg-slate-950/80 p-3.5 rounded-2xl border border-slate-800 flex items-start justify-between gap-3 text-xs">
+                            <div class="space-y-1">
+                                <div class="flex items-center gap-2">
+                                    <strong class="text-white">${r.name}</strong>
+                                    <span class="text-[10px] text-slate-400">(${r.dorm})</span>
+                                    <span class="text-amber-400 font-bold">${stars}</span>
+                                </div>
+                                <p class="text-slate-300 italic">"${r.comment}"</p>
+                                <div class="text-[10px] text-slate-500">ออเดอร์: #${r.orderId || '-'} • ${dt}</div>
+                            </div>
+                            <button type="button" class="btn-delete-review text-red-400 hover:text-red-300 transition p-1" data-id="${r.id}" title="ลบรีวิวนี้">
+                                <i class="fas fa-trash-can"></i>
+                            </button>
+                        </div>
+                    `;
+                }).join('');
+
+                document.querySelectorAll('.btn-delete-review').forEach(btn => {
+                    btn.addEventListener('click', async () => {
+                        const targetId = btn.dataset.id;
+                        if (confirm('คุณต้องการลบรีวิวนี้ใช่หรือไม่?')) {
+                            if (window.SukpaDB) {
+                                await window.SukpaDB.deleteReview(targetId);
+                            }
+                            renderAdminReviews();
+                            showToast('🗑️ ลบรีวิวเรียบร้อยแล้ว');
+                        }
+                    });
+                });
+            }
+
+            if (btnOpenReviewsModal) {
+                btnOpenReviewsModal.addEventListener('click', () => {
+                    renderAdminReviews();
+                    if (reviewsModal) reviewsModal.classList.remove('hidden');
+                });
+            }
+
+            if (closeReviewsModal) {
+                closeReviewsModal.addEventListener('click', () => {
+                    if (reviewsModal) reviewsModal.classList.add('hidden');
                 });
             }
 

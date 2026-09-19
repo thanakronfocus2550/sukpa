@@ -587,6 +587,55 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 16);
   }
 
+  // ─────────────────────────────────────────────
+  // CUSTOMER REVIEWS RENDERER
+  // ─────────────────────────────────────────────
+  async function renderCustomerReviews() {
+    const grid = document.getElementById('reviews-grid');
+    if (!grid) return;
+
+    const reviews = window.SukpaDB ? await window.SukpaDB.getReviews() : [];
+    if (reviews.length === 0) return;
+
+    grid.innerHTML = reviews.map(r => {
+      const dt = new Date(r.createdAt).toLocaleDateString('th-TH', {
+        month: 'short', day: 'numeric', year: 'numeric'
+      });
+      const stars = '⭐'.repeat(r.rating || 5);
+      const name = r.name || 'ลูกค้า มจพ.';
+      const initial = name.charAt(0).toUpperCase();
+
+      return `
+        <div class="bg-slate-800/60 border border-slate-700/60 rounded-3xl p-6 backdrop-blur-md flex flex-col justify-between space-y-4 hover:border-amber-400/50 hover:bg-slate-800/90 transition-all duration-300 shadow-xl group">
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 text-slate-950 font-black text-base flex items-center justify-center shadow-md">
+                  ${initial}
+                </div>
+                <div>
+                  <h4 class="font-bold text-white text-sm group-hover:text-amber-300 transition-colors">${name}</h4>
+                  <div class="text-[11px] text-slate-400">${r.dorm || 'หอพัก มจพ.'}</div>
+                </div>
+              </div>
+              <span class="text-xs text-amber-400 font-mono tracking-tighter">${stars}</span>
+            </div>
+            <p class="text-xs text-slate-300 leading-relaxed italic">
+              "${r.comment}"
+            </p>
+          </div>
+          <div class="pt-3 border-t border-slate-700/50 flex items-center justify-between text-[10px] text-slate-400">
+            <span class="inline-flex items-center gap-1 text-emerald-400 font-semibold">
+              <i class="fas fa-certificate text-[9px]"></i> ลูกค้าใช้บริการจริง
+            </span>
+            <span>${dt}</span>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+  renderCustomerReviews();
+
 });
 
 
