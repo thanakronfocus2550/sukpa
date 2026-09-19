@@ -61,7 +61,18 @@ ALTER TABLE public.coupons
     ADD COLUMN IF NOT EXISTS max_uses NUMERIC DEFAULT 0,
     ADD COLUMN IF NOT EXISTS used_count NUMERIC DEFAULT 0;
 
--- 3. เพิ่มข้อมูลคูปองเริ่มต้น
+-- 3. สร้างตารางรีวิวลูกค้า (reviews)
+CREATE TABLE IF NOT EXISTS public.reviews (
+    id TEXT PRIMARY KEY,
+    order_id TEXT DEFAULT '',
+    name TEXT NOT NULL DEFAULT 'ลูกค้า',
+    dorm TEXT DEFAULT '',
+    rating NUMERIC DEFAULT 5,
+    comment TEXT DEFAULT '',
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 4. เพิ่มข้อมูลคูปองเริ่มต้น
 INSERT INTO public.coupons (code, type, amount, label) VALUES
     ('WELCOME10', 'flat', 10, 'ส่วนลดต้อนรับ 10฿'),
     ('SUKPA20', 'flat', 20, 'ส่วนลดพิเศษ 20฿'),
@@ -70,11 +81,12 @@ INSERT INTO public.coupons (code, type, amount, label) VALUES
     ('STUDENT10', 'percent', 10, 'ส่วนลดนักศึกษา 10%')
 ON CONFLICT (code) DO NOTHING;
 
--- 4. ปิด RLS (Row Level Security) เพื่อให้เว็บอ่าน-เขียนข้อมูลได้ทันที
+-- 5. ปิด RLS (Row Level Security) เพื่อให้เว็บอ่าน-เขียนข้อมูลได้ทันที
 ALTER TABLE public.orders DISABLE ROW LEVEL SECURITY;
 ALTER TABLE public.coupons DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.reviews DISABLE ROW LEVEL SECURITY;
 
--- 5. เปิดใช้งาน Realtime แบบปลอดภัย
+-- 6. เปิดใช้งาน Realtime แบบปลอดภัย
 DO $$ 
 BEGIN
     BEGIN
@@ -84,6 +96,11 @@ BEGIN
     END;
     BEGIN
         ALTER PUBLICATION supabase_realtime ADD TABLE public.coupons;
+    EXCEPTION
+        WHEN duplicate_object THEN NULL;
+    END;
+    BEGIN
+        ALTER PUBLICATION supabase_realtime ADD TABLE public.reviews;
     EXCEPTION
         WHEN duplicate_object THEN NULL;
     END;

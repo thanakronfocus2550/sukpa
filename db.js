@@ -802,14 +802,17 @@
                 }
             ];
 
-            let localReviews = [];
+            let localReviews = null;
             try {
-                localReviews = JSON.parse(localStorage.getItem(STORAGE_KEY_REVIEWS) || '[]');
+                const raw = localStorage.getItem(STORAGE_KEY_REVIEWS);
+                if (raw !== null) {
+                    localReviews = JSON.parse(raw);
+                }
             } catch (e) {
-                localReviews = [];
+                localReviews = null;
             }
 
-            if (localReviews.length === 0) {
+            if (!Array.isArray(localReviews)) {
                 localReviews = defaultReviews;
                 localStorage.setItem(STORAGE_KEY_REVIEWS, JSON.stringify(localReviews));
             }
@@ -821,7 +824,7 @@
                         .select('*')
                         .order('created_at', { ascending: false });
 
-                    if (!error && Array.isArray(data) && data.length > 0) {
+                    if (!error && Array.isArray(data)) {
                         const mapped = data.map(r => ({
                             id: r.id || r.review_id,
                             orderId: r.order_id || r.orderId || '',
@@ -831,6 +834,7 @@
                             comment: r.comment || '',
                             createdAt: r.created_at || new Date().toISOString()
                         }));
+                        // Only save to localStorage if cloud returned results or user has cloud DB set up
                         localStorage.setItem(STORAGE_KEY_REVIEWS, JSON.stringify(mapped));
                         return mapped;
                     }
