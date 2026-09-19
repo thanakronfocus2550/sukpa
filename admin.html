@@ -907,7 +907,7 @@
             <div class="flex flex-col gap-2 pt-1">
                 <button type="button" id="btn-approve-slip"
                     class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-lg transition flex items-center justify-center gap-1.5">
-                    <i class="fas fa-circle-check"></i> ✅ อนุมัติสลีป (เปลี่ยนเป็น: กำลังซัก-อบ)
+                    <i class="fas fa-circle-check"></i> ✅ อนุมัติสลีป (เปลี่ยนเป็น: กำลังไปรับผ้า)
                 </button>
                 <button type="button" id="btn-reject-slip"
                     class="w-full py-2.5 rounded-xl bg-amber-600/20 hover:bg-amber-600/30 text-amber-300 font-bold text-xs border border-amber-500/30 transition flex items-center justify-center gap-1.5">
@@ -1468,9 +1468,9 @@ END $$;`;
             if (btnApproveSlip) {
                 btnApproveSlip.addEventListener('click', async () => {
                     if (!activeSlipOrderId) return;
-                    await updateOrderStatus(activeSlipOrderId, 'processing');
+                    await updateOrderStatus(activeSlipOrderId, 'picked_up');
                     if (slipModalVerify) slipModalVerify.classList.add('hidden');
-                    showToast(`✅ ยืนยันสลีป #${activeSlipOrderId} สำเร็จ! ปรับเป็น: กำลังซัก-อบ`);
+                    showToast(`✅ ยืนยันสลีป #${activeSlipOrderId} สำเร็จ! ปรับเป็น: กำลังไปรับผ้า`);
                 });
             }
 
