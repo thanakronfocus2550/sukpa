@@ -447,19 +447,39 @@
                     </div>
                 </div>
 
-                <!-- Loyalty Stamp Status Card -->
-                <div id="loyalty-stamp-card" class="bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl p-3.5 text-white shadow-md flex items-center justify-between">
-                    <div class="flex items-center gap-2.5">
-                        <div class="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center font-bold text-lg">
-                            🏷️
+                <!-- Loyalty Stamp Physical Card UI -->
+                <div id="loyalty-stamp-card" class="bg-gradient-to-br from-amber-500 via-orange-500 to-amber-600 rounded-3xl p-4 sm:p-5 text-white shadow-xl border border-amber-300/40 relative overflow-hidden space-y-3">
+                    <!-- Background Decorative Circles -->
+                    <div class="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-white/10 blur-xl pointer-events-none"></div>
+                    <div class="absolute -left-6 -top-6 w-24 h-24 rounded-full bg-amber-400/20 blur-xl pointer-events-none"></div>
+
+                    <!-- Header -->
+                    <div class="flex items-center justify-between relative z-10">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-10 h-10 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center font-bold text-xl shadow-inner border border-white/30">
+                                🧺
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-black tracking-wide text-white" id="loyalty-title">บัตรสะสมแต้มซักผ้า (Sukpa Loyalty)</h3>
+                                <p class="text-[11px] text-amber-100 font-medium" id="loyalty-desc">กรอกเบอร์โทรศัพท์เพื่อเริ่มสะสมแต้ม</p>
+                            </div>
                         </div>
-                        <div>
-                            <div class="text-xs font-bold" id="loyalty-title">ตราประทับสะสมซักผ้า</div>
-                            <div class="text-[11px] text-amber-100" id="loyalty-desc">กรอกเบอร์โทรเพื่อดูแต้มสะสม</div>
+                        <div class="text-right">
+                            <span class="inline-flex items-center gap-1 text-xs font-black bg-slate-900/40 backdrop-blur-md px-3 py-1 rounded-full font-mono border border-white/20 text-amber-200" id="loyalty-badge">0/10 ดวง</span>
                         </div>
                     </div>
-                    <div class="text-right">
-                        <span class="text-lg font-black bg-white/20 px-2.5 py-1 rounded-xl font-mono" id="loyalty-badge">0/10</span>
+
+                    <!-- 10 Stamp Circle Slots Grid (5x2) -->
+                    <div class="grid grid-cols-5 gap-2 relative z-10 pt-1" id="stamp-slots-grid">
+                        <!-- Rendered dynamically via JS -->
+                    </div>
+
+                    <!-- Reward Banner when 10 stamps reached -->
+                    <div id="loyalty-reward-banner" class="hidden relative z-10 bg-emerald-950/90 border border-emerald-400/50 rounded-2xl p-2.5 text-center text-xs font-bold text-emerald-200 shadow-inner flex flex-col sm:flex-row items-center justify-between gap-2">
+                        <span>🎁 ยินดีด้วย! คุณสะสมครบ 10 ดวง รับสิทธิ์ฟรีค่าจัดส่ง 0 บาททันที!</span>
+                        <button type="button" id="btn-auto-apply-freedelivery" class="w-full sm:w-auto px-3 py-1 rounded-xl bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-extrabold text-xs transition shadow flex items-center justify-center gap-1 whitespace-nowrap">
+                            <span>✨ ใช้สิทธิ์ฟรีค่าส่ง</span>
+                        </button>
                     </div>
                 </div>
 
@@ -813,26 +833,87 @@
                 });
             }
 
-            // Update Loyalty Stamp Badge
+            // Update Loyalty Stamp Badge & Physical Card UI
             function updateLoyaltyStamps() {
-                if (!loyaltyBadge) return;
+                const stampGrid = document.getElementById('stamp-slots-grid');
+                const rewardBanner = document.getElementById('loyalty-reward-banner');
+                const btnApplyReward = document.getElementById('btn-auto-apply-freedelivery');
+
                 const rawPhone = (state.phone || '').replace(/\D/g, '');
-                if (rawPhone.length < 9) {
-                    if (loyaltyTitle) loyaltyTitle.textContent = 'ตราประทับสะสมซักผ้า (10 ครั้ง ฟรีจัดส่ง)';
-                    if (loyaltyDesc) loyaltyDesc.textContent = 'กรอกเบอร์โทรเพื่อดูแต้มสะสม';
-                    loyaltyBadge.textContent = '0/10';
-                    return;
+                
+                let count = 0;
+                if (rawPhone.length >= 9) {
+                    const orders = (window.SukpaDB ? window.SukpaDB.getLocalOrders() : JSON.parse(localStorage.getItem('sp_orders') || '[]'));
+                    const userOrders = orders.filter(o => (o.phone || '').replace(/\D/g, '') === rawPhone);
+                    count = userOrders.length;
                 }
-                const orders = (window.SukpaDB ? window.SukpaDB.getLocalOrders() : JSON.parse(localStorage.getItem('sp_orders') || '[]'));
-                const userOrders = orders.filter(o => (o.phone || '').replace(/\D/g, '') === rawPhone);
-                const count = userOrders.length;
-                const stamps = count % 10;
-                loyaltyBadge.textContent = `${stamps}/10`;
-                if (loyaltyTitle) loyaltyTitle.textContent = `สะสมแล้ว ${count} ครั้ง!`;
-                if (stamps === 0 && count > 0) {
-                    if (loyaltyDesc) loyaltyDesc.textContent = '🎉 ยินดีด้วย! คุณสะสมครบ 10 ครั้ง ใช้โค้ด FREEDELIVERY ฟรีค่าจัดส่ง!';
+
+                // Calculate current cycle stamps (0 to 10)
+                let stamps = count % 10;
+                if (count > 0 && stamps === 0) {
+                    stamps = 10;
+                }
+
+                if (loyaltyBadge) loyaltyBadge.textContent = `${stamps}/10 ดวง`;
+
+                if (rawPhone.length < 9) {
+                    if (loyaltyTitle) loyaltyTitle.textContent = 'บัตรสะสมแต้มซักผ้า (Sukpa Loyalty)';
+                    if (loyaltyDesc) loyaltyDesc.textContent = 'กรอกเบอร์โทรศัพท์เพื่อเริ่มสะสมแต้ม';
+                    stamps = 0;
                 } else {
-                    if (loyaltyDesc) loyaltyDesc.textContent = `ซักอีก ${10 - stamps} ครั้ง รับสิทธิ์ฟรีค่าจัดส่ง 0 บาท! (ใช้โค้ด FREEDELIVERY)`;
+                    if (loyaltyTitle) loyaltyTitle.textContent = `สะสมแล้ว ${count} ครั้ง!`;
+                    if (stamps === 10) {
+                        if (loyaltyDesc) loyaltyDesc.textContent = '🎉 สะสมครบ 10 ดวงแล้ว! ได้รับสิทธิ์ฟรีค่าจัดส่ง!';
+                    } else {
+                        if (loyaltyDesc) loyaltyDesc.textContent = `ซักอีก ${10 - stamps} ครั้ง รับสิทธิ์ฟรีค่าจัดส่ง 0 บาท!`;
+                    }
+                }
+
+                // Render 10 slots
+                if (stampGrid) {
+                    let slotsHTML = '';
+                    for (let i = 1; i <= 10; i++) {
+                        const isStamped = (i <= stamps && rawPhone.length >= 9);
+                        const isRewardSlot = (i === 10);
+
+                        if (isStamped) {
+                            slotsHTML += `
+                                <div class="aspect-square rounded-2xl bg-gradient-to-br from-amber-200 via-amber-100 to-yellow-300 text-amber-900 border-2 border-amber-200 shadow-md flex flex-col items-center justify-center relative transform scale-105 transition-all duration-300">
+                                    <span class="text-xl sm:text-2xl drop-shadow">${isRewardSlot ? '🎁' : '🧺'}</span>
+                                    <span class="text-[9px] font-black text-amber-950 uppercase tracking-tighter">ดวงที่ ${i}</span>
+                                    <div class="absolute -top-1 -right-1 bg-emerald-500 text-white w-4 h-4 rounded-full text-[9px] flex items-center justify-center font-bold shadow">✓</div>
+                                </div>
+                            `;
+                        } else {
+                            slotsHTML += `
+                                <div class="aspect-square rounded-2xl bg-white/10 backdrop-blur-sm border-2 border-dashed ${isRewardSlot ? 'border-amber-300/80 bg-amber-400/20 text-amber-200' : 'border-white/30 text-white/60'} flex flex-col items-center justify-center relative">
+                                    <span class="text-xs sm:text-sm font-extrabold">${isRewardSlot ? '🎁' : i}</span>
+                                    <span class="text-[9px] font-medium opacity-70">${isRewardSlot ? 'FREE' : 'แต้ม'}</span>
+                                </div>
+                            `;
+                        }
+                    }
+                    stampGrid.innerHTML = slotsHTML;
+                }
+
+                // Show/hide reward banner
+                if (rewardBanner) {
+                    if (stamps === 10 && rawPhone.length >= 9) {
+                        rewardBanner.classList.remove('hidden');
+                    } else {
+                        rewardBanner.classList.add('hidden');
+                    }
+                }
+
+                // Attach button handler if not already attached
+                if (btnApplyReward && !btnApplyReward.dataset.hasListener) {
+                    btnApplyReward.dataset.hasListener = 'true';
+                    btnApplyReward.addEventListener('click', () => {
+                        const promoInput = document.getElementById('promo-code-input');
+                        const promoBtn = document.getElementById('btn-apply-promo');
+                        if (promoInput) promoInput.value = 'FREEDELIVERY';
+                        if (promoBtn) promoBtn.click();
+                    });
                 }
             }
 
