@@ -481,7 +481,7 @@
                             <span id="coupon-badge" class="hidden text-[10px] bg-emerald-500 text-white px-2 py-0.5 rounded-full font-bold">ใช้แล้ว</span>
                         </div>
                         <div class="flex gap-1.5">
-                            <input type="text" id="input-promo-code" placeholder="เช่น WELCOME10, SUKPA20" class="uppercase flex-grow px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-mono focus:outline-none focus:border-blue-500 bg-white" />
+                            <input type="text" id="input-promo-code" placeholder="กรอกโค้ดส่วนลด (ถ้ามี)" class="uppercase flex-grow px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-mono focus:outline-none focus:border-blue-500 bg-white" />
                             <button type="button" id="btn-apply-promo" class="px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs transition">ใช้โค้ด</button>
                         </div>
                         <div id="promo-msg" class="text-[11px] font-medium hidden"></div>
@@ -1107,6 +1107,10 @@
                 return `SP-${dateStr}-${randomCode}`;
             }
 
+            // Restore or initialize Order ID
+            const urlParamsOrder = new URLSearchParams(window.location.search).get('orderId');
+            state.currentOrderId = urlParamsOrder || sessionStorage.getItem('sp_pending_order_id') || '';
+
             // Handle Proceed Checkout Button
             btnProceedCheckout.addEventListener('click', () => {
                 if (!state.name.trim()) {
@@ -1133,7 +1137,10 @@
                     couponCode: state.couponCode
                 });
 
-                state.currentOrderId = generateOrderId();
+                if (!state.currentOrderId) {
+                    state.currentOrderId = generateOrderId();
+                }
+                sessionStorage.setItem('sp_pending_order_id', state.currentOrderId);
                 state.slipDataUrl = '';
 
                 if (checkoutOrderId) checkoutOrderId.textContent = `#${state.currentOrderId}`;
@@ -1177,7 +1184,7 @@
 
             // Submit Booking Order Handler
             if (btnSubmitOrder) {
-                btnSubmitOrder.addEventListener('click', () => {
+                btnSubmitOrder.addEventListener('click', async () => {
                     const calc = calculateSukpaPrice({
                         sizeKey: state.sizeKey,
                         dryerKey: state.dryerKey,
@@ -1185,6 +1192,10 @@
                         zoneKey: state.zoneKey,
                         couponCode: state.couponCode
                     });
+
+                    if (!state.currentOrderId) {
+                        state.currentOrderId = generateOrderId();
+                    }
 
                     const orderRecord = {
                         orderId: state.currentOrderId,
@@ -1211,12 +1222,15 @@
 
                     // Save order to Cloud DB (Supabase) + LocalStorage Fallback
                     if (window.SukpaDB) {
-                        window.SukpaDB.saveOrder(orderRecord);
+                        await window.SukpaDB.saveOrder(orderRecord);
                     } else {
                         const existingOrders = JSON.parse(localStorage.getItem('sp_orders') || '[]');
                         existingOrders.unshift(orderRecord);
                         localStorage.setItem('sp_orders', JSON.stringify(existingOrders));
                     }
+
+                    // Reset pending order id
+                    sessionStorage.removeItem('sp_pending_order_id');
 
                     // Close checkout modal
                     if (checkoutModal) checkoutModal.classList.add('hidden');
@@ -1227,6 +1241,7 @@
                     if (receiptPhone) receiptPhone.textContent = orderRecord.phone;
                     if (receiptDorm) receiptDorm.textContent = orderRecord.dorm;
                     if (receiptService) receiptService.textContent = orderRecord.serviceName;
+                    if (receiptTotal) receiptTotal.textContent = `${orderRecord.total}฿`;
                     const btnTrackOrderLink = document.getElementById('btn-track-order-link');
                     if (btnTrackOrderLink) btnTrackOrderLink.href = `track.html?id=${orderRecord.orderId}`;
 

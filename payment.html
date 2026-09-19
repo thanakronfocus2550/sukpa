@@ -43,6 +43,10 @@
     <!-- QRCode.js Library (Client-side EMVCo PromptPay QR Generator) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
+    <!-- Supabase JS Client & Centralized DB Layer -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="db.js"></script>
+
     <style>
         body {
             font-family: 'Kanit', sans-serif;
@@ -210,6 +214,29 @@
             <p class="text-[11px] text-slate-400 mt-2 ml-1">กรอกยอดจากบิล แล้วกด ยืนยัน — QR จะแสดงยอดนี้</p>
         </div>
 
+        <!-- SLIP UPLOAD CARD ON PAYMENT PAGE -->
+        <div class="bg-white rounded-3xl p-5 border border-slate-200 shadow-md space-y-3">
+            <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2">
+                <i class="fas fa-file-invoice-dollar text-blue-600"></i>
+                <span>แนบหลักฐานการโอนเงิน (สลีป)</span>
+            </h3>
+
+            <div id="payment-slip-upload-area">
+                <input type="file" id="payment-slip-input" accept="image/*" class="sr-only" />
+                <label for="payment-slip-input" id="payment-slip-dropzone" class="flex flex-col items-center justify-center p-4 border-2 border-dashed border-slate-300 hover:border-blue-500 rounded-2xl bg-slate-50 hover:bg-blue-50/50 cursor-pointer transition text-center group">
+                    <i class="fas fa-cloud-arrow-up text-2xl text-slate-400 group-hover:text-blue-600 mb-1 transition"></i>
+                    <span id="payment-slip-filename" class="text-xs font-semibold text-slate-600 group-hover:text-blue-600">คลิกเลือกรูปภาพสลีปโอนเงิน</span>
+                </label>
+            </div>
+
+            <div id="payment-slip-preview-container" class="hidden text-center space-y-2">
+                <img id="payment-slip-preview-img" src="" alt="สลีปโอนเงิน" class="max-h-48 mx-auto rounded-xl shadow-sm border border-slate-200" />
+                <div class="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
+                    <i class="fas fa-circle-check"></i> แนบสลีปเรียบร้อยแล้ว!
+                </div>
+            </div>
+        </div>
+
         <!-- WEB BOOKING ACTION -->
         <div class="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl p-4 border border-blue-200 shadow-sm space-y-2.5">
             <div class="flex items-start gap-3">
@@ -217,14 +244,16 @@
                     <i class="fas fa-receipt"></i>
                 </div>
                 <div>
-                    <h3 class="font-bold text-xs sm:text-sm text-slate-800">สแกนจ่ายเงินเสร็จแล้ว ยืนยันบนเว็บได้เลย!</h3>
-                    <p class="text-[11px] text-slate-500 leading-relaxed mt-0.5">
-                        กลับไปยังหน้าฟอร์มจองคิว เพื่อแนบสลิปและรับเลขรหัสคำสั่งซื้อ (Order ID) ได้ทันทีครับ 🫧
-                    </p>
-                </div>
+            <!-- Order ID Badge if present -->
+            <div id="display-order-id-container" class="hidden mb-2">
+                <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200 text-xs font-extrabold">
+                    <i class="fas fa-receipt text-blue-600"></i>
+                    <span>รหัสคำสั่งซื้อ: </span>
+                    <span id="display-order-id" class="font-mono text-blue-800">#SP-XXXXXXXX-XXXX</span>
+                </span>
             </div>
 
-            <a href="booking.html"
+            <a href="booking.html" id="btn-return-booking"
                 class="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white font-bold text-sm shadow-md shadow-blue-500/20 active:scale-98 transition-all flex items-center justify-center gap-2">
                 <i class="fas fa-file-circle-check text-lg"></i>
                 <span>ไปที่หน้าจองคิว / ยืนยันบนเว็บ</span>
@@ -437,6 +466,19 @@
                 }
                 displayPromptpayId.textContent = `พร้อมเพย์: ${formattedId} (นาย ธนกร ชูวงศ์วาลย์)`;
 
+                // Display Order ID if passed
+                const passedOrderId = urlParams.get('orderId') || sessionStorage.getItem('sp_pending_order_id') || '';
+                const displayOrderIdContainer = document.getElementById('display-order-id-container');
+                const displayOrderId = document.getElementById('display-order-id');
+                const btnReturnBooking = document.getElementById('btn-return-booking');
+
+                if (passedOrderId) {
+                    const cleanOrdId = passedOrderId.replace(/^#/, '');
+                    if (displayOrderId) displayOrderId.textContent = `#${cleanOrdId}`;
+                    if (displayOrderIdContainer) displayOrderIdContainer.classList.remove('hidden');
+                    if (btnReturnBooking) btnReturnBooking.href = `booking.html?orderId=${encodeURIComponent(cleanOrdId)}`;
+                }
+
                 // Update Dynamic QR Code
                 updateQrCode(currentAmount);
             }
@@ -485,6 +527,49 @@
                     console.error('Copy failed', err);
                 }
             });
+
+            // Slip Upload Handler on Payment Page
+            const paymentSlipInput = document.getElementById('payment-slip-input');
+            const paymentSlipFilename = document.getElementById('payment-slip-filename');
+            const paymentSlipPreviewContainer = document.getElementById('payment-slip-preview-container');
+            const paymentSlipPreviewImg = document.getElementById('payment-slip-preview-img');
+
+            if (paymentSlipInput) {
+                paymentSlipInput.addEventListener('change', (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+
+                    if (paymentSlipFilename) paymentSlipFilename.textContent = file.name;
+
+                    const reader = new FileReader();
+                    reader.onload = async (event) => {
+                        const dataUrl = event.target.result;
+                        if (paymentSlipPreviewImg) paymentSlipPreviewImg.src = dataUrl;
+                        if (paymentSlipPreviewContainer) paymentSlipPreviewContainer.classList.remove('hidden');
+
+                        const activeOrderId = urlParams.get('orderId') || sessionStorage.getItem('sp_pending_order_id') || '';
+                        if (activeOrderId) {
+                            const cleanId = activeOrderId.replace(/^#/, '').trim();
+                            const orders = JSON.parse(localStorage.getItem('sp_orders') || '[]');
+                            const idx = orders.findIndex(o => o.orderId === cleanId);
+                            if (idx !== -1) {
+                                orders[idx].slipDataUrl = dataUrl;
+                                orders[idx].slip_url = dataUrl;
+                                localStorage.setItem('sp_orders', JSON.stringify(orders));
+                                if (window.SukpaDB) {
+                                    await window.SukpaDB.saveOrder(orders[idx]);
+                                }
+                                showToast(`📸 บันทึกสลีปสำหรับออเดอร์ #${cleanId} เรียบร้อยแล้ว!`);
+                            } else {
+                                showToast('📸 แนบสลีปเรียบร้อยแล้ว!');
+                            }
+                        } else {
+                            showToast('📸 แนบสลีปเรียบร้อยแล้ว!');
+                        }
+                    };
+                    reader.readAsDataURL(file);
+                });
+            }
 
             // Download QR Handler
             if (btnDownloadQr) {

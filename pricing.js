@@ -128,27 +128,14 @@ const SUKPA_PRICING = {
         },
     },
 
-    // คูปองส่วนลดตั้งต้น
-    coupons: {
-        'WELCOME10': { code: 'WELCOME10', type: 'flat', amount: 10, label: 'ส่วนลดต้อนรับ 10฿' },
-        'SUKPA20': { code: 'SUKPA20', type: 'flat', amount: 20, label: 'ส่วนลดพิเศษ 20฿' },
-        'FREEDRY': { code: 'FREEDRY', type: 'flat', amount: 50, label: 'ส่วนลดค่าอบแห้ง 50฿' },
-        'FREEDELIVERY': { code: 'FREEDELIVERY', type: 'flat', amount: 40, label: 'ฟรีค่าจัดส่ง (สะสมครบ 10 ครั้ง)' },
-        'STUDENT10': { code: 'STUDENT10', type: 'percent', amount: 10, label: 'ส่วนลดนักศึกษา 10%' },
-    }
+    // คูปองส่วนลดในระบบ (Admin สามารถเพิ่ม/ลบได้)
+    coupons: {}
 };
 
 /**
- * ดึงรายการคูปองส่วนลดทั้งหมด (รวมคูปองที่ Admin เพิ่มใหม่)
+ * ดึงรายการคูปองส่วนลดทั้งหมด (จาก DB / LocalStorage)
  */
 function getSukpaCoupons() {
-    const defaultCoupons = {
-        'WELCOME10': { code: 'WELCOME10', type: 'flat', amount: 10, label: 'ส่วนลดต้อนรับ 10฿' },
-        'SUKPA20': { code: 'SUKPA20', type: 'flat', amount: 20, label: 'ส่วนลดพิเศษ 20฿' },
-        'FREEDRY': { code: 'FREEDRY', type: 'flat', amount: 50, label: 'ส่วนลดค่าอบแห้ง 50฿' },
-        'FREEDELIVERY': { code: 'FREEDELIVERY', type: 'flat', amount: 40, label: 'ฟรีค่าจัดส่ง (สะสมครบ 10 ครั้ง)' },
-        'STUDENT10': { code: 'STUDENT10', type: 'percent', amount: 10, label: 'ส่วนลดนักศึกษา 10%' },
-    };
     try {
         const raw = localStorage.getItem('sp_coupons');
         if (raw !== null) {
@@ -160,8 +147,13 @@ function getSukpaCoupons() {
     } catch (e) {
         console.error('Error reading sp_coupons:', e);
     }
-    localStorage.setItem('sp_coupons', JSON.stringify(defaultCoupons));
-    return defaultCoupons;
+    
+    // Asynchronously sync from Cloud DB if available
+    if (typeof window !== 'undefined' && window.SukpaDB && typeof window.SukpaDB.getCoupons === 'function') {
+        window.SukpaDB.getCoupons().catch(err => console.warn('Coupons cloud fetch error:', err));
+    }
+    
+    return {};
 }
 
 /**
@@ -170,6 +162,11 @@ function getSukpaCoupons() {
 function saveSukpaCoupons(couponsObj) {
     try {
         localStorage.setItem('sp_coupons', JSON.stringify(couponsObj || {}));
+        if (typeof window !== 'undefined' && window.SukpaDB && typeof window.SukpaDB.saveCoupon === 'function') {
+            Object.values(couponsObj || {}).forEach(c => {
+                if (c && c.code) window.SukpaDB.saveCoupon(c);
+            });
+        }
         return true;
     } catch (e) {
         console.error('Error saving sp_coupons:', e);
@@ -192,13 +189,19 @@ function validateCoupon(rawCode, subtotal = 0) {
     if (!coupon) {
         return { valid: false, message: 'ไม่พบโค้ดส่วนลดนี้ หรือโค้ดหมดอายุ', discountAmount: 0 };
     }
+    // Check usage quota limit
+    const maxUses = Number(coupon.maxUses) || 0;
+    const usedCount = Number(coupon.usedCount) || 0;
+    if (maxUses > 0 && usedCount >= maxUses) {
+        return { valid: false, message: `โค้ดส่วนลดนี้ครบสิทธิ์การใช้งานแล้ว (${usedCount}/${maxUses} สิทธิ์)`, discountAmount: 0 };
+    }
     let discount = 0;
     if (coupon.type === 'flat') {
         discount = Number(coupon.amount) || 0;
     } else if (coupon.type === 'percent') {
         discount = Math.round((subtotal * (Number(coupon.amount) || 0)) / 100);
     }
-    discount = Math.min(discount, subtotal);
+    discount = Math.min(discount, Math.max(0, subtotal));
     return {
         valid: true,
         code: coupon.code,
@@ -210,42 +213,27 @@ function validateCoupon(rawCode, subtotal = 0) {
 
 /**
  * คำนวณราคารวมพร้อมรายละเอียดแต่ละส่วน
- * @param {Object} options
- * @param {string} [options.sizeKey='s'] - เครื่องซัก ('s' | 'm' | 'l' | 'jumbo')
- * @param {string} [options.dryerKey='d15'] - เครื่องอบ ('d15' | 'd25')
- * @param {string} [options.detergentKey='own'] - น้ำยา ('own' | 'shop')
- * @param {string} [options.zoneKey='off'] - จุดรับส่ง ('off' | 'on' | 'far')
- * @param {string} [options.couponCode=''] - โค้ดส่วนลด
- * @returns {{
- *   sizePrice: number,
- *   dryerPrice: number,
- *   detergentSurcharge: number,
- *   zoneSurcharge: number,
- *   subtotal: number,
- *   discountAmount: number,
- *   couponCode: string,
- *   couponInfo: Object,
- *   total: number,
- *   sizeInfo: Object,
- *   dryerInfo: Object,
- *   detergentInfo: Object,
- *   zoneInfo: Object
- * }}
  */
-function calculateSukpaPrice({ sizeKey = 's', dryerKey = 'd15', detergentKey = 'own', zoneKey = 'off', couponCode = '' } = {}) {
+function calculateSukpaPrice(opts = {}) {
+    const sizeKey = opts.sizeKey || 's';
+    const dryerKey = opts.dryerKey || 'd15';
+    const detergentKey = opts.detergentKey || 'own';
+    const zoneKey = opts.zoneKey || 'off';
+    const couponCode = opts.couponCode || '';
+
     const sizeInfo = SUKPA_PRICING.sizes[sizeKey] || SUKPA_PRICING.sizes.s;
     const dryerInfo = SUKPA_PRICING.dryers[dryerKey] || SUKPA_PRICING.dryers.d15;
     const detergentInfo = SUKPA_PRICING.detergents[detergentKey] || SUKPA_PRICING.detergents.own;
     const zoneInfo = SUKPA_PRICING.zones[zoneKey] || SUKPA_PRICING.zones.off;
 
-    const sizePrice = sizeInfo.price;
-    const dryerPrice = dryerInfo ? dryerInfo.price : 0;
-    const detergentSurcharge = detergentInfo.surcharge;
-    const zoneSurcharge = zoneInfo.surcharge;
+    const sizePrice = Number(sizeInfo ? sizeInfo.price : 50) || 0;
+    const dryerPrice = Number(dryerInfo ? dryerInfo.price : 50) || 0;
+    const detergentSurcharge = Number(detergentInfo ? detergentInfo.surcharge : 0) || 0;
+    const zoneSurcharge = Number(zoneInfo ? zoneInfo.surcharge : 30) || 0;
     const subtotal = sizePrice + dryerPrice + detergentSurcharge + zoneSurcharge;
 
     const couponRes = couponCode ? validateCoupon(couponCode, subtotal) : { valid: false, discountAmount: 0 };
-    const discountAmount = couponRes.discountAmount || 0;
+    const discountAmount = Number(couponRes.discountAmount || 0);
     const total = Math.max(0, subtotal - discountAmount);
 
     return {

@@ -73,27 +73,27 @@
         _mapFromDb(row) {
             if (!row) return null;
             return {
-                orderId: row.order_id,
-                name: row.name,
-                phone: row.phone,
-                dorm: row.dorm,
+                orderId: row.order_id || row.orderId || row.id || '',
+                name: row.name || '',
+                phone: row.phone || '',
+                dorm: row.dorm || '',
                 notes: row.notes || '',
-                serviceName: row.service_name || '',
-                sizeKey: row.size_key || '',
-                dryerKey: row.dryer_key || '',
-                detergentKey: row.detergent_key || '',
-                zoneKey: row.zone_key || '',
-                sizePrice: Number(row.size_price || 0),
-                dryerPrice: Number(row.dryer_price || 0),
-                detergentSurcharge: Number(row.detergent_surcharge || 0),
-                zoneSurcharge: Number(row.zone_surcharge || 0),
-                couponCode: row.coupon_code || '',
-                discountAmount: Number(row.discount_amount || 0),
-                total: Number(row.total || 0),
-                slipDataUrl: row.slip_url || row.slip_data_url || '',
+                serviceName: row.service_name || row.serviceName || '',
+                sizeKey: row.size_key || row.sizeKey || '',
+                dryerKey: row.dryer_key || row.dryerKey || '',
+                detergentKey: row.detergent_key || row.detergentKey || '',
+                zoneKey: row.zone_key || row.zoneKey || '',
+                sizePrice: Number(row.size_price ?? row.sizePrice ?? 0),
+                dryerPrice: Number(row.dryer_price ?? row.dryerPrice ?? 0),
+                detergentSurcharge: Number(row.detergent_surcharge ?? row.detergentSurcharge ?? 0),
+                zoneSurcharge: Number(row.zone_surcharge ?? row.zoneSurcharge ?? 0),
+                couponCode: row.coupon_code || row.couponCode || '',
+                discountAmount: Number(row.discount_amount ?? row.discountAmount ?? 0),
+                total: Number(row.total ?? 0),
+                slipDataUrl: row.slip_url || row.slip_data_url || row.slipDataUrl || '',
                 deliveryPhotoUrl: row.delivery_photo_url || row.deliveryPhotoUrl || '',
                 status: row.status || 'pending',
-                createdAt: row.created_at || new Date().toISOString()
+                createdAt: row.created_at || row.createdAt || new Date().toISOString()
             };
         },
 
@@ -102,27 +102,27 @@
          */
         _mapToDb(order) {
             return {
-                order_id: order.orderId,
-                name: order.name,
-                phone: order.phone,
-                dorm: order.dorm,
+                order_id: order.orderId || order.order_id || '',
+                name: order.name || '',
+                phone: order.phone || '',
+                dorm: order.dorm || '',
                 notes: order.notes || '',
-                service_name: order.serviceName || '',
-                size_key: order.sizeKey || '',
-                dryer_key: order.dryerKey || '',
-                detergent_key: order.detergentKey || '',
-                zone_key: order.zoneKey || '',
-                size_price: order.sizePrice || 0,
-                dryer_price: order.dryerPrice || 0,
-                detergent_surcharge: order.detergentSurcharge || 0,
-                zone_surcharge: order.zoneSurcharge || 0,
-                coupon_code: order.couponCode || '',
-                discount_amount: order.discountAmount || 0,
-                total: order.total || 0,
+                service_name: order.serviceName || order.service_name || '',
+                size_key: order.sizeKey || order.size_key || '',
+                dryer_key: order.dryerKey || order.dryer_key || '',
+                detergent_key: order.detergentKey || order.detergent_key || '',
+                zone_key: order.zoneKey || order.zone_key || '',
+                size_price: Number(order.sizePrice ?? order.size_price ?? 0),
+                dryer_price: Number(order.dryerPrice ?? order.dryer_price ?? 0),
+                detergent_surcharge: Number(order.detergentSurcharge ?? order.detergent_surcharge ?? 0),
+                zone_surcharge: Number(order.zoneSurcharge ?? order.zone_surcharge ?? 0),
+                coupon_code: order.couponCode || order.coupon_code || '',
+                discount_amount: Number(order.discountAmount ?? order.discount_amount ?? 0),
+                total: Number(order.total ?? 0),
                 slip_url: order.slipDataUrl || order.slipUrl || order.slip_url || '',
                 delivery_photo_url: order.deliveryPhotoUrl || order.delivery_photo_url || '',
                 status: order.status || 'pending',
-                created_at: order.createdAt || new Date().toISOString()
+                created_at: order.createdAt || order.created_at || new Date().toISOString()
             };
         },
 
@@ -147,7 +147,56 @@
         /**
          * Fetch all orders (From Cloud DB if connected, fallback to LocalStorage)
          */
+        /**
+         * Compress base64 DataURL image (max 800px width, JPEG 0.7 quality)
+         */
+        compressDataUrl(dataUrl, maxWidth = 800, quality = 0.7) {
+            return new Promise((resolve) => {
+                if (!dataUrl || typeof dataUrl !== 'string' || !dataUrl.startsWith('data:image')) {
+                    resolve(dataUrl || '');
+                    return;
+                }
+                // If already small enough (< 150KB), return as is
+                if (dataUrl.length < 200000) {
+                    resolve(dataUrl);
+                    return;
+                }
+                const img = new Image();
+                img.onload = () => {
+                    try {
+                        const canvas = document.createElement('canvas');
+                        let width = img.width;
+                        let height = img.height;
+
+                        if (width > maxWidth) {
+                            height = Math.round((height * maxWidth) / width);
+                            width = maxWidth;
+                        }
+
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+
+                        const compressed = canvas.toDataURL('image/jpeg', quality);
+                        resolve(compressed);
+                    } catch (e) {
+                        resolve(dataUrl);
+                    }
+                };
+                img.onerror = () => resolve(dataUrl);
+                img.src = dataUrl;
+            });
+        },
+
+        /**
+         * Fetch all orders (From Cloud DB if connected, fallback to LocalStorage)
+         */
         async getOrders() {
+            const localOrders = this.getLocalOrders();
+            const localMap = {};
+            localOrders.forEach(o => { if (o.orderId) localMap[o.orderId] = o; });
+
             if (this.isCloudEnabled()) {
                 try {
                     const { data, error } = await supabaseClient
@@ -156,7 +205,20 @@
                         .order('created_at', { ascending: false });
 
                     if (!error && Array.isArray(data)) {
-                        const mappedOrders = data.map(row => this._mapFromDb(row));
+                        const mappedOrders = data.map(row => {
+                            const mapped = this._mapFromDb(row);
+                            // Preserve local slip and delivery photo if cloud returned empty
+                            if (localMap[mapped.orderId]) {
+                                const loc = localMap[mapped.orderId];
+                                if (!mapped.slipDataUrl && (loc.slipDataUrl || loc.slipUrl)) {
+                                    mapped.slipDataUrl = loc.slipDataUrl || loc.slipUrl;
+                                }
+                                if (!mapped.deliveryPhotoUrl && loc.deliveryPhotoUrl) {
+                                    mapped.deliveryPhotoUrl = loc.deliveryPhotoUrl;
+                                }
+                            }
+                            return mapped;
+                        });
                         this.setLocalOrders(mappedOrders);
                         return mappedOrders;
                     } else if (error) {
@@ -166,7 +228,7 @@
                     console.warn('⚠️ Supabase query exception, using local fallback:', err);
                 }
             }
-            return this.getLocalOrders();
+            return localOrders;
         },
 
         /**
@@ -179,7 +241,6 @@
 
             if (this.isCloudEnabled()) {
                 try {
-                    // Try exact match or ilike ending match
                     const { data, error } = await supabaseClient
                         .from('orders')
                         .select('*')
@@ -187,7 +248,14 @@
                         .limit(1);
 
                     if (!error && Array.isArray(data) && data.length > 0) {
-                        return this._mapFromDb(data[0]);
+                        const cloudOrd = this._mapFromDb(data[0]);
+                        const local = this.getLocalOrders().find(o => o.orderId === cloudOrd.orderId);
+                        if (local) {
+                            if (!cloudOrd.slipDataUrl && (local.slipDataUrl || local.slipUrl)) {
+                                cloudOrd.slipDataUrl = local.slipDataUrl || local.slipUrl;
+                            }
+                        }
+                        return cloudOrd;
                     }
                 } catch (err) {
                     console.warn('⚠️ Supabase getOrderById error:', err);
@@ -206,6 +274,16 @@
          * Save a new order
          */
         async saveOrder(orderRecord) {
+            if (!orderRecord) return null;
+
+            // Compress heavy slip / photo images if present
+            if (orderRecord.slipDataUrl && orderRecord.slipDataUrl.length > 200000) {
+                orderRecord.slipDataUrl = await this.compressDataUrl(orderRecord.slipDataUrl);
+            }
+            if (orderRecord.deliveryPhotoUrl && orderRecord.deliveryPhotoUrl.length > 200000) {
+                orderRecord.deliveryPhotoUrl = await this.compressDataUrl(orderRecord.deliveryPhotoUrl);
+            }
+
             // Always save to localStorage immediately for instant feedback
             const existing = this.getLocalOrders();
             const filtered = existing.filter(o => o.orderId !== orderRecord.orderId);
@@ -216,12 +294,37 @@
             if (this.isCloudEnabled()) {
                 try {
                     const dbRow = this._mapToDb(orderRecord);
-                    const { data, error } = await supabaseClient
+                    let { data, error } = await supabaseClient
                         .from('orders')
                         .upsert([dbRow], { onConflict: 'order_id' });
 
                     if (error) {
-                        console.error('❌ Failed to save order to Supabase:', error.message);
+                        console.warn('⚠️ Standard upsert error:', error.message);
+                        if (error.message && (error.message.includes('Could not find') || error.message.includes('column') || error.message.includes('schema cache'))) {
+                            console.warn('⚠️ Table schema mismatch detected. Retrying with basic schema fields...');
+                            const baseRow = {
+                                order_id: dbRow.order_id,
+                                name: dbRow.name,
+                                phone: dbRow.phone,
+                                dorm: dbRow.dorm,
+                                notes: dbRow.notes,
+                                service_name: dbRow.service_name,
+                                total: dbRow.total,
+                                status: dbRow.status,
+                                created_at: dbRow.created_at
+                            };
+                            const fallbackRes = await supabaseClient
+                                .from('orders')
+                                .upsert([baseRow], { onConflict: 'order_id' });
+
+                            if (fallbackRes.error) {
+                                console.error('❌ Base column fallback also failed:', fallbackRes.error.message);
+                            } else {
+                                console.log('✅ Order saved to Supabase Cloud via basic schema fallback!');
+                            }
+                        } else {
+                            console.error('❌ Failed to save order to Supabase:', error.message);
+                        }
                     } else {
                         console.log('✅ Order saved to Supabase Cloud!');
                     }
@@ -229,7 +332,183 @@
                     console.error('❌ Exception saving order to Supabase:', err);
                 }
             }
+
+            // Increment coupon usage if order used a coupon
+            if (orderRecord.couponCode) {
+                this.incrementCouponUsage(orderRecord.couponCode).catch(() => {});
+            }
+
             return orderRecord;
+        },
+
+        /**
+         * Get Coupons (From Cloud DB if connected, fallback to LocalStorage)
+         */
+        async getCoupons() {
+            const STORAGE_KEY_COUPONS = 'sp_coupons';
+            let localCoupons = {};
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY_COUPONS);
+                if (raw) localCoupons = JSON.parse(raw) || {};
+            } catch (e) { }
+
+            if (this.isCloudEnabled()) {
+                try {
+                    const { data, error } = await supabaseClient
+                        .from('coupons')
+                        .select('*');
+
+                    if (!error && Array.isArray(data) && data.length > 0) {
+                        const cloudCoupons = {};
+                        data.forEach(c => {
+                            const code = (c.code || '').toUpperCase();
+                            if (code) {
+                                cloudCoupons[code] = {
+                                    code: code,
+                                    type: c.type || 'flat',
+                                    amount: Number(c.amount || 0),
+                                    label: c.label || code,
+                                    maxUses: Number(c.max_uses ?? c.maxUses ?? 0),
+                                    usedCount: Number(c.used_count ?? c.usedCount ?? 0)
+                                };
+                            }
+                        });
+                        const merged = { ...localCoupons, ...cloudCoupons };
+                        localStorage.setItem(STORAGE_KEY_COUPONS, JSON.stringify(merged));
+                        return merged;
+                    }
+                } catch (err) {
+                    console.warn('⚠️ Supabase getCoupons error:', err);
+                }
+            }
+            return localCoupons;
+        },
+
+        /**
+         * Save Coupon (To Cloud DB if connected & LocalStorage)
+         */
+        async saveCoupon(couponObj) {
+            if (!couponObj || !couponObj.code) return false;
+            const STORAGE_KEY_COUPONS = 'sp_coupons';
+            const code = couponObj.code.trim().toUpperCase();
+            const formatted = {
+                code: code,
+                type: couponObj.type || 'flat',
+                amount: Number(couponObj.amount || 0),
+                label: couponObj.label || code,
+                maxUses: Number(couponObj.maxUses || 0),
+                usedCount: Number(couponObj.usedCount || 0)
+            };
+
+            let local = {};
+            try {
+                local = JSON.parse(localStorage.getItem(STORAGE_KEY_COUPONS) || '{}');
+            } catch (e) { }
+            local[code] = formatted;
+            localStorage.setItem(STORAGE_KEY_COUPONS, JSON.stringify(local));
+
+            if (this.isCloudEnabled()) {
+                try {
+                    const dbRow = {
+                        code: formatted.code,
+                        type: formatted.type,
+                        amount: formatted.amount,
+                        label: formatted.label,
+                        max_uses: formatted.maxUses,
+                        used_count: formatted.usedCount,
+                        created_at: new Date().toISOString()
+                    };
+                    const { error } = await supabaseClient
+                        .from('coupons')
+                        .upsert([dbRow], { onConflict: 'code' });
+
+                    if (error) {
+                        console.error('❌ Supabase saveCoupon error:', error.message);
+                    } else {
+                        console.log(`✅ Coupon saved to Supabase: ${code}`);
+                    }
+                } catch (err) {
+                    console.error('❌ Exception saving coupon to Supabase:', err);
+                }
+            }
+            return true;
+        },
+
+        /**
+         * Clear All Coupons (From LocalStorage & Cloud DB)
+         */
+        async clearAllCoupons() {
+            const STORAGE_KEY_COUPONS = 'sp_coupons';
+            localStorage.setItem(STORAGE_KEY_COUPONS, JSON.stringify({}));
+
+            if (this.isCloudEnabled()) {
+                try {
+                    const { error } = await supabaseClient
+                        .from('coupons')
+                        .delete()
+                        .neq('code', '');
+
+                    if (error) {
+                        console.error('❌ Supabase clearAllCoupons error:', error.message);
+                    } else {
+                        console.log('✅ Cleared all coupons from Supabase Cloud DB');
+                    }
+                } catch (err) {
+                    console.error('❌ Exception clearing coupons from Supabase:', err);
+                }
+            }
+            return true;
+        },
+
+        /**
+         * Increment Coupon Used Count
+         */
+        async incrementCouponUsage(code) {
+            if (!code) return false;
+            const cleanCode = code.trim().toUpperCase();
+            const coupons = await this.getCoupons();
+            const coupon = coupons[cleanCode];
+            if (coupon) {
+                coupon.usedCount = (Number(coupon.usedCount) || 0) + 1;
+                await this.saveCoupon(coupon);
+                console.log(`🎟️ Incremented coupon usage: ${cleanCode} -> ${coupon.usedCount}/${coupon.maxUses || '∞'}`);
+                return true;
+            }
+            return false;
+        },
+
+        /**
+         * Delete Coupon (From Cloud DB if connected & LocalStorage)
+         */
+        async deleteCoupon(code) {
+            if (!code) return false;
+            const STORAGE_KEY_COUPONS = 'sp_coupons';
+            const cleanCode = code.trim().toUpperCase();
+
+            let local = {};
+            try {
+                local = JSON.parse(localStorage.getItem(STORAGE_KEY_COUPONS) || '{}');
+            } catch (e) { }
+            delete local[cleanCode];
+            localStorage.setItem(STORAGE_KEY_COUPONS, JSON.stringify(local));
+
+            if (this.isCloudEnabled()) {
+                try {
+                    const { error } = await supabaseClient
+                        .from('coupons')
+                        .delete()
+                        .eq('code', cleanCode);
+
+                    if (error) {
+                        console.error('❌ Supabase deleteCoupon error:', error.message);
+                    } else {
+                        console.log(`✅ Coupon deleted from Supabase: ${cleanCode}`);
+                    }
+                } catch (err) {
+                    console.error('❌ Exception deleting coupon from Supabase:', err);
+                }
+            }
+            return true;
         },
 
         /**

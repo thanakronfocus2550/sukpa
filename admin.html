@@ -636,12 +636,12 @@
     </div>
 
     <!-- ═══════════════════════════════════════════════════ -->
-    <!-- SLIP PREVIEW MODAL -->
+    <!-- LEGACY SLIP PREVIEW MODAL -->
     <!-- ═══════════════════════════════════════════════════ -->
-    <div id="slip-modal"
+    <div id="legacy-slip-modal"
         class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
         <div class="glass-card rounded-3xl max-w-md w-full p-6 text-center space-y-4 relative border border-slate-700">
-            <button type="button" id="close-slip-modal"
+            <button type="button" id="close-legacy-slip-modal"
                 class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center">
                 <i class="fas fa-xmark"></i>
             </button>
@@ -694,10 +694,15 @@
                 </div>
             </div>
 
-            <div class="flex gap-2">
+            <div class="flex flex-col gap-2">
                 <button type="button" id="btn-save-config"
-                    class="flex-1 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs shadow-lg transition flex items-center justify-center gap-1.5">
+                    class="w-full py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs shadow-lg transition flex items-center justify-center gap-1.5">
                     <i class="fas fa-save"></i> บันทึก & เชื่อมต่อ Cloud
+                </button>
+                <button type="button" id="btn-copy-sql-schema"
+                    class="w-full py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-cyan-300 font-semibold text-xs border border-slate-700 transition flex items-center justify-center gap-1.5"
+                    title="คัดลอกคำสั่ง SQL สำหรับนำไปวางใน Supabase SQL Editor">
+                    <i class="fas fa-code"></i> คัดลอก SQL Script สร้างตารางใน Supabase
                 </button>
             </div>
         </div>
@@ -790,7 +795,7 @@
                 </div>
                 <div>
                     <h3 class="font-extrabold text-white text-lg">จัดการโค้ดส่วนลด (Coupon Manager)</h3>
-                    <p class="text-xs text-slate-400">เพิ่ม หรือลบโค้ดส่วนลดสำหรับลูกค้าได้ทันที</p>
+                    <p class="text-xs text-slate-400">เพิ่ม, จำกัดจำนวนสิทธิ์ หรือลบโค้ดส่วนลดสำหรับลูกค้า</p>
                 </div>
             </div>
 
@@ -819,6 +824,11 @@
                             class="w-full glass-input px-3 py-2 rounded-xl text-white font-mono focus:outline-none focus:border-emerald-500" />
                     </div>
                     <div>
+                        <label class="block text-slate-400 mb-1">จำกัดสิทธิ์ (คน/ครั้ง)</label>
+                        <input type="number" id="input-coupon-max-uses" placeholder="เช่น 10 (0 หรือเว้น = ไม่จำกัด)" min="0"
+                            class="w-full glass-input px-3 py-2 rounded-xl text-white font-mono focus:outline-none focus:border-emerald-500" />
+                    </div>
+                    <div class="sm:col-span-2">
                         <label class="block text-slate-400 mb-1">คำอธิบายแสดงลูกค้า</label>
                         <input type="text" id="input-coupon-label" placeholder="ส่วนลดพิเศษ 30 บาท"
                             class="w-full glass-input px-3 py-2 rounded-xl text-white focus:outline-none focus:border-emerald-500" />
@@ -839,14 +849,70 @@
                             class="text-[10px] bg-slate-800 text-slate-400 px-2.5 py-0.5 rounded-full font-mono">0
                             โค้ด</span>
                     </div>
-                    <button type="button" id="btn-reset-default-coupons"
-                        class="text-[11px] text-slate-400 hover:text-cyan-400 transition flex items-center gap-1 font-medium">
-                        <i class="fas fa-rotate-right"></i> คืนค่าโค้ดเริ่มต้น
-                    </button>
+                    <div class="flex items-center gap-3">
+                        <button type="button" id="btn-clear-all-coupons"
+                            class="text-[11px] text-red-400 hover:text-red-300 transition flex items-center gap-1 font-semibold">
+                            <i class="fas fa-trash-can"></i> ลบโค้ดทั้งหมด
+                        </button>
+                        <button type="button" id="btn-reset-default-coupons"
+                            class="text-[11px] text-slate-400 hover:text-cyan-400 transition flex items-center gap-1 font-medium">
+                            <i class="fas fa-rotate-right"></i> คืนค่าโค้ดเริ่มต้น
+                        </button>
+                    </div>
                 </div>
                 <div id="coupons-list-container" class="space-y-2 max-h-56 overflow-y-auto">
                     <!-- Dynamic Render -->
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Slip Verification Modal -->
+    <div id="slip-modal"
+        class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div
+            class="glass-card rounded-3xl max-w-md w-full p-6 space-y-4 border border-slate-700 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+            <button type="button" id="close-slip-modal"
+                class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition">
+                <i class="fas fa-times text-base"></i>
+            </button>
+            <div class="flex items-center gap-3 pb-2 border-b border-slate-800">
+                <div
+                    class="w-10 h-10 rounded-xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-lg font-bold border border-cyan-500/30">
+                    <i class="fas fa-receipt"></i>
+                </div>
+                <div>
+                    <h3 class="font-extrabold text-white text-base">ตรวจสอบสลีปการโอนเงิน</h3>
+                    <p class="text-xs text-cyan-400 font-mono font-bold" id="slip-modal-order-id">#SP-XXXX</p>
+                </div>
+            </div>
+
+            <div class="bg-slate-900/90 rounded-2xl p-3 border border-slate-800 text-xs space-y-1 text-slate-300">
+                <div class="flex justify-between"><span>👤 ลูกค้า:</span> <strong id="slip-modal-name" class="text-white">-</strong></div>
+                <div class="flex justify-between"><span>📞 เบอร์โทร:</span> <span id="slip-modal-phone" class="text-white">-</span></div>
+                <div class="flex justify-between"><span>🏢 หอพัก:</span> <span id="slip-modal-dorm" class="text-white">-</span></div>
+                <div class="flex justify-between"><span>💰 ยอดสุทธิ:</span> <strong id="slip-modal-total" class="text-emerald-400 text-sm">฿0</strong></div>
+            </div>
+
+            <!-- Slip Image Preview -->
+            <div class="bg-slate-950 rounded-2xl p-2 border border-slate-800 text-center min-h-[200px] flex flex-col items-center justify-center">
+                <img id="slip-modal-img" src="" alt="สลีปการชำระเงิน" class="max-h-80 w-auto object-contain mx-auto rounded-xl shadow-lg border border-slate-700 hidden" />
+                <div id="slip-modal-no-img" class="text-slate-500 text-xs py-8 space-y-2">
+                    <i class="fas fa-file-excel text-3xl text-slate-600 block"></i>
+                    <span>ไม่มีรูปสลีปแนบในออเดอร์นี้</span>
+                </div>
+            </div>
+
+            <!-- Verification Action Buttons -->
+            <div class="flex flex-col gap-2 pt-1">
+                <button type="button" id="btn-approve-slip"
+                    class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-lg transition flex items-center justify-center gap-1.5">
+                    <i class="fas fa-circle-check"></i> ✅ อนุมัติสลีป (เปลี่ยนเป็น: กำลังซัก-อบ)
+                </button>
+                <button type="button" id="btn-reject-slip"
+                    class="w-full py-2.5 rounded-xl bg-amber-600/20 hover:bg-amber-600/30 text-amber-300 font-bold text-xs border border-amber-500/30 transition flex items-center justify-center gap-1.5">
+                    <i class="fas fa-triangle-exclamation"></i> ⚠️ สลีปไม่ถูกต้อง (ให้ลูกค้าส่งใหม่)
+                </button>
             </div>
         </div>
     </div>
@@ -945,10 +1011,26 @@
             const inputCouponCode = document.getElementById('input-coupon-code');
             const selectCouponType = document.getElementById('select-coupon-type');
             const inputCouponAmount = document.getElementById('input-coupon-amount');
+            const inputCouponMaxUses = document.getElementById('input-coupon-max-uses');
             const inputCouponLabel = document.getElementById('input-coupon-label');
             const btnAddCoupon = document.getElementById('btn-add-coupon');
+            const btnClearAllCoupons = document.getElementById('btn-clear-all-coupons');
             const couponsListContainer = document.getElementById('coupons-list-container');
             const couponCountBadge = document.getElementById('coupon-count-badge');
+
+            // Slip Verification Modal Elements
+            const slipModalVerify = document.getElementById('slip-modal');
+            const closeSlipModalVerify = document.getElementById('close-slip-modal');
+            const slipModalImg = document.getElementById('slip-modal-img');
+            const slipModalNoImg = document.getElementById('slip-modal-no-img');
+            const slipModalOrderId = document.getElementById('slip-modal-order-id');
+            const slipModalName = document.getElementById('slip-modal-name');
+            const slipModalPhone = document.getElementById('slip-modal-phone');
+            const slipModalDorm = document.getElementById('slip-modal-dorm');
+            const slipModalTotal = document.getElementById('slip-modal-total');
+            const btnApproveSlip = document.getElementById('btn-approve-slip');
+            const btnRejectSlip = document.getElementById('btn-reject-slip');
+            let activeSlipOrderId = null;
 
             // Toast helper
             let toastTimer = null;
@@ -1105,29 +1187,115 @@
                 });
             }
 
-            // Coupon Management Logic
-            function renderCouponsList() {
-                if (!couponsListContainer) return;
-                const couponsMap = typeof getSukpaCoupons === 'function' ? getSukpaCoupons() : (function () {
-                    const raw = localStorage.getItem('sp_coupons');
-                    if (raw !== null) {
-                        try {
-                            const p = JSON.parse(raw);
-                            if (p && typeof p === 'object') return p;
-                        } catch (e) { }
-                    }
-                    const defaults = {
-                        'WELCOME10': { code: 'WELCOME10', type: 'flat', amount: 10, label: 'ส่วนลดต้อนรับ 10฿' },
-                        'SUKPA20': { code: 'SUKPA20', type: 'flat', amount: 20, label: 'ส่วนลดพิเศษ 20฿' },
-                        'FREEDRY': { code: 'FREEDRY', type: 'flat', amount: 50, label: 'ส่วนลดค่าอบแห้ง 50฿' },
-                        'FREEDELIVERY': { code: 'FREEDELIVERY', type: 'flat', amount: 40, label: 'ฟรีค่าจัดส่ง (สะสมครบ 10 ครั้ง)' },
-                        'STUDENT10': { code: 'STUDENT10', type: 'percent', amount: 10, label: 'ส่วนลดนักศึกษา 10%' },
-                    };
-                    localStorage.setItem('sp_coupons', JSON.stringify(defaults));
-                    return defaults;
-                })();
+            const btnCopySqlSchema = document.getElementById('btn-copy-sql-schema');
+            if (btnCopySqlSchema) {
+                btnCopySqlSchema.addEventListener('click', async () => {
+                    const sqlSchema =
+`-- 1. สร้างตารางคำสั่งซื้อ (orders)
+CREATE TABLE IF NOT EXISTS public.orders (
+    order_id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    phone TEXT NOT NULL,
+    dorm TEXT NOT NULL,
+    notes TEXT DEFAULT '',
+    service_name TEXT DEFAULT '',
+    size_key TEXT DEFAULT '',
+    dryer_key TEXT DEFAULT '',
+    detergent_key TEXT DEFAULT '',
+    zone_key TEXT DEFAULT '',
+    size_price NUMERIC DEFAULT 0,
+    dryer_price NUMERIC DEFAULT 0,
+    detergent_surcharge NUMERIC DEFAULT 0,
+    zone_surcharge NUMERIC DEFAULT 0,
+    coupon_code TEXT DEFAULT '',
+    discount_amount NUMERIC DEFAULT 0,
+    total NUMERIC DEFAULT 0,
+    slip_url TEXT DEFAULT '',
+    delivery_photo_url TEXT DEFAULT '',
+    status TEXT DEFAULT 'pending',
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
 
-                const couponKeys = Object.keys(couponsMap);
+-- เพิ่มคอลัมน์ใหม่ลงในตาราง orders (กรณีมีตารางเดิมอยู่แล้ว)
+ALTER TABLE public.orders 
+    ADD COLUMN IF NOT EXISTS size_key TEXT DEFAULT '',
+    ADD COLUMN IF NOT EXISTS dryer_key TEXT DEFAULT '',
+    ADD COLUMN IF NOT EXISTS detergent_key TEXT DEFAULT '',
+    ADD COLUMN IF NOT EXISTS zone_key TEXT DEFAULT '',
+    ADD COLUMN IF NOT EXISTS size_price NUMERIC DEFAULT 0,
+    ADD COLUMN IF NOT EXISTS dryer_price NUMERIC DEFAULT 0,
+    ADD COLUMN IF NOT EXISTS detergent_surcharge NUMERIC DEFAULT 0,
+    ADD COLUMN IF NOT EXISTS zone_surcharge NUMERIC DEFAULT 0,
+    ADD COLUMN IF NOT EXISTS coupon_code TEXT DEFAULT '',
+    ADD COLUMN IF NOT EXISTS discount_amount NUMERIC DEFAULT 0,
+    ADD COLUMN IF NOT EXISTS slip_url TEXT DEFAULT '',
+    ADD COLUMN IF NOT EXISTS delivery_photo_url TEXT DEFAULT '';
+
+-- 2. สร้างตารางคูปองส่วนลด (coupons)
+CREATE TABLE IF NOT EXISTS public.coupons (
+    code TEXT PRIMARY KEY,
+    type TEXT NOT NULL DEFAULT 'flat',
+    amount NUMERIC NOT NULL DEFAULT 0,
+    label TEXT DEFAULT '',
+    max_uses NUMERIC DEFAULT 0,
+    used_count NUMERIC DEFAULT 0,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE public.coupons 
+    ADD COLUMN IF NOT EXISTS max_uses NUMERIC DEFAULT 0,
+    ADD COLUMN IF NOT EXISTS used_count NUMERIC DEFAULT 0;
+
+-- 3. เพิ่มข้อมูลคูปองเริ่มต้น
+INSERT INTO public.coupons (code, type, amount, label, max_uses, used_count) VALUES
+    ('WELCOME10', 'flat', 10, 'ส่วนลดต้อนรับ 10฿', 0, 0),
+    ('SUKPA20', 'flat', 20, 'ส่วนลดพิเศษ 20฿', 0, 0),
+    ('FREEDRY', 'flat', 50, 'ส่วนลดค่าอบแห้ง 50฿', 0, 0),
+    ('FREEDELIVERY', 'flat', 40, 'ฟรีค่าจัดส่ง (สะสมครบ 10 ครั้ง)', 0, 0),
+    ('STUDENT10', 'percent', 10, 'ส่วนลดนักศึกษา 10%', 0, 0)
+ON CONFLICT (code) DO NOTHING;
+
+-- 4. ปิด RLS เพื่อให้อ่าน-เขียนได้ทันที
+ALTER TABLE public.orders DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.coupons DISABLE ROW LEVEL SECURITY;
+
+-- 5. เปิดใช้งาน Realtime แบบปลอดภัย
+DO $$ 
+BEGIN
+    BEGIN
+        ALTER PUBLICATION supabase_realtime ADD TABLE public.orders;
+    EXCEPTION WHEN duplicate_object THEN NULL;
+    END;
+    BEGIN
+        ALTER PUBLICATION supabase_realtime ADD TABLE public.coupons;
+    EXCEPTION WHEN duplicate_object THEN NULL;
+    END;
+END $$;`;
+                    try {
+                        if (navigator.clipboard && window.isSecureContext) {
+                            await navigator.clipboard.writeText(sqlSchema);
+                        } else {
+                            const ta = document.createElement('textarea');
+                            ta.value = sqlSchema;
+                            ta.style.position = 'fixed';
+                            document.body.appendChild(ta);
+                            ta.select();
+                            document.execCommand('copy');
+                            document.body.removeChild(ta);
+                        }
+                        showToast('📋 คัดลอก SQL Script สร้างตารางเรียบร้อย!');
+                    } catch (e) {
+                        showToast('คัดลอกไม่สำเร็จ');
+                    }
+                });
+            }
+
+            // Coupon Management Logic
+            async function renderCouponsList() {
+                if (!couponsListContainer) return;
+                const couponsMap = window.SukpaDB ? await window.SukpaDB.getCoupons() : (typeof getSukpaCoupons === 'function' ? getSukpaCoupons() : {});
+
+                const couponKeys = Object.keys(couponsMap || {});
 
                 if (couponCountBadge) couponCountBadge.textContent = `${couponKeys.length} โค้ด`;
 
@@ -1143,12 +1311,28 @@
                 couponsListContainer.innerHTML = couponKeys.map(key => {
                     const c = couponsMap[key];
                     const typeBadge = c.type === 'percent' ? `${c.amount}%` : `${c.amount}฿`;
+                    const maxUses = Number(c.maxUses || 0);
+                    const usedCount = Number(c.usedCount || 0);
+
+                    let quotaTag = '';
+                    if (maxUses > 0) {
+                        const isFull = usedCount >= maxUses;
+                        quotaTag = isFull
+                            ? `<span class="text-[10px] bg-red-500/20 text-red-400 px-2 py-0.5 rounded border border-red-500/30 font-bold">เต็ม ${usedCount}/${maxUses} สิทธิ์</span>`
+                            : `<span class="text-[10px] bg-blue-500/10 text-blue-300 px-2 py-0.5 rounded border border-blue-500/20">${usedCount}/${maxUses} สิทธิ์</span>`;
+                    } else {
+                        quotaTag = `<span class="text-[10px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded">ใช้ ${usedCount} ครั้ง (ไม่จำกัด)</span>`;
+                    }
+
                     return `
                         <div class="flex items-center justify-between p-3 rounded-xl bg-slate-900 border border-slate-800 text-xs">
                             <div class="flex items-center gap-2.5">
                                 <span class="font-mono font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20">${c.code}</span>
                                 <div>
-                                    <div class="font-semibold text-white">${c.label || c.code}</div>
+                                    <div class="font-semibold text-white flex items-center gap-2">
+                                        <span>${c.label || c.code}</span>
+                                        ${quotaTag}
+                                    </div>
                                     <div class="text-[10px] text-slate-400">ลด ${typeBadge}</div>
                                 </div>
                             </div>
@@ -1160,30 +1344,42 @@
                 }).join('');
 
                 couponsListContainer.querySelectorAll('.btn-delete-coupon').forEach(btn => {
-                    btn.addEventListener('click', () => {
+                    btn.addEventListener('click', async () => {
                         const targetCode = btn.dataset.code;
-                        deleteCoupon(targetCode);
+                        await deleteCoupon(targetCode);
                     });
                 });
             }
 
-            function deleteCoupon(code) {
-                const couponsMap = typeof getSukpaCoupons === 'function' ? getSukpaCoupons() : JSON.parse(localStorage.getItem('sp_coupons') || '{}');
-                if (couponsMap[code]) {
+            async function deleteCoupon(code) {
+                if (window.SukpaDB) {
+                    await window.SukpaDB.deleteCoupon(code);
+                } else {
+                    const couponsMap = typeof getSukpaCoupons === 'function' ? getSukpaCoupons() : JSON.parse(localStorage.getItem('sp_coupons') || '{}');
                     delete couponsMap[code];
-                    if (typeof saveSukpaCoupons === 'function') {
-                        saveSukpaCoupons(couponsMap);
-                    } else {
-                        localStorage.setItem('sp_coupons', JSON.stringify(couponsMap));
-                    }
-                    renderCouponsList();
-                    showToast(`🗑️ ลบโค้ดส่วนลด ${code} เรียบร้อยแล้ว`);
+                    localStorage.setItem('sp_coupons', JSON.stringify(couponsMap));
                 }
+                await renderCouponsList();
+                showToast(`🗑️ ลบโค้ดส่วนลด ${code} เรียบร้อยแล้ว`);
+            }
+
+            if (btnClearAllCoupons) {
+                btnClearAllCoupons.addEventListener('click', async () => {
+                    if (confirm('คุณต้องการลบโค้ดส่วนลดทั้งหมดในระบบใช่หรือไม่?')) {
+                        if (window.SukpaDB) {
+                            await window.SukpaDB.clearAllCoupons();
+                        } else {
+                            localStorage.setItem('sp_coupons', JSON.stringify({}));
+                        }
+                        await renderCouponsList();
+                        showToast('🗑️ เคลียร์ลบโค้ดส่วนลดทั้งหมดเรียบร้อยแล้ว!');
+                    }
+                });
             }
 
             if (btnOpenCouponModal) {
-                btnOpenCouponModal.addEventListener('click', () => {
-                    renderCouponsList();
+                btnOpenCouponModal.addEventListener('click', async () => {
+                    await renderCouponsList();
                     if (couponModal) couponModal.classList.remove('hidden');
                 });
             }
@@ -1195,10 +1391,11 @@
             }
 
             if (btnAddCoupon) {
-                btnAddCoupon.addEventListener('click', () => {
+                btnAddCoupon.addEventListener('click', async () => {
                     const rawCode = inputCouponCode ? inputCouponCode.value.trim().toUpperCase() : '';
                     const type = selectCouponType ? selectCouponType.value : 'flat';
                     const amount = inputCouponAmount ? Number(inputCouponAmount.value) : 0;
+                    const maxUses = inputCouponMaxUses ? Number(inputCouponMaxUses.value) : 0;
                     const label = inputCouponLabel ? inputCouponLabel.value.trim() : '';
 
                     if (!rawCode) {
@@ -1210,46 +1407,79 @@
                         return;
                     }
 
-                    const couponsMap = typeof getSukpaCoupons === 'function' ? getSukpaCoupons() : JSON.parse(localStorage.getItem('sp_coupons') || '{}');
-                    couponsMap[rawCode] = {
+                    const couponObj = {
                         code: rawCode,
                         type: type,
                         amount: amount,
+                        maxUses: maxUses,
+                        usedCount: 0,
                         label: label || (type === 'percent' ? `ส่วนลด ${amount}%` : `ส่วนลด ${amount}฿`)
                     };
 
-                    if (typeof saveSukpaCoupons === 'function') {
-                        saveSukpaCoupons(couponsMap);
-                    } else {
-                        localStorage.setItem('sp_coupons', JSON.stringify(couponsMap));
+                    if (window.SukpaDB) {
+                        await window.SukpaDB.saveCoupon(couponObj);
+                    } else if (typeof saveSukpaCoupons === 'function') {
+                        saveSukpaCoupons({ [rawCode]: couponObj });
                     }
 
                     if (inputCouponCode) inputCouponCode.value = '';
                     if (inputCouponAmount) inputCouponAmount.value = '';
+                    if (inputCouponMaxUses) inputCouponMaxUses.value = '';
                     if (inputCouponLabel) inputCouponLabel.value = '';
 
-                    renderCouponsList();
-                    showToast(`🎉 เพิ่มโค้ดส่วนลด ${rawCode} เรียบร้อยแล้ว!`);
+                    await renderCouponsList();
+                    showToast(`🎉 เพิ่มโค้ดส่วนลด ${rawCode} (${maxUses > 0 ? maxUses + ' สิทธิ์' : 'ไม่จำกัด'}) เรียบร้อยแล้ว!`);
                 });
             }
 
             const btnResetDefaultCoupons = document.getElementById('btn-reset-default-coupons');
             if (btnResetDefaultCoupons) {
-                btnResetDefaultCoupons.addEventListener('click', () => {
-                    const defaults = {
-                        'WELCOME10': { code: 'WELCOME10', type: 'flat', amount: 10, label: 'ส่วนลดต้อนรับ 10฿' },
-                        'SUKPA20': { code: 'SUKPA20', type: 'flat', amount: 20, label: 'ส่วนลดพิเศษ 20฿' },
-                        'FREEDRY': { code: 'FREEDRY', type: 'flat', amount: 50, label: 'ส่วนลดค่าอบแห้ง 50฿' },
-                        'FREEDELIVERY': { code: 'FREEDELIVERY', type: 'flat', amount: 40, label: 'ฟรีค่าจัดส่ง (สะสมครบ 10 ครั้ง)' },
-                        'STUDENT10': { code: 'STUDENT10', type: 'percent', amount: 10, label: 'ส่วนลดนักศึกษา 10%' },
-                    };
-                    if (typeof saveSukpaCoupons === 'function') {
-                        saveSukpaCoupons(defaults);
-                    } else {
-                        localStorage.setItem('sp_coupons', JSON.stringify(defaults));
+                btnResetDefaultCoupons.addEventListener('click', async () => {
+                    const defaults = [
+                        { code: 'WELCOME10', type: 'flat', amount: 10, label: 'ส่วนลดต้อนรับ 10฿', maxUses: 0, usedCount: 0 },
+                        { code: 'SUKPA20', type: 'flat', amount: 20, label: 'ส่วนลดพิเศษ 20฿', maxUses: 0, usedCount: 0 },
+                        { code: 'FREEDRY', type: 'flat', amount: 50, label: 'ส่วนลดค่าอบแห้ง 50฿', maxUses: 0, usedCount: 0 },
+                        { code: 'FREEDELIVERY', type: 'flat', amount: 40, label: 'ฟรีค่าจัดส่ง (สะสมครบ 10 ครั้ง)', maxUses: 0, usedCount: 0 },
+                        { code: 'STUDENT10', type: 'percent', amount: 10, label: 'ส่วนลดนักศึกษา 10%', maxUses: 0, usedCount: 0 }
+                    ];
+
+                    for (const c of defaults) {
+                        if (window.SukpaDB) {
+                            await window.SukpaDB.saveCoupon(c);
+                        }
                     }
-                    renderCouponsList();
+                    if (typeof saveSukpaCoupons === 'function') {
+                        const defaultsObj = {};
+                        defaults.forEach(c => defaultsObj[c.code] = c);
+                        saveSukpaCoupons(defaultsObj);
+                    }
+                    await renderCouponsList();
                     showToast('🔄 คืนค่าโค้ดส่วนลดเริ่มต้นเรียบร้อยแล้ว!');
+                });
+            }
+
+            // Slip Verification Modal Event Listeners
+            if (closeSlipModalVerify) {
+                closeSlipModalVerify.addEventListener('click', () => {
+                    if (slipModalVerify) slipModalVerify.classList.add('hidden');
+                });
+            }
+
+            if (btnApproveSlip) {
+                btnApproveSlip.addEventListener('click', async () => {
+                    if (!activeSlipOrderId) return;
+                    await updateOrderStatus(activeSlipOrderId, 'processing');
+                    if (slipModalVerify) slipModalVerify.classList.add('hidden');
+                    showToast(`✅ ยืนยันสลีป #${activeSlipOrderId} สำเร็จ! ปรับเป็น: กำลังซัก-อบ`);
+                });
+            }
+
+            if (btnRejectSlip) {
+                btnRejectSlip.addEventListener('click', async () => {
+                    if (!activeSlipOrderId) return;
+                    await updateOrderStatus(activeSlipOrderId, 'pending');
+                    if (slipModalVerify) slipModalVerify.classList.add('hidden');
+                    showToast(`⚠️ ปฏิเสธสลีป #${activeSlipOrderId} เรียบร้อย! ปรับเป็น: รอตรวจสอบ`);
                 });
             }
 
@@ -1718,11 +1948,12 @@
                     else if (st === 'processing') { badgeClass = 'bg-purple-500/10 text-purple-400 border-purple-500/20'; badgeLabel = '🟣 กำลังซัก-อบ'; }
                     else if (st === 'delivered') { badgeClass = 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'; badgeLabel = '🟢 จัดส่งแล้ว'; }
 
-                    const slipBtn = ord.slipDataUrl ? `
-                        <button type="button" class="btn-view-slip px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-cyan-400 text-xs font-semibold border border-slate-700 transition flex items-center gap-1" data-slip="${ord.slipDataUrl}">
-                            <i class="fas fa-file-image"></i> ดูสลิป
+                    const slipUrl = ord.slipDataUrl || ord.slipUrl || '';
+                    const slipBtn = slipUrl ? `
+                        <button type="button" class="btn-verify-slip px-2.5 py-1 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 text-xs font-semibold border border-cyan-500/30 transition flex items-center gap-1.5" data-id="${ord.orderId}" data-slip="${slipUrl}">
+                            <i class="fas fa-receipt text-cyan-400"></i> 🔍 ตรวจสอบสลีป
                         </button>
-                    ` : '<span class="text-[11px] text-slate-500">ไม่มีสลิป</span>';
+                    ` : '<span class="text-[11px] text-slate-500 bg-slate-900/80 px-2.5 py-1 rounded-lg border border-slate-800">⚠️ ยังไม่แนบสลีป</span>';
 
                     const deliveryPhotoBtn = ord.deliveryPhotoUrl ? `
                         <button type="button" class="btn-view-slip px-2.5 py-1 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 text-xs font-semibold border border-emerald-500/30 transition flex items-center gap-1" data-slip="${ord.deliveryPhotoUrl}">
@@ -1895,12 +2126,39 @@
                     });
                 });
 
-                document.querySelectorAll('.btn-view-slip').forEach(btn => {
+                document.querySelectorAll('.btn-view-slip, .btn-verify-slip').forEach(btn => {
                     btn.addEventListener('click', () => {
+                        const targetId = btn.dataset.id;
                         const slipUrl = btn.dataset.slip;
-                        if (modalSlipImg) modalSlipImg.src = slipUrl;
-                        if (btnDownloadSlipImg) btnDownloadSlipImg.href = slipUrl;
-                        if (slipModal) slipModal.classList.remove('hidden');
+                        let ord = targetId ? orders.find(o => o.orderId === targetId) : null;
+                        
+                        if (ord) {
+                            activeSlipOrderId = ord.orderId;
+                            if (slipModalOrderId) slipModalOrderId.textContent = `#${ord.orderId}`;
+                            if (slipModalName) slipModalName.textContent = ord.name || '-';
+                            if (slipModalPhone) slipModalPhone.textContent = ord.phone || '-';
+                            if (slipModalDorm) slipModalDorm.textContent = ord.dorm || '-';
+                            if (slipModalTotal) slipModalTotal.textContent = `฿${ord.total}`;
+
+                            const img = ord.slipDataUrl || ord.slipUrl || slipUrl || '';
+                            if (img && slipModalImg) {
+                                slipModalImg.src = img;
+                                slipModalImg.classList.remove('hidden');
+                                if (slipModalNoImg) slipModalNoImg.classList.add('hidden');
+                            } else {
+                                if (slipModalImg) slipModalImg.classList.add('hidden');
+                                if (slipModalNoImg) slipModalNoImg.classList.remove('hidden');
+                            }
+
+                            if (slipModalVerify) slipModalVerify.classList.remove('hidden');
+                        } else if (slipUrl) {
+                            if (slipModalImg) {
+                                slipModalImg.src = slipUrl;
+                                slipModalImg.classList.remove('hidden');
+                                if (slipModalNoImg) slipModalNoImg.classList.add('hidden');
+                            }
+                            if (slipModalVerify) slipModalVerify.classList.remove('hidden');
+                        }
                     });
                 });
 
@@ -1913,6 +2171,31 @@
                         reader.onload = (event) => {
                             const dataUrl = event.target.result;
                             updateOrderDeliveryPhoto(targetId, dataUrl);
+                        };
+                        reader.readAsDataURL(file);
+                    });
+                });
+
+                document.querySelectorAll('.admin-slip-upload-input').forEach(input => {
+                    input.addEventListener('change', (e) => {
+                        const file = e.target.files[0];
+                        if (!file) return;
+                        const targetId = input.dataset.id;
+                        const reader = new FileReader();
+                        reader.onload = async (event) => {
+                            const dataUrl = event.target.result;
+                            const localOrders = JSON.parse(localStorage.getItem('sp_orders') || '[]');
+                            const idx = localOrders.findIndex(o => o.orderId === targetId);
+                            if (idx !== -1) {
+                                localOrders[idx].slipDataUrl = dataUrl;
+                                localOrders[idx].slip_url = dataUrl;
+                                localStorage.setItem('sp_orders', JSON.stringify(localOrders));
+                                if (window.SukpaDB) {
+                                    await window.SukpaDB.saveOrder(localOrders[idx]);
+                                }
+                                renderDashboard();
+                                showToast(`📸 แนบสลีปให้ออเดอร์ #${targetId} เรียบร้อยแล้ว!`);
+                            }
                         };
                         reader.readAsDataURL(file);
                     });
