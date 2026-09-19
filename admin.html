@@ -24,7 +24,8 @@
     <!-- Google Font: Kanit -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet" />
 
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
@@ -58,9 +59,12 @@
             body * {
                 visibility: hidden;
             }
-            #printable-tag-area, #printable-tag-area * {
+
+            #printable-tag-area,
+            #printable-tag-area * {
                 visibility: visible;
             }
+
             #tag-modal {
                 position: absolute;
                 left: 0;
@@ -70,6 +74,7 @@
                 background: white !important;
                 backdrop-filter: none !important;
             }
+
             #printable-tag-area {
                 position: absolute;
                 left: 0;
@@ -88,9 +93,11 @@
     <!-- PIN LOGIN GATEWAY (Default View) -->
     <!-- ═══════════════════════════════════════════════════ -->
     <div id="pin-screen" class="fixed inset-0 z-50 bg-slate-950 flex items-center justify-center p-4">
-        <div class="glass-card rounded-3xl max-w-sm w-full p-6 sm:p-8 text-center shadow-2xl space-y-6 relative border border-slate-800">
+        <div
+            class="glass-card rounded-3xl max-w-sm w-full p-6 sm:p-8 text-center shadow-2xl space-y-6 relative border border-slate-800">
             <!-- Brand Logo -->
-            <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-blue-600 to-cyan-400 flex items-center justify-center mx-auto shadow-lg shadow-blue-500/20">
+            <div
+                class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-blue-600 to-cyan-400 flex items-center justify-center mx-auto shadow-lg shadow-blue-500/20">
                 <i class="fas fa-lock text-white text-2xl"></i>
             </div>
 
@@ -127,41 +134,60 @@
         <header class="bg-slate-900/90 border-b border-slate-800 sticky top-0 z-40 backdrop-blur-md">
             <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
                 <div class="flex items-center gap-3">
-                    <div class="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center font-bold text-white shadow-md">
+                    <div
+                        class="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center font-bold text-white shadow-md">
                         <i class="fas fa-user-shield text-sm"></i>
                     </div>
                     <div>
-                        <span class="font-extrabold text-lg text-white">ซักป่ะ? <span class="text-cyan-400 text-xs font-normal">| Admin Panel</span></span>
+                        <span class="font-extrabold text-lg text-white">ซักป่ะ? <span
+                                class="text-cyan-400 text-xs font-normal">| Admin Panel</span></span>
                         <span class="text-[10px] text-slate-400 block -mt-0.5">มจพ.ปราจีนบุรี</span>
                     </div>
                 </div>
 
                 <div class="flex items-center gap-1.5 sm:gap-2">
-                    <button type="button" id="btn-export-csv" class="px-3 py-1.5 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 text-xs font-semibold border border-emerald-500/30 transition flex items-center gap-1.5" title="ส่งออกรายงานเป็นไฟล์ Excel (CSV)">
+                    <button type="button" id="btn-copy-daily-summary"
+                        class="px-3 py-1.5 rounded-xl bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 text-xs font-semibold border border-purple-500/30 transition flex items-center gap-1.5"
+                        title="คัดลอกข้อความสรุปยอดขายรายวันส่ง LINE">
+                        <i class="fas fa-copy"></i>
+                        <span class="hidden sm:inline">สรุปรายวัน</span>
+                    </button>
+                    <button type="button" id="btn-export-csv"
+                        class="px-3 py-1.5 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 text-xs font-semibold border border-emerald-500/30 transition flex items-center gap-1.5"
+                        title="ส่งออกรายงานเป็นไฟล์ Excel (CSV)">
                         <i class="fas fa-file-excel"></i>
                         <span class="hidden sm:inline">Export Excel</span>
                     </button>
-                    <button type="button" id="btn-toggle-sound" class="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-400 text-xs font-semibold border border-slate-700 transition flex items-center gap-1" title="เปิด/ปิด เสียงแจ้งเตือน">
+                    <button type="button" id="btn-toggle-sound"
+                        class="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-400 text-xs font-semibold border border-slate-700 transition flex items-center gap-1"
+                        title="เปิด/ปิด เสียงแจ้งเตือน">
                         <i class="fas fa-bell text-xs" id="sound-icon"></i>
                     </button>
-                    <button type="button" id="btn-open-config" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-cyan-400 text-xs font-semibold border border-slate-700 transition flex items-center gap-1.5">
+                    <button type="button" id="btn-open-config"
+                        class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-cyan-400 text-xs font-semibold border border-slate-700 transition flex items-center gap-1.5">
                         <i class="fas fa-cloud text-cyan-400"></i>
                         <span class="hidden md:inline">Cloud DB</span>
                         <span id="cloud-status-dot" class="w-2.5 h-2.5 rounded-full bg-slate-500 inline-block"></span>
                     </button>
-                    <button type="button" id="btn-open-coupon-modal" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-emerald-400 text-xs font-semibold border border-slate-700 transition flex items-center gap-1.5" title="จัดการโค้ดส่วนลด">
+                    <button type="button" id="btn-open-coupon-modal"
+                        class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-emerald-400 text-xs font-semibold border border-slate-700 transition flex items-center gap-1.5"
+                        title="จัดการโค้ดส่วนลด">
                         <i class="fas fa-ticket text-emerald-400"></i>
                         <span class="hidden md:inline">จัดการคูปอง</span>
                     </button>
-                    <button type="button" id="btn-open-pin-modal" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-purple-400 text-xs font-semibold border border-slate-700 transition flex items-center gap-1.5" title="เปลี่ยนรหัส PIN">
+                    <button type="button" id="btn-open-pin-modal"
+                        class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-purple-400 text-xs font-semibold border border-slate-700 transition flex items-center gap-1.5"
+                        title="เปลี่ยนรหัส PIN">
                         <i class="fas fa-key text-purple-400"></i>
                         <span class="hidden lg:inline">เปลี่ยน PIN</span>
                     </button>
-                    <button type="button" id="btn-seed-sample-data" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold border border-slate-700 transition flex items-center gap-1.5">
+                    <button type="button" id="btn-seed-sample-data"
+                        class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold border border-slate-700 transition flex items-center gap-1.5">
                         <i class="fas fa-dice text-amber-400"></i>
                         <span class="hidden md:inline">สุ่มออเดอร์</span>
                     </button>
-                    <button type="button" id="btn-logout-admin" class="px-3 py-1.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-semibold border border-red-500/20 transition flex items-center gap-1.5">
+                    <button type="button" id="btn-logout-admin"
+                        class="px-3 py-1.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-semibold border border-red-500/20 transition flex items-center gap-1.5">
                         <i class="fas fa-right-from-bracket"></i>
                         <span class="hidden sm:inline">ออก</span>
                     </button>
@@ -175,11 +201,13 @@
             <!-- Navigation View Switcher Tabs -->
             <div class="flex items-center justify-between border-b border-slate-800 pb-3">
                 <div class="flex items-center gap-2">
-                    <button type="button" id="nav-tab-orders" class="px-4 py-2 rounded-xl bg-blue-600 text-white font-bold text-xs shadow-md transition flex items-center gap-2">
+                    <button type="button" id="nav-tab-orders"
+                        class="px-4 py-2 rounded-xl bg-blue-600 text-white font-bold text-xs shadow-md transition flex items-center gap-2">
                         <i class="fas fa-list-check"></i>
                         <span>รายการคำสั่งซื้อ (Orders)</span>
                     </button>
-                    <button type="button" id="nav-tab-analytics" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs transition flex items-center gap-2">
+                    <button type="button" id="nav-tab-analytics"
+                        class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs transition flex items-center gap-2">
                         <i class="fas fa-chart-line text-cyan-400"></i>
                         <span>แดชบอร์ดวิเคราะห์ (Analytics Charts)</span>
                     </button>
@@ -192,225 +220,271 @@
             <!-- VIEW 1: ORDERS SECTION -->
             <div id="view-orders-section" class="space-y-6">
 
-            <!-- KPI OVERVIEW CARDS -->
-            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-5">
+                <!-- KPI OVERVIEW CARDS -->
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-5">
 
-                <!-- Card 1: รายรับรวม -->
-                <div class="glass-card rounded-2xl p-4 sm:p-5 border border-slate-800 relative overflow-hidden">
-                    <div class="flex items-center justify-between text-xs text-slate-400 mb-2">
-                        <span>รายรับรวมทั้งหมด</span>
-                        <div class="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-sm">
-                            <i class="fas fa-wallet"></i>
-                        </div>
-                    </div>
-                    <div class="text-2xl sm:text-3xl font-extrabold text-emerald-400" id="kpi-total-revenue">฿0</div>
-                    <div class="text-[10px] text-slate-400 mt-1">จากคำสั่งซื้อที่อนุมัติแล้ว</div>
-                </div>
-
-                <!-- Card 2: รายรับวันนี้ -->
-                <div class="glass-card rounded-2xl p-4 sm:p-5 border border-slate-800 relative overflow-hidden">
-                    <div class="flex items-center justify-between text-xs text-slate-400 mb-2">
-                        <span>รายรับวันนี้</span>
-                        <div class="w-8 h-8 rounded-xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-sm">
-                            <i class="fas fa-calendar-day"></i>
-                        </div>
-                    </div>
-                    <div class="text-2xl sm:text-3xl font-extrabold text-cyan-400" id="kpi-today-revenue">฿0</div>
-                    <div class="text-[10px] text-slate-400 mt-1" id="kpi-today-date">วันนี้</div>
-                </div>
-
-                <!-- Card 3: คำสั่งซื้อทั้งหมด -->
-                <div class="glass-card rounded-2xl p-4 sm:p-5 border border-slate-800 relative overflow-hidden">
-                    <div class="flex items-center justify-between text-xs text-slate-400 mb-2">
-                        <span>คำสั่งซื้อทั้งหมด</span>
-                        <div class="w-8 h-8 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center text-sm">
-                            <i class="fas fa-layer-group"></i>
-                        </div>
-                    </div>
-                    <div class="text-2xl sm:text-3xl font-extrabold text-blue-400" id="kpi-total-orders">0</div>
-                    <div class="text-[10px] text-slate-400 mt-1">รายการออเดอร์ในระบบ</div>
-                </div>
-
-                <!-- Card 4: รอตรวจสอบ -->
-                <div class="glass-card rounded-2xl p-4 sm:p-5 border border-slate-800 relative overflow-hidden">
-                    <div class="flex items-center justify-between text-xs text-slate-400 mb-2">
-                        <span>รอตรวจสอบ</span>
-                        <div class="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-sm">
-                            <i class="fas fa-clock"></i>
-                        </div>
-                    </div>
-                    <div class="text-2xl sm:text-3xl font-extrabold text-amber-400" id="kpi-pending-orders">0</div>
-                    <div class="text-[10px] text-amber-400/80 mt-1">ต้องตรวจสลิป/อนุมัติ</div>
-                </div>
-
-            </div>
-
-            <!-- REVENUE BREAKDOWN BY CATEGORY CARD (ความต้องการผู้ใช้: ขอรายรับเพิ่ม แยกหมวด) -->
-            <div class="glass-card rounded-3xl p-5 sm:p-7 border border-slate-800 space-y-5">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-800">
-                    <div>
-                        <h2 class="text-lg font-extrabold text-white flex items-center gap-2">
-                            <i class="fas fa-chart-pie text-cyan-400"></i>
-                            <span>สรุปรายรับแยกตามหมวดหมู่บริการ (Revenue Analytics)</span>
-                        </h2>
-                        <p class="text-xs text-slate-400">วิเคราะห์รายได้แยกตามขนาดเครื่องซักและบริการเสริม</p>
-                    </div>
-                    <div class="text-xs font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 rounded-full w-fit">
-                        อัตราส่วนสร้างรายได้
-                    </div>
-                </div>
-
-                <!-- Categories Grid -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-
-                    <!-- Sub-Card 1: รายรับตามขนาดเครื่องซัก (Size S, M, L, Jumbo) -->
-                    <div class="bg-slate-900/80 p-4 sm:p-5 rounded-2xl border border-slate-800 space-y-3">
-                        <div class="text-xs font-bold text-slate-300 flex items-center justify-between">
-                            <span>🧺 รายรับจากเครื่องซักผ้า (แยก Size)</span>
-                            <span class="text-blue-400 font-bold" id="cat-wash-total">฿0</span>
-                        </div>
-
-                        <div class="space-y-2.5 text-xs">
-                            <!-- Size S -->
-                            <div>
-                                <div class="flex justify-between text-slate-400 mb-1">
-                                    <span>Size S (50฿)</span>
-                                    <span class="font-bold text-white" id="cat-size-s-amt">฿0</span>
-                                </div>
-                                <div class="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
-                                    <div id="cat-size-s-bar" class="h-full bg-green-500 rounded-full" style="width: 0%;"></div>
-                                </div>
-                            </div>
-
-                            <!-- Size M -->
-                            <div>
-                                <div class="flex justify-between text-slate-400 mb-1">
-                                    <span>Size M (70฿)</span>
-                                    <span class="font-bold text-white" id="cat-size-m-amt">฿0</span>
-                                </div>
-                                <div class="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
-                                    <div id="cat-size-m-bar" class="h-full bg-blue-500 rounded-full" style="width: 0%;"></div>
-                                </div>
-                            </div>
-
-                            <!-- Size L -->
-                            <div>
-                                <div class="flex justify-between text-slate-400 mb-1">
-                                    <span>Size L (80฿)</span>
-                                    <span class="font-bold text-white" id="cat-size-l-amt">฿0</span>
-                                </div>
-                                <div class="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
-                                    <div id="cat-size-l-bar" class="h-full bg-indigo-500 rounded-full" style="width: 0%;"></div>
-                                </div>
-                            </div>
-
-                            <!-- Jumbo -->
-                            <div>
-                                <div class="flex justify-between text-slate-400 mb-1">
-                                    <span>Jumbo (110฿)</span>
-                                    <span class="font-bold text-white" id="cat-size-jumbo-amt">฿0</span>
-                                </div>
-                                <div class="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
-                                    <div id="cat-size-jumbo-bar" class="h-full bg-purple-500 rounded-full" style="width: 0%;"></div>
-                                </div>
+                    <!-- Card 1: รายรับรวม -->
+                    <div class="glass-card rounded-2xl p-4 sm:p-5 border border-slate-800 relative overflow-hidden">
+                        <div class="flex items-center justify-between text-xs text-slate-400 mb-2">
+                            <span>รายรับรวมทั้งหมด</span>
+                            <div
+                                class="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-sm">
+                                <i class="fas fa-wallet"></i>
                             </div>
                         </div>
+                        <div class="text-2xl sm:text-3xl font-extrabold text-emerald-400" id="kpi-total-revenue">฿0
+                        </div>
+                        <div class="text-[10px] text-slate-400 mt-1">จากคำสั่งซื้อที่อนุมัติแล้ว</div>
                     </div>
 
-                    <!-- Sub-Card 2: รายรับบริการเสริม (เครื่องอบ, น้ำยา, ค่าจัดส่ง) -->
-                    <div class="bg-slate-900/80 p-4 sm:p-5 rounded-2xl border border-slate-800 space-y-3">
-                        <div class="text-xs font-bold text-slate-300 flex items-center justify-between">
-                            <span>🛵 รายรับจากบริการเสริม & จัดส่ง</span>
-                            <span class="text-cyan-400 font-bold" id="cat-addon-total">฿0</span>
-                        </div>
-
-                        <div class="space-y-2.5 text-xs">
-                            <!-- ค่าอบผ้า -->
-                            <div>
-                                <div class="flex justify-between text-slate-400 mb-1">
-                                    <span>💨 ค่าเครื่องอบผ้า (15kg/25kg)</span>
-                                    <span class="font-bold text-white" id="cat-dryer-amt">฿0</span>
-                                </div>
-                                <div class="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
-                                    <div id="cat-dryer-bar" class="h-full bg-orange-500 rounded-full" style="width: 0%;"></div>
-                                </div>
-                            </div>
-
-                            <!-- ค่าน้ำยาซัก/ปรับผ้านุ่ม -->
-                            <div>
-                                <div class="flex justify-between text-slate-400 mb-1">
-                                    <span>🧼 ค่าน้ำยาจัดเตรียมให้ (+15฿)</span>
-                                    <span class="font-bold text-white" id="cat-det-amt">฿0</span>
-                                </div>
-                                <div class="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
-                                    <div id="cat-det-bar" class="h-full bg-cyan-500 rounded-full" style="width: 0%;"></div>
-                                </div>
-                            </div>
-
-                            <!-- ค่าจัดส่ง นอก มจพ. (30฿) -->
-                            <div>
-                                <div class="flex justify-between text-slate-400 mb-1">
-                                    <span>📍 ค่าส่ง นอก มจพ. (30฿)</span>
-                                    <span class="font-bold text-white" id="cat-zone30-amt">฿0</span>
-                                </div>
-                                <div class="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
-                                    <div id="cat-zone30-bar" class="h-full bg-emerald-500 rounded-full" style="width: 0%;"></div>
-                                </div>
-                            </div>
-
-                            <!-- ค่าจัดส่ง หอใน มจพ. (40฿) -->
-                            <div>
-                                <div class="flex justify-between text-slate-400 mb-1">
-                                    <span>🏢 ค่าส่ง หอใน มจพ. (40฿)</span>
-                                    <span class="font-bold text-white" id="cat-zone40-amt">฿0</span>
-                                </div>
-                                <div class="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
-                                    <div id="cat-zone40-bar" class="h-full bg-teal-500 rounded-full" style="width: 0%;"></div>
-                                </div>
-                            </div>
-
-                            <!-- ค่าจัดส่ง โซนไกล >5km (55฿) -->
-                            <div>
-                                <div class="flex justify-between text-slate-400 mb-1">
-                                    <span>🚚 ค่าส่ง โซนไกล >5km (55฿)</span>
-                                    <span class="font-bold text-white" id="cat-zone55-amt">฿0</span>
-                                </div>
-                                <div class="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
-                                    <div id="cat-zone55-bar" class="h-full bg-amber-500 rounded-full" style="width: 0%;"></div>
-                                </div>
+                    <!-- Card 2: รายรับวันนี้ -->
+                    <div class="glass-card rounded-2xl p-4 sm:p-5 border border-slate-800 relative overflow-hidden">
+                        <div class="flex items-center justify-between text-xs text-slate-400 mb-2">
+                            <span>รายรับวันนี้</span>
+                            <div
+                                class="w-8 h-8 rounded-xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-sm">
+                                <i class="fas fa-calendar-day"></i>
                             </div>
                         </div>
+                        <div class="text-2xl sm:text-3xl font-extrabold text-cyan-400" id="kpi-today-revenue">฿0</div>
+                        <div class="text-[10px] text-slate-400 mt-1" id="kpi-today-date">วันนี้</div>
+                    </div>
+
+                    <!-- Card 3: คำสั่งซื้อทั้งหมด -->
+                    <div class="glass-card rounded-2xl p-4 sm:p-5 border border-slate-800 relative overflow-hidden">
+                        <div class="flex items-center justify-between text-xs text-slate-400 mb-2">
+                            <span>คำสั่งซื้อทั้งหมด</span>
+                            <div
+                                class="w-8 h-8 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center text-sm">
+                                <i class="fas fa-layer-group"></i>
+                            </div>
+                        </div>
+                        <div class="text-2xl sm:text-3xl font-extrabold text-blue-400" id="kpi-total-orders">0</div>
+                        <div class="text-[10px] text-slate-400 mt-1">รายการออเดอร์ในระบบ</div>
+                    </div>
+
+                    <!-- Card 4: รอตรวจสอบ -->
+                    <div class="glass-card rounded-2xl p-4 sm:p-5 border border-slate-800 relative overflow-hidden">
+                        <div class="flex items-center justify-between text-xs text-slate-400 mb-2">
+                            <span>รอตรวจสอบ</span>
+                            <div
+                                class="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-sm">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                        </div>
+                        <div class="text-2xl sm:text-3xl font-extrabold text-amber-400" id="kpi-pending-orders">0</div>
+                        <div class="text-[10px] text-amber-400/80 mt-1">ต้องตรวจสลิป/อนุมัติ</div>
                     </div>
 
                 </div>
-            </div>
 
-            <!-- ORDER MANAGEMENT TABLE & FILTER TABS -->
-            <div class="glass-card rounded-3xl p-5 sm:p-7 border border-slate-800 space-y-5">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                    <div>
-                        <h2 class="text-lg font-extrabold text-white flex items-center gap-2">
-                            <i class="fas fa-list-check text-blue-400"></i>
-                            <span>รายการคำสั่งซื้อทั้งหมด (Order Management)</span>
-                        </h2>
-                        <p class="text-xs text-slate-400">คลิกที่ปุ่มเพื่อเปลี่ยนสถานะออเดอร์ ระบบจะซิงค์กับลูกค้าทันที</p>
+                <!-- REVENUE BREAKDOWN BY CATEGORY CARD (ความต้องการผู้ใช้: ขอรายรับเพิ่ม แยกหมวด) -->
+                <div class="glass-card rounded-3xl p-5 sm:p-7 border border-slate-800 space-y-5">
+                    <div
+                        class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-800">
+                        <div>
+                            <h2 class="text-lg font-extrabold text-white flex items-center gap-2">
+                                <i class="fas fa-chart-pie text-cyan-400"></i>
+                                <span>สรุปรายรับแยกตามหมวดหมู่บริการ (Revenue Analytics)</span>
+                            </h2>
+                            <p class="text-xs text-slate-400">วิเคราะห์รายได้แยกตามขนาดเครื่องซักและบริการเสริม</p>
+                        </div>
+                        <div
+                            class="text-xs font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 rounded-full w-fit">
+                            อัตราส่วนสร้างรายได้
+                        </div>
                     </div>
 
-                    <!-- Filter Tabs -->
-                    <div class="flex items-center gap-1.5 bg-slate-900/90 p-1 rounded-2xl border border-slate-800 overflow-x-auto text-xs">
-                        <button type="button" class="tab-filter active px-3 py-1.5 rounded-xl font-bold transition text-white bg-blue-600" data-filter="all">ทั้งหมด</button>
-                        <button type="button" class="tab-filter px-3 py-1.5 rounded-xl font-medium transition text-slate-400 hover:text-white" data-filter="pending">รอตรวจ</button>
-                        <button type="button" class="tab-filter px-3 py-1.5 rounded-xl font-medium transition text-slate-400 hover:text-white" data-filter="picked_up">รับผ้าแล้ว</button>
-                        <button type="button" class="tab-filter px-3 py-1.5 rounded-xl font-medium transition text-slate-400 hover:text-white" data-filter="processing">กำลังซัก-อบ</button>
-                        <button type="button" class="tab-filter px-3 py-1.5 rounded-xl font-medium transition text-slate-400 hover:text-white" data-filter="delivered">จัดส่งแล้ว</button>
+                    <!-- Categories Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+                        <!-- Sub-Card 1: รายรับตามขนาดเครื่องซัก (Size S, M, L, Jumbo) -->
+                        <div class="bg-slate-900/80 p-4 sm:p-5 rounded-2xl border border-slate-800 space-y-3">
+                            <div class="text-xs font-bold text-slate-300 flex items-center justify-between">
+                                <span>🧺 รายรับจากเครื่องซักผ้า (แยก Size)</span>
+                                <span class="text-blue-400 font-bold" id="cat-wash-total">฿0</span>
+                            </div>
+
+                            <div class="space-y-2.5 text-xs">
+                                <!-- Size S -->
+                                <div>
+                                    <div class="flex justify-between text-slate-400 mb-1">
+                                        <span>Size S (50฿)</span>
+                                        <span class="font-bold text-white" id="cat-size-s-amt">฿0</span>
+                                    </div>
+                                    <div class="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
+                                        <div id="cat-size-s-bar" class="h-full bg-green-500 rounded-full"
+                                            style="width: 0%;"></div>
+                                    </div>
+                                </div>
+
+                                <!-- Size M -->
+                                <div>
+                                    <div class="flex justify-between text-slate-400 mb-1">
+                                        <span>Size M (70฿)</span>
+                                        <span class="font-bold text-white" id="cat-size-m-amt">฿0</span>
+                                    </div>
+                                    <div class="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
+                                        <div id="cat-size-m-bar" class="h-full bg-blue-500 rounded-full"
+                                            style="width: 0%;"></div>
+                                    </div>
+                                </div>
+
+                                <!-- Size L -->
+                                <div>
+                                    <div class="flex justify-between text-slate-400 mb-1">
+                                        <span>Size L (80฿)</span>
+                                        <span class="font-bold text-white" id="cat-size-l-amt">฿0</span>
+                                    </div>
+                                    <div class="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
+                                        <div id="cat-size-l-bar" class="h-full bg-indigo-500 rounded-full"
+                                            style="width: 0%;"></div>
+                                    </div>
+                                </div>
+
+                                <!-- Jumbo -->
+                                <div>
+                                    <div class="flex justify-between text-slate-400 mb-1">
+                                        <span>Jumbo (110฿)</span>
+                                        <span class="font-bold text-white" id="cat-size-jumbo-amt">฿0</span>
+                                    </div>
+                                    <div class="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
+                                        <div id="cat-size-jumbo-bar" class="h-full bg-purple-500 rounded-full"
+                                            style="width: 0%;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sub-Card 2: รายรับบริการเสริม (เครื่องอบ, น้ำยา, ค่าจัดส่ง) -->
+                        <div class="bg-slate-900/80 p-4 sm:p-5 rounded-2xl border border-slate-800 space-y-3">
+                            <div class="text-xs font-bold text-slate-300 flex items-center justify-between">
+                                <span>🛵 รายรับจากบริการเสริม & จัดส่ง</span>
+                                <span class="text-cyan-400 font-bold" id="cat-addon-total">฿0</span>
+                            </div>
+
+                            <div class="space-y-2.5 text-xs">
+                                <!-- ค่าอบผ้า -->
+                                <div>
+                                    <div class="flex justify-between text-slate-400 mb-1">
+                                        <span>💨 ค่าเครื่องอบผ้า (15kg/25kg)</span>
+                                        <span class="font-bold text-white" id="cat-dryer-amt">฿0</span>
+                                    </div>
+                                    <div class="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
+                                        <div id="cat-dryer-bar" class="h-full bg-orange-500 rounded-full"
+                                            style="width: 0%;"></div>
+                                    </div>
+                                </div>
+
+                                <!-- ค่าน้ำยาซัก/ปรับผ้านุ่ม -->
+                                <div>
+                                    <div class="flex justify-between text-slate-400 mb-1">
+                                        <span>🧼 ค่าน้ำยาจัดเตรียมให้ (+15฿)</span>
+                                        <span class="font-bold text-white" id="cat-det-amt">฿0</span>
+                                    </div>
+                                    <div class="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
+                                        <div id="cat-det-bar" class="h-full bg-cyan-500 rounded-full"
+                                            style="width: 0%;"></div>
+                                    </div>
+                                </div>
+
+                                <!-- ค่าจัดส่ง นอก มจพ. (30฿) -->
+                                <div>
+                                    <div class="flex justify-between text-slate-400 mb-1">
+                                        <span>📍 ค่าส่ง นอก มจพ. (30฿)</span>
+                                        <span class="font-bold text-white" id="cat-zone30-amt">฿0</span>
+                                    </div>
+                                    <div class="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
+                                        <div id="cat-zone30-bar" class="h-full bg-emerald-500 rounded-full"
+                                            style="width: 0%;"></div>
+                                    </div>
+                                </div>
+
+                                <!-- ค่าจัดส่ง หอใน มจพ. (40฿) -->
+                                <div>
+                                    <div class="flex justify-between text-slate-400 mb-1">
+                                        <span>🏢 ค่าส่ง หอใน มจพ. (40฿)</span>
+                                        <span class="font-bold text-white" id="cat-zone40-amt">฿0</span>
+                                    </div>
+                                    <div class="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
+                                        <div id="cat-zone40-bar" class="h-full bg-teal-500 rounded-full"
+                                            style="width: 0%;"></div>
+                                    </div>
+                                </div>
+
+                                <!-- ค่าจัดส่ง โซนไกล >5km (55฿) -->
+                                <div>
+                                    <div class="flex justify-between text-slate-400 mb-1">
+                                        <span>🚚 ค่าส่ง โซนไกล >5km (55฿)</span>
+                                        <span class="font-bold text-white" id="cat-zone55-amt">฿0</span>
+                                    </div>
+                                    <div class="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
+                                        <div id="cat-zone55-bar" class="h-full bg-amber-500 rounded-full"
+                                            style="width: 0%;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
 
-                <!-- Orders Table Container -->
-                <div class="space-y-3" id="orders-list-container">
-                    <!-- Dynamic Render Orders -->
+                <!-- ORDER MANAGEMENT TABLE & FILTER TABS -->
+                <div class="glass-card rounded-3xl p-5 sm:p-7 border border-slate-800 space-y-5">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                        <div>
+                            <h2 class="text-lg font-extrabold text-white flex items-center gap-2">
+                                <i class="fas fa-list-check text-blue-400"></i>
+                                <span>รายการคำสั่งซื้อทั้งหมด (Order Management)</span>
+                            </h2>
+                            <p class="text-xs text-slate-400">จัดการรายการคำสั่งซื้อ ค้นหา กรองสถานะ
+                                และอัปเดตสถานะแบบเรียลไทม์</p>
+                        </div>
+
+                        <div class="flex flex-wrap items-center gap-2">
+                            <!-- Search Bar -->
+                            <div class="relative flex-1 sm:w-64">
+                                <i
+                                    class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                                <input type="text" id="input-search-orders"
+                                    placeholder="ค้นหา Order ID, ชื่อ, เบอร์โทร..."
+                                    class="w-full pl-9 pr-3 py-1.5 rounded-xl glass-input text-white text-xs placeholder:text-slate-500 focus:outline-none focus:border-blue-500" />
+                            </div>
+
+                            <!-- Manual Refresh Button -->
+                            <button type="button" id="btn-manual-refresh"
+                                class="px-3 py-1.5 rounded-xl bg-cyan-600/20 hover:bg-cyan-600/30 text-cyan-300 text-xs font-semibold border border-cyan-500/30 transition flex items-center gap-1.5"
+                                title="ดึงข้อมูลออเดอร์ล่าสุดจาก Cloud DB">
+                                <i class="fas fa-rotate"></i>
+                                <span class="hidden sm:inline">รีเฟรช Cloud</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div
+                        class="flex items-center gap-1.5 bg-slate-900/90 p-1 rounded-2xl border border-slate-800 overflow-x-auto text-xs">
+                        <button type="button"
+                            class="tab-filter active px-3 py-1.5 rounded-xl font-bold transition text-white bg-blue-600"
+                            data-filter="all">ทั้งหมด</button>
+                        <button type="button"
+                            class="tab-filter px-3 py-1.5 rounded-xl font-medium transition text-slate-400 hover:text-white"
+                            data-filter="pending">รอตรวจ</button>
+                        <button type="button"
+                            class="tab-filter px-3 py-1.5 rounded-xl font-medium transition text-slate-400 hover:text-white"
+                            data-filter="picked_up">รับผ้าแล้ว</button>
+                        <button type="button"
+                            class="tab-filter px-3 py-1.5 rounded-xl font-medium transition text-slate-400 hover:text-white"
+                            data-filter="processing">กำลังซัก-อบ</button>
+                        <button type="button"
+                            class="tab-filter px-3 py-1.5 rounded-xl font-medium transition text-slate-400 hover:text-white"
+                            data-filter="delivered">จัดส่งแล้ว</button>
+                    </div>
+
+                    <!-- Orders Table Container -->
+                    <div class="space-y-3" id="orders-list-container">
+                        <!-- Dynamic Render Orders -->
+                    </div>
                 </div>
-            </div>
             </div> <!-- End of view-orders-section -->
 
             <!-- VIEW 2: ANALYTICS DASHBOARD SECTION -->
@@ -421,7 +495,8 @@
                     <div class="glass-card rounded-2xl p-5 border border-slate-800">
                         <div class="flex items-center justify-between text-xs text-slate-400 mb-2">
                             <span>ยอดขายเฉลี่ยต่อออเดอร์ (AOV)</span>
-                            <div class="w-8 h-8 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center text-sm">
+                            <div
+                                class="w-8 h-8 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center text-sm">
                                 <i class="fas fa-calculator"></i>
                             </div>
                         </div>
@@ -432,7 +507,8 @@
                     <div class="glass-card rounded-2xl p-5 border border-slate-800">
                         <div class="flex items-center justify-between text-xs text-slate-400 mb-2">
                             <span>ส่วนลดคูปองทั้งหมดที่ใช้ไป</span>
-                            <div class="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-sm">
+                            <div
+                                class="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-sm">
                                 <i class="fas fa-ticket"></i>
                             </div>
                         </div>
@@ -443,7 +519,8 @@
                     <div class="glass-card rounded-2xl p-5 border border-slate-800">
                         <div class="flex items-center justify-between text-xs text-slate-400 mb-2">
                             <span>อัตราจัดส่งสำเร็จ (Completion Rate)</span>
-                            <div class="w-8 h-8 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center text-sm">
+                            <div
+                                class="w-8 h-8 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center text-sm">
                                 <i class="fas fa-circle-check"></i>
                             </div>
                         </div>
@@ -498,9 +575,12 @@
     <!-- ═══════════════════════════════════════════════════ -->
     <!-- THERMAL RECEIPT / LAUNDRY BAG TAG PRINT MODAL (Option 2) -->
     <!-- ═══════════════════════════════════════════════════ -->
-    <div id="tag-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
-        <div class="glass-card rounded-3xl max-w-sm w-full p-6 text-center space-y-4 relative border border-slate-700 shadow-2xl">
-            <button type="button" id="close-tag-modal" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center print:hidden">
+    <div id="tag-modal"
+        class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div
+            class="glass-card rounded-3xl max-w-sm w-full p-6 text-center space-y-4 relative border border-slate-700 shadow-2xl">
+            <button type="button" id="close-tag-modal"
+                class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center print:hidden">
                 <i class="fas fa-xmark"></i>
             </button>
 
@@ -510,11 +590,13 @@
             </h3>
 
             <!-- Thermal Tag Ticket Card (Printable Area) -->
-            <div id="printable-tag-area" class="bg-white text-slate-900 rounded-2xl p-4 font-mono text-left text-xs border border-slate-200 shadow-inner space-y-2 select-all">
+            <div id="printable-tag-area"
+                class="bg-white text-slate-900 rounded-2xl p-4 font-mono text-left text-xs border border-slate-200 shadow-inner space-y-2 select-all">
                 <div class="text-center pb-2 border-b-2 border-dashed border-slate-300">
                     <div class="text-lg font-black tracking-tight text-blue-600">ซักป่ะ? 🫧</div>
                     <div class="text-[10px] text-slate-500 font-semibold">บริการซัก-อบแห้ง มจพ.ปราจีนบุรี</div>
-                    <div class="text-xs font-bold text-slate-800 mt-1 bg-slate-100 py-0.5 rounded" id="tag-order-id">#SP-20260919-0000</div>
+                    <div class="text-xs font-bold text-slate-800 mt-1 bg-slate-100 py-0.5 rounded" id="tag-order-id">
+                        #SP-20260919-0000</div>
                 </div>
 
                 <div class="space-y-1 pt-1 border-b border-dashed border-slate-200 pb-2">
@@ -535,15 +617,17 @@
                     <span id="tag-total" class="text-blue-600 text-base">0฿</span>
                 </div>
 
-                <div class="text-center pt-2 text-[9px] text-slate-400 border-t border-dashed border-slate-300 font-sans">
-                    ขอบคุณที่ใช้บริการซักป่ะ? 🫧<br/>
+                <div
+                    class="text-center pt-2 text-[9px] text-slate-400 border-t border-dashed border-slate-300 font-sans">
+                    ขอบคุณที่ใช้บริการซักป่ะ? 🫧<br />
                     สแกน QR / เช็คสถานะได้ตลอด 24 ชม.
                 </div>
             </div>
 
             <!-- Print Trigger Button -->
             <div class="flex gap-2 print:hidden">
-                <button type="button" id="btn-trigger-print" class="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-lg transition flex items-center justify-center gap-2">
+                <button type="button" id="btn-trigger-print"
+                    class="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-lg transition flex items-center justify-center gap-2">
                     <i class="fas fa-print text-sm"></i>
                     <span>สั่งพิมพ์แท็กสลิป (Print 80mm Tag)</span>
                 </button>
@@ -554,9 +638,11 @@
     <!-- ═══════════════════════════════════════════════════ -->
     <!-- SLIP PREVIEW MODAL -->
     <!-- ═══════════════════════════════════════════════════ -->
-    <div id="slip-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+    <div id="slip-modal"
+        class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
         <div class="glass-card rounded-3xl max-w-md w-full p-6 text-center space-y-4 relative border border-slate-700">
-            <button type="button" id="close-slip-modal" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center">
+            <button type="button" id="close-slip-modal"
+                class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center">
                 <i class="fas fa-xmark"></i>
             </button>
             <h3 class="text-lg font-bold text-white flex items-center justify-center gap-2">
@@ -564,9 +650,11 @@
                 <span>สลิปการโอนเงิน</span>
             </h3>
             <div class="p-2 bg-slate-900 rounded-2xl border border-slate-800">
-                <img id="modal-slip-img" src="" alt="สลิปโอนเงิน" class="max-h-[60vh] mx-auto rounded-xl object-contain" />
+                <img id="modal-slip-img" src="" alt="สลิปโอนเงิน"
+                    class="max-h-[60vh] mx-auto rounded-xl object-contain" />
             </div>
-            <a id="btn-download-slip-img" href="#" download="slip.png" class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs transition">
+            <a id="btn-download-slip-img" href="#" download="slip.png"
+                class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs transition">
                 <i class="fas fa-download"></i>
                 <span>ดาวน์โหลดภาพสลิป</span>
             </a>
@@ -574,13 +662,16 @@
     </div>
 
     <!-- Supabase Cloud DB Config Modal -->
-    <div id="config-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div id="config-modal"
+        class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
         <div class="glass-card rounded-3xl max-w-md w-full p-6 space-y-5 border border-slate-800 shadow-2xl relative">
-            <button type="button" id="close-config-modal" class="absolute top-4 right-4 text-slate-400 hover:text-white transition">
+            <button type="button" id="close-config-modal"
+                class="absolute top-4 right-4 text-slate-400 hover:text-white transition">
                 <i class="fas fa-times text-lg"></i>
             </button>
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-xl font-bold border border-cyan-500/30">
+                <div
+                    class="w-10 h-10 rounded-xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-xl font-bold border border-cyan-500/30">
                     <i class="fas fa-database"></i>
                 </div>
                 <div>
@@ -592,17 +683,20 @@
             <div class="space-y-4 text-sm">
                 <div>
                     <label class="block text-xs text-slate-300 font-semibold mb-1">Supabase Project URL</label>
-                    <input type="text" id="input-supabase-url" placeholder="https://xxxx.supabase.co" class="w-full px-3.5 py-2.5 rounded-xl glass-input text-white text-xs font-mono focus:outline-none focus:border-cyan-500" />
+                    <input type="text" id="input-supabase-url" placeholder="https://xxxx.supabase.co"
+                        class="w-full px-3.5 py-2.5 rounded-xl glass-input text-white text-xs font-mono focus:outline-none focus:border-cyan-500" />
                 </div>
 
                 <div>
                     <label class="block text-xs text-slate-300 font-semibold mb-1">Supabase Anon Public Key</label>
-                    <input type="password" id="input-supabase-key" placeholder="eyJhbGciOiJIUzI..." class="w-full px-3.5 py-2.5 rounded-xl glass-input text-white text-xs font-mono focus:outline-none focus:border-cyan-500" />
+                    <input type="password" id="input-supabase-key" placeholder="eyJhbGciOiJIUzI..."
+                        class="w-full px-3.5 py-2.5 rounded-xl glass-input text-white text-xs font-mono focus:outline-none focus:border-cyan-500" />
                 </div>
             </div>
 
             <div class="flex gap-2">
-                <button type="button" id="btn-save-config" class="flex-1 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs shadow-lg transition flex items-center justify-center gap-1.5">
+                <button type="button" id="btn-save-config"
+                    class="flex-1 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs shadow-lg transition flex items-center justify-center gap-1.5">
                     <i class="fas fa-save"></i> บันทึก & เชื่อมต่อ Cloud
                 </button>
             </div>
@@ -610,13 +704,16 @@
     </div>
 
     <!-- Admin PIN Security Change Modal -->
-    <div id="pin-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div id="pin-modal"
+        class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
         <div class="glass-card rounded-3xl max-w-md w-full p-6 space-y-5 border border-slate-800 shadow-2xl relative">
-            <button type="button" id="close-pin-modal" class="absolute top-4 right-4 text-slate-400 hover:text-white transition">
+            <button type="button" id="close-pin-modal"
+                class="absolute top-4 right-4 text-slate-400 hover:text-white transition">
                 <i class="fas fa-times text-lg"></i>
             </button>
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center text-xl font-bold border border-purple-500/30">
+                <div
+                    class="w-10 h-10 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center text-xl font-bold border border-purple-500/30">
                     <i class="fas fa-key"></i>
                 </div>
                 <div>
@@ -628,32 +725,67 @@
             <div class="space-y-3 text-xs">
                 <div>
                     <label class="block text-slate-300 font-semibold mb-1">รหัส PIN เดิม</label>
-                    <input type="password" id="input-pin-old" maxlength="6" placeholder="• • • • • •" class="w-full px-3.5 py-2.5 rounded-xl glass-input text-white text-base font-mono text-center focus:outline-none focus:border-purple-500" />
+                    <input type="password" id="input-pin-old" maxlength="6" placeholder="• • • • • •"
+                        class="w-full px-3.5 py-2.5 rounded-xl glass-input text-white text-base font-mono text-center focus:outline-none focus:border-purple-500" />
                 </div>
                 <div>
                     <label class="block text-slate-300 font-semibold mb-1">รหัส PIN ใหม่ (6 หลัก)</label>
-                    <input type="password" id="input-pin-new" maxlength="6" placeholder="• • • • • •" class="w-full px-3.5 py-2.5 rounded-xl glass-input text-white text-base font-mono text-center focus:outline-none focus:border-purple-500" />
+                    <input type="password" id="input-pin-new" maxlength="6" placeholder="• • • • • •"
+                        class="w-full px-3.5 py-2.5 rounded-xl glass-input text-white text-base font-mono text-center focus:outline-none focus:border-purple-500" />
                 </div>
                 <div>
                     <label class="block text-slate-300 font-semibold mb-1">ยืนยันรหัส PIN ใหม่</label>
-                    <input type="password" id="input-pin-confirm" maxlength="6" placeholder="• • • • • •" class="w-full px-3.5 py-2.5 rounded-xl glass-input text-white text-base font-mono text-center focus:outline-none focus:border-purple-500" />
+                    <input type="password" id="input-pin-confirm" maxlength="6" placeholder="• • • • • •"
+                        class="w-full px-3.5 py-2.5 rounded-xl glass-input text-white text-base font-mono text-center focus:outline-none focus:border-purple-500" />
                 </div>
             </div>
 
-            <button type="button" id="btn-save-pin" class="w-full py-3 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs shadow-lg transition flex items-center justify-center gap-1.5">
+            <button type="button" id="btn-save-pin"
+                class="w-full py-3 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs shadow-lg transition flex items-center justify-center gap-1.5">
                 <i class="fas fa-check-circle"></i> บันทึกรหัส PIN ใหม่
             </button>
         </div>
     </div>
 
+    <!-- Confirm Delete Order Modal -->
+    <div id="delete-modal"
+        class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div
+            class="glass-card rounded-3xl max-w-sm w-full p-6 space-y-4 border border-slate-800 shadow-2xl relative text-center">
+            <div
+                class="w-12 h-12 rounded-2xl bg-red-500/20 text-red-400 flex items-center justify-center text-2xl mx-auto border border-red-500/30">
+                <i class="fas fa-triangle-exclamation"></i>
+            </div>
+            <div>
+                <h3 class="font-extrabold text-white text-lg">ยืนยันลบคำสั่งซื้อ?</h3>
+                <p class="text-xs text-slate-400 mt-1">ออเดอร์ <span id="delete-order-id-display"
+                        class="font-mono text-cyan-400 font-bold">#---</span> จะถูกลบออกจากระบบและ Cloud DB ถาวร</p>
+            </div>
+            <div class="flex gap-2 pt-2">
+                <button type="button" id="btn-cancel-delete"
+                    class="flex-1 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs transition">
+                    ยกเลิก
+                </button>
+                <button type="button" id="btn-confirm-delete"
+                    class="flex-1 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold text-xs shadow-lg transition flex items-center justify-center gap-1">
+                    <i class="fas fa-trash-can"></i> ยืนยันลบ
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Admin Coupon Management Modal -->
-    <div id="coupon-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
-        <div class="glass-card rounded-3xl max-w-xl w-full p-6 space-y-5 border border-slate-800 shadow-2xl relative max-h-[90vh] overflow-y-auto">
-            <button type="button" id="close-coupon-modal" class="absolute top-4 right-4 text-slate-400 hover:text-white transition">
+    <div id="coupon-modal"
+        class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div
+            class="glass-card rounded-3xl max-w-xl w-full p-6 space-y-5 border border-slate-800 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+            <button type="button" id="close-coupon-modal"
+                class="absolute top-4 right-4 text-slate-400 hover:text-white transition">
                 <i class="fas fa-times text-lg"></i>
             </button>
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xl font-bold border border-emerald-500/30">
+                <div
+                    class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xl font-bold border border-emerald-500/30">
                     <i class="fas fa-ticket-alt"></i>
                 </div>
                 <div>
@@ -670,25 +802,30 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                     <div>
                         <label class="block text-slate-400 mb-1">รหัสโค้ด (เช่น SUMMER30)</label>
-                        <input type="text" id="input-coupon-code" placeholder="SUKPA50" class="uppercase w-full glass-input px-3 py-2 rounded-xl text-white font-mono focus:outline-none focus:border-emerald-500" />
+                        <input type="text" id="input-coupon-code" placeholder="SUKPA50"
+                            class="uppercase w-full glass-input px-3 py-2 rounded-xl text-white font-mono focus:outline-none focus:border-emerald-500" />
                     </div>
                     <div>
                         <label class="block text-slate-400 mb-1">ประเภทส่วนลด</label>
-                        <select id="select-coupon-type" class="w-full glass-input px-3 py-2 rounded-xl text-white bg-slate-900 focus:outline-none focus:border-emerald-500">
+                        <select id="select-coupon-type"
+                            class="w-full glass-input px-3 py-2 rounded-xl text-white bg-slate-900 focus:outline-none focus:border-emerald-500">
                             <option value="flat">ลดเป็นบาท (฿)</option>
                             <option value="percent">ลดเป็นเปอร์เซ็นต์ (%)</option>
                         </select>
                     </div>
                     <div>
                         <label class="block text-slate-400 mb-1">จำนวนเงิน / เปอร์เซ็นต์</label>
-                        <input type="number" id="input-coupon-amount" placeholder="30" min="1" class="w-full glass-input px-3 py-2 rounded-xl text-white font-mono focus:outline-none focus:border-emerald-500" />
+                        <input type="number" id="input-coupon-amount" placeholder="30" min="1"
+                            class="w-full glass-input px-3 py-2 rounded-xl text-white font-mono focus:outline-none focus:border-emerald-500" />
                     </div>
                     <div>
                         <label class="block text-slate-400 mb-1">คำอธิบายแสดงลูกค้า</label>
-                        <input type="text" id="input-coupon-label" placeholder="ส่วนลดพิเศษ 30 บาท" class="w-full glass-input px-3 py-2 rounded-xl text-white focus:outline-none focus:border-emerald-500" />
+                        <input type="text" id="input-coupon-label" placeholder="ส่วนลดพิเศษ 30 บาท"
+                            class="w-full glass-input px-3 py-2 rounded-xl text-white focus:outline-none focus:border-emerald-500" />
                     </div>
                 </div>
-                <button type="button" id="btn-add-coupon" class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md transition flex items-center justify-center gap-1.5">
+                <button type="button" id="btn-add-coupon"
+                    class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md transition flex items-center justify-center gap-1.5">
                     <i class="fas fa-check"></i> เพิ่มโค้ดส่วนลดใหม่
                 </button>
             </div>
@@ -698,9 +835,12 @@
                 <div class="flex items-center justify-between pb-1 border-b border-slate-800/80">
                     <div class="flex items-center gap-2">
                         <h4 class="text-xs font-bold text-slate-300">รายการโค้ดส่วนลดในระบบ</h4>
-                        <span id="coupon-count-badge" class="text-[10px] bg-slate-800 text-slate-400 px-2.5 py-0.5 rounded-full font-mono">0 โค้ด</span>
+                        <span id="coupon-count-badge"
+                            class="text-[10px] bg-slate-800 text-slate-400 px-2.5 py-0.5 rounded-full font-mono">0
+                            โค้ด</span>
                     </div>
-                    <button type="button" id="btn-reset-default-coupons" class="text-[11px] text-slate-400 hover:text-cyan-400 transition flex items-center gap-1 font-medium">
+                    <button type="button" id="btn-reset-default-coupons"
+                        class="text-[11px] text-slate-400 hover:text-cyan-400 transition flex items-center gap-1 font-medium">
                         <i class="fas fa-rotate-right"></i> คืนค่าโค้ดเริ่มต้น
                     </button>
                 </div>
@@ -712,7 +852,8 @@
     </div>
 
     <!-- Toast Notification -->
-    <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-slate-900 text-white px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-3 backdrop-blur-sm pointer-events-none text-sm font-medium transition-all duration-300 opacity-0 translate-y-4 border border-slate-700">
+    <div id="toast"
+        class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-slate-900 text-white px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-3 backdrop-blur-sm pointer-events-none text-sm font-medium transition-all duration-300 opacity-0 translate-y-4 border border-slate-700">
         <div class="w-6 h-6 rounded-full bg-cyan-500 flex items-center justify-center text-white text-xs">
             <i class="fas fa-check"></i>
         </div>
@@ -744,6 +885,19 @@
 
             const ordersListContainer = document.getElementById('orders-list-container');
             const tabFilters = document.querySelectorAll('.tab-filter');
+
+            let currentFilter = 'all';
+            let currentSearchQuery = '';
+            let pendingDeleteId = null;
+
+            const inputSearchOrders = document.getElementById('input-search-orders');
+            const btnManualRefresh = document.getElementById('btn-manual-refresh');
+            const btnCopyDailySummary = document.getElementById('btn-copy-daily-summary');
+
+            const deleteModal = document.getElementById('delete-modal');
+            const deleteOrderIdDisplay = document.getElementById('delete-order-id-display');
+            const btnConfirmDelete = document.getElementById('btn-confirm-delete');
+            const btnCancelDelete = document.getElementById('btn-cancel-delete');
 
             const slipModal = document.getElementById('slip-modal');
             const closeSlipModal = document.getElementById('close-slip-modal');
@@ -796,8 +950,6 @@
             const couponsListContainer = document.getElementById('coupons-list-container');
             const couponCountBadge = document.getElementById('coupon-count-badge');
 
-            let currentFilter = 'all';
-
             // Toast helper
             let toastTimer = null;
             function showToast(msg) {
@@ -814,11 +966,12 @@
 
             // PIN Authentication Handler
             function verifyPin() {
+                if (!inputAdminPin) return;
                 const val = inputAdminPin.value.trim();
                 if (val === getAdminPin()) {
                     sessionStorage.setItem('sp_admin_authed', 'true');
-                    pinScreen.classList.add('hidden');
-                    adminDashboard.classList.remove('hidden');
+                    if (pinScreen) pinScreen.classList.add('hidden');
+                    if (adminDashboard) adminDashboard.classList.remove('hidden');
                     renderDashboard();
                     resetInactivityTimer();
                     showToast('🔓 ปลดล็อกเข้าสู่ระบบสำเร็จ!');
@@ -829,26 +982,32 @@
                 }
             }
 
-            btnLoginPin.addEventListener('click', verifyPin);
-            inputAdminPin.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') verifyPin();
-            });
+            if (btnLoginPin) {
+                btnLoginPin.addEventListener('click', verifyPin);
+            }
+            if (inputAdminPin) {
+                inputAdminPin.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') verifyPin();
+                });
+            }
 
             // Check Session
             if (sessionStorage.getItem('sp_admin_authed') === 'true') {
-                pinScreen.classList.add('hidden');
-                adminDashboard.classList.remove('hidden');
+                if (pinScreen) pinScreen.classList.add('hidden');
+                if (adminDashboard) adminDashboard.classList.remove('hidden');
                 renderDashboard();
                 resetInactivityTimer();
             }
 
             // Logout Handler
-            btnLogoutAdmin.addEventListener('click', () => {
-                sessionStorage.removeItem('sp_admin_authed');
-                adminDashboard.classList.add('hidden');
-                pinScreen.classList.remove('hidden');
-                inputAdminPin.value = '';
-            });
+            if (btnLogoutAdmin) {
+                btnLogoutAdmin.addEventListener('click', () => {
+                    sessionStorage.removeItem('sp_admin_authed');
+                    if (adminDashboard) adminDashboard.classList.add('hidden');
+                    if (pinScreen) pinScreen.classList.remove('hidden');
+                    if (inputAdminPin) inputAdminPin.value = '';
+                });
+            }
 
             // Change PIN Modal Handlers
             if (btnOpenPinModal) {
@@ -891,16 +1050,71 @@
                 });
             }
 
+            // Cloud DB Configuration Modal Logic
+            const btnOpenConfig = document.getElementById('btn-open-config');
+            const configModal = document.getElementById('config-modal');
+            const closeConfigModal = document.getElementById('close-config-modal');
+            const inputSupabaseUrl = document.getElementById('input-supabase-url');
+            const inputSupabaseKey = document.getElementById('input-supabase-key');
+            const btnSaveConfig = document.getElementById('btn-save-config');
+            const cloudStatusDot = document.getElementById('cloud-status-dot');
+
+            function updateCloudStatusUI() {
+                if (!cloudStatusDot) return;
+                if (window.SukpaDB && window.SukpaDB.isCloudEnabled()) {
+                    cloudStatusDot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-400 inline-block shadow-[0_0_8px_rgba(52,211,153,0.8)]';
+                    cloudStatusDot.title = 'เชื่อมต่อ Cloud DB (Supabase) เรียบร้อย';
+                } else {
+                    cloudStatusDot.className = 'w-2.5 h-2.5 rounded-full bg-slate-500 inline-block';
+                    cloudStatusDot.title = 'ไม่ได้เชื่อมต่อ Cloud DB (ใช้ LocalStorage)';
+                }
+            }
+
+            if (btnOpenConfig) {
+                btnOpenConfig.addEventListener('click', () => {
+                    if (window.SukpaDB) {
+                        const cfg = window.SukpaDB.getConfig();
+                        if (inputSupabaseUrl) inputSupabaseUrl.value = cfg.url || '';
+                        if (inputSupabaseKey) inputSupabaseKey.value = cfg.key || '';
+                    }
+                    if (configModal) configModal.classList.remove('hidden');
+                });
+            }
+
+            if (closeConfigModal) {
+                closeConfigModal.addEventListener('click', () => {
+                    if (configModal) configModal.classList.add('hidden');
+                });
+            }
+
+            if (btnSaveConfig) {
+                btnSaveConfig.addEventListener('click', async () => {
+                    const url = inputSupabaseUrl ? inputSupabaseUrl.value.trim() : '';
+                    const key = inputSupabaseKey ? inputSupabaseKey.value.trim() : '';
+
+                    if (window.SukpaDB) {
+                        window.SukpaDB.saveConfig(url, key);
+                    }
+                    updateCloudStatusUI();
+                    if (configModal) configModal.classList.add('hidden');
+                    showToast('⚡ บันทึกและเชื่อมต่อ Cloud DB เรียบร้อยแล้ว!');
+                    if (window.SukpaDB) {
+                        await window.SukpaDB.getOrders();
+                        renderDashboard();
+                    }
+                });
+            }
+
             // Coupon Management Logic
             function renderCouponsList() {
                 if (!couponsListContainer) return;
-                const couponsMap = typeof getSukpaCoupons === 'function' ? getSukpaCoupons() : (function() {
+                const couponsMap = typeof getSukpaCoupons === 'function' ? getSukpaCoupons() : (function () {
                     const raw = localStorage.getItem('sp_coupons');
                     if (raw !== null) {
                         try {
                             const p = JSON.parse(raw);
                             if (p && typeof p === 'object') return p;
-                        } catch(e){}
+                        } catch (e) { }
                     }
                     const defaults = {
                         'WELCOME10': { code: 'WELCOME10', type: 'flat', amount: 10, label: 'ส่วนลดต้อนรับ 10฿' },
@@ -1253,7 +1467,8 @@
             }
 
             // Seed Sample Data for Testing
-            btnSeedSampleData.addEventListener('click', () => {
+            if (btnSeedSampleData) {
+                btnSeedSampleData.addEventListener('click', async () => {
                 const sampleOrders = [
                     {
                         orderId: `SP-20260919-4821`,
@@ -1317,9 +1532,15 @@
                 const existing = JSON.parse(localStorage.getItem('sp_orders') || '[]');
                 const merged = [...sampleOrders, ...existing];
                 localStorage.setItem('sp_orders', JSON.stringify(merged));
+                if (window.SukpaDB) {
+                    for (const ord of sampleOrders) {
+                        await window.SukpaDB.saveOrder(ord);
+                    }
+                }
                 renderDashboard();
                 showToast('🎲 สุ่มเพิ่มออเดอร์ตัวอย่างเรียบร้อย!');
             });
+        }
 
             // Render Dashboard & Analytics
             function renderDashboard() {
@@ -1464,6 +1685,16 @@
                 if (currentFilter !== 'all') {
                     filtered = orders.filter(o => (o.status || 'pending') === currentFilter);
                 }
+                if (currentSearchQuery) {
+                    const q = currentSearchQuery.toLowerCase();
+                    filtered = filtered.filter(o =>
+                        (o.orderId || '').toLowerCase().includes(q) ||
+                        (o.name || '').toLowerCase().includes(q) ||
+                        (o.phone || '').includes(q) ||
+                        (o.dorm || '').toLowerCase().includes(q) ||
+                        (o.serviceName || '').toLowerCase().includes(q)
+                    );
+                }
 
                 if (filtered.length === 0) {
                     ordersListContainer.innerHTML = `
@@ -1554,6 +1785,9 @@
                                     <button type="button" class="btn-notify-openchat px-2.5 py-1 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 text-xs font-semibold border border-emerald-500/30 transition flex items-center gap-1" data-id="${ord.orderId}" title="คัดลอกข้อความ & เปิด LINE OpenChat">
                                         <i class="fab fa-line text-emerald-400"></i> แจ้ง OpenChat
                                     </button>
+                                    <button type="button" class="btn-delete-order px-2.5 py-1 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-semibold border border-red-500/20 transition flex items-center gap-1" data-id="${ord.orderId}" title="ลบออเดอร์นี้">
+                                        <i class="fas fa-trash-can"></i> ลบ
+                                    </button>
                                 </div>
 
                                 <div class="flex flex-wrap items-center gap-1.5 text-xs">
@@ -1625,7 +1859,7 @@
 
                         const currentStatusText = statusMap[ord.status || 'pending'] || '🟡 รอตรวจสอบชำระเงิน';
                         const trackUrl = `${window.location.origin}${window.location.pathname.replace('admin.html', 'track.html')}?id=${ord.orderId}`;
-                        
+
                         let msg = `🫧 [ซักป่ะ? อัปเดตสถานะผ้า]\n`;
                         msg += `📌 ออเดอร์: #${ord.orderId}\n`;
                         msg += `👤 คุณ: ${ord.name}\n`;
@@ -1648,6 +1882,16 @@
 
                         const OPENCHAT_URL = 'https://line.me/ti/g2/c4n6z-xzaKCXJcKWlGoLYVoxeAxBuZNRcGEg1A?utm_source=invitation&utm_medium=link_copy&utm_campaign=default';
                         window.open(OPENCHAT_URL, '_blank', 'noopener,noreferrer');
+                    });
+                });
+
+                document.querySelectorAll('.btn-delete-order').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        pendingDeleteId = btn.dataset.id;
+                        const deleteModal = document.getElementById('delete-modal');
+                        const deleteOrderIdDisplay = document.getElementById('delete-order-id-display');
+                        if (deleteOrderIdDisplay) deleteOrderIdDisplay.textContent = `#${pendingDeleteId}`;
+                        if (deleteModal) deleteModal.classList.remove('hidden');
                     });
                 });
 
@@ -1690,13 +1934,16 @@
                 }
             }
 
-            // Update Order Status in localStorage
-            function updateOrderStatus(orderId, newStatus) {
+            // Update Order Status in localStorage & Supabase Cloud
+            async function updateOrderStatus(orderId, newStatus) {
                 const orders = JSON.parse(localStorage.getItem('sp_orders') || '[]');
                 const idx = orders.findIndex(o => o.orderId === orderId);
                 if (idx !== -1) {
                     orders[idx].status = newStatus;
                     localStorage.setItem('sp_orders', JSON.stringify(orders));
+                    if (window.SukpaDB) {
+                        await window.SukpaDB.updateOrderStatus(orderId, newStatus);
+                    }
                     renderDashboard();
                     showToast(`⚡ อัปเดตสถานะออเดอร์ #${orderId} เรียบร้อย!`);
                 }
@@ -1775,8 +2022,8 @@
                     }
 
                     const headers = [
-                        'Order ID', 'วันที่-เวลา', 'ชื่อลูกค้า', 'เบอร์โทร', 'หอพัก/จุดนัดรับ', 
-                        'รายการบริการ', 'ค่าซัก (บาท)', 'ค่าอบ (บาท)', 'ค่าน้ำยา (บาท)', 
+                        'Order ID', 'วันที่-เวลา', 'ชื่อลูกค้า', 'เบอร์โทร', 'หอพัก/จุดนัดรับ',
+                        'รายการบริการ', 'ค่าซัก (บาท)', 'ค่าอบ (บาท)', 'ค่าน้ำยา (บาท)',
                         'ค่าจัดส่ง (บาท)', 'โค้ดส่วนลด', 'ส่วนลด (บาท)', 'ราคารวม (บาท)', 'สถานะ', 'หมายเหตุ'
                     ];
 
@@ -1824,6 +2071,107 @@
             if (closeSlipModal) {
                 closeSlipModal.addEventListener('click', () => {
                     if (slipModal) slipModal.classList.add('hidden');
+                });
+            }
+
+            // Search input listener
+            if (inputSearchOrders) {
+                inputSearchOrders.addEventListener('input', (e) => {
+                    currentSearchQuery = e.target.value.trim();
+                    renderDashboard();
+                });
+            }
+
+            // Manual Refresh listener
+            if (btnManualRefresh) {
+                btnManualRefresh.addEventListener('click', async () => {
+                    showToast('🔄 กำลังดึงข้อมูลล่าสุดจาก Cloud DB...');
+                    if (window.SukpaDB) {
+                        await window.SukpaDB.getOrders();
+                    }
+                    renderDashboard();
+                    showToast('✅ รีเฟรชข้อมูลจาก Cloud DB เรียบร้อยแล้ว!');
+                });
+            }
+
+            // Daily Summary Copier listener
+            if (btnCopyDailySummary) {
+                btnCopyDailySummary.addEventListener('click', async () => {
+                    const orders = window.SukpaDB ? await window.SukpaDB.getOrders() : JSON.parse(localStorage.getItem('sp_orders') || '[]');
+                    const todayStr = new Date().toISOString().slice(0, 10);
+                    const todayOrders = orders.filter(o => o.createdAt && o.createdAt.startsWith(todayStr));
+                    let todayRev = 0;
+                    let pendingCount = 0;
+                    let deliveredCount = 0;
+
+                    todayOrders.forEach(o => {
+                        todayRev += Number(o.total) || 0;
+                        if (o.status === 'delivered') deliveredCount++;
+                        else if (o.status === 'pending' || !o.status) pendingCount++;
+                    });
+
+                    const dateFormatted = new Date().toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' });
+                    let summaryText = `📊 [ซักป่ะ? สรุปรายงานประจำวัน]\n`;
+                    summaryText += `📅 วันที่: ${dateFormatted}\n`;
+                    summaryText += `💰 รายรับวันนี้: ฿${todayRev.toLocaleString()}\n`;
+                    summaryText += `📦 ออเดอร์วันนี้: ${todayOrders.length} รายการ\n`;
+                    summaryText += `🟢 จัดส่งแล้ว: ${deliveredCount} รายการ\n`;
+                    summaryText += `🟡 รอตรวจสอบ: ${pendingCount} รายการ\n`;
+                    summaryText += `--------------------------\n`;
+                    summaryText += `✨ ขอบคุณทีมงานทุกคนครับ! 🫧`;
+
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        await navigator.clipboard.writeText(summaryText);
+                        showToast('📋 คัดลอกข้อความสรุปรายวันเรียบร้อยแล้ว!');
+                    } else {
+                        showToast('📋 คัดลอกสรุปรายวันสำเร็จ');
+                    }
+                });
+            }
+
+            // Delete Order Modal Action listeners
+            if (btnCancelDelete) {
+                btnCancelDelete.addEventListener('click', () => {
+                    pendingDeleteId = null;
+                    if (deleteModal) deleteModal.classList.add('hidden');
+                });
+            }
+
+            if (btnConfirmDelete) {
+                btnConfirmDelete.addEventListener('click', async () => {
+                    if (pendingDeleteId) {
+                        if (window.SukpaDB) {
+                            await window.SukpaDB.deleteOrder(pendingDeleteId);
+                        } else {
+                            const localOrders = JSON.parse(localStorage.getItem('sp_orders') || '[]');
+                            const filtered = localOrders.filter(o => o.orderId !== pendingDeleteId);
+                            localStorage.setItem('sp_orders', JSON.stringify(filtered));
+                        }
+                        showToast(`🗑️ ลบออเดอร์ #${pendingDeleteId} เรียบร้อยแล้ว`);
+                        pendingDeleteId = null;
+                        if (deleteModal) deleteModal.classList.add('hidden');
+                        renderDashboard();
+                    }
+                });
+            }
+
+            // Auto fetch orders from Cloud DB and setup Realtime Subscription
+            updateCloudStatusUI();
+
+            (async () => {
+                if (window.SukpaDB) {
+                    await window.SukpaDB.getOrders();
+                    renderDashboard();
+                }
+            })();
+
+            if (window.SukpaDB) {
+                window.SukpaDB.subscribeOrders((orders, payload) => {
+                    renderDashboard();
+                    if (payload && payload.type !== 'local_storage') {
+                        playOrderChime();
+                        showToast('⚡ มีการอัปเดตข้อมูลออเดอร์ใหม่แบบ Realtime!');
+                    }
                 });
             }
         });

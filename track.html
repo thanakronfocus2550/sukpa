@@ -359,8 +359,9 @@
                 if (!matchedOrder) {
                     // Try partial match in local or fetched orders list
                     const allOrders = window.SukpaDB ? await window.SukpaDB.getOrders() : JSON.parse(localStorage.getItem('sp_orders') || '[]');
+                    const cleanUpper = cleanId.toUpperCase();
                     matchedOrder = allOrders.find(ord => 
-                        ord.orderId.toUpperCase() === cleanId || ord.orderId.toUpperCase().endsWith(cleanId)
+                        ord && ord.orderId && (ord.orderId.toUpperCase() === cleanUpper || ord.orderId.toUpperCase().endsWith(cleanUpper))
                     );
                 }
 
