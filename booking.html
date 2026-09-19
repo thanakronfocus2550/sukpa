@@ -1254,9 +1254,13 @@
                     if (slipFilename) slipFilename.textContent = file.name;
 
                     const reader = new FileReader();
-                    reader.onload = (event) => {
-                        state.slipDataUrl = event.target.result;
-                        if (slipPreviewImg) slipPreviewImg.src = event.target.result;
+                    reader.onload = async (event) => {
+                        let rawUrl = event.target.result;
+                        if (window.SukpaDB && typeof window.SukpaDB.compressDataUrl === 'function') {
+                            rawUrl = await window.SukpaDB.compressDataUrl(rawUrl, 600, 0.5);
+                        }
+                        state.slipDataUrl = rawUrl;
+                        if (slipPreviewImg) slipPreviewImg.src = rawUrl;
                         if (slipPreviewContainer) slipPreviewContainer.classList.remove('hidden');
                     };
                     reader.readAsDataURL(file);

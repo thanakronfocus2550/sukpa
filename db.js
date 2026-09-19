@@ -150,14 +150,14 @@
         /**
          * Compress base64 DataURL image (max 800px width, JPEG 0.7 quality)
          */
-        compressDataUrl(dataUrl, maxWidth = 800, quality = 0.7) {
+        compressDataUrl(dataUrl, maxWidth = 600, quality = 0.5) {
             return new Promise((resolve) => {
                 if (!dataUrl || typeof dataUrl !== 'string' || !dataUrl.startsWith('data:image')) {
                     resolve(dataUrl || '');
                     return;
                 }
-                // If already small enough (< 150KB), return as is
-                if (dataUrl.length < 200000) {
+                // If already small enough (< 50KB), return as is
+                if (dataUrl.length < 50000) {
                     resolve(dataUrl);
                     return;
                 }
@@ -210,8 +210,8 @@
                             // Preserve local slip and delivery photo if cloud returned empty
                             if (localMap[mapped.orderId]) {
                                 const loc = localMap[mapped.orderId];
-                                if (!mapped.slipDataUrl && (loc.slipDataUrl || loc.slipUrl)) {
-                                    mapped.slipDataUrl = loc.slipDataUrl || loc.slipUrl;
+                                if (!mapped.slipDataUrl && (loc.slipDataUrl || loc.slipUrl || loc.slip_url)) {
+                                    mapped.slipDataUrl = loc.slipDataUrl || loc.slipUrl || loc.slip_url;
                                 }
                                 if (!mapped.deliveryPhotoUrl && loc.deliveryPhotoUrl) {
                                     mapped.deliveryPhotoUrl = loc.deliveryPhotoUrl;
@@ -251,8 +251,8 @@
                         const cloudOrd = this._mapFromDb(data[0]);
                         const local = this.getLocalOrders().find(o => o.orderId === cloudOrd.orderId);
                         if (local) {
-                            if (!cloudOrd.slipDataUrl && (local.slipDataUrl || local.slipUrl)) {
-                                cloudOrd.slipDataUrl = local.slipDataUrl || local.slipUrl;
+                            if (!cloudOrd.slipDataUrl && (local.slipDataUrl || local.slipUrl || local.slip_url)) {
+                                cloudOrd.slipDataUrl = local.slipDataUrl || local.slipUrl || local.slip_url;
                             }
                         }
                         return cloudOrd;
@@ -277,11 +277,11 @@
             if (!orderRecord) return null;
 
             // Compress heavy slip / photo images if present
-            if (orderRecord.slipDataUrl && orderRecord.slipDataUrl.length > 200000) {
-                orderRecord.slipDataUrl = await this.compressDataUrl(orderRecord.slipDataUrl);
+            if (orderRecord.slipDataUrl && orderRecord.slipDataUrl.length > 50000) {
+                orderRecord.slipDataUrl = await this.compressDataUrl(orderRecord.slipDataUrl, 600, 0.5);
             }
-            if (orderRecord.deliveryPhotoUrl && orderRecord.deliveryPhotoUrl.length > 200000) {
-                orderRecord.deliveryPhotoUrl = await this.compressDataUrl(orderRecord.deliveryPhotoUrl);
+            if (orderRecord.deliveryPhotoUrl && orderRecord.deliveryPhotoUrl.length > 50000) {
+                orderRecord.deliveryPhotoUrl = await this.compressDataUrl(orderRecord.deliveryPhotoUrl, 600, 0.5);
             }
 
             // Always save to localStorage immediately for instant feedback
@@ -310,6 +310,7 @@
                                 notes: dbRow.notes,
                                 service_name: dbRow.service_name,
                                 total: dbRow.total,
+                                slip_url: dbRow.slip_url,
                                 status: dbRow.status,
                                 created_at: dbRow.created_at
                             };
