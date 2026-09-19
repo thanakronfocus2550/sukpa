@@ -311,6 +311,7 @@
                                 service_name: dbRow.service_name,
                                 total: dbRow.total,
                                 slip_url: dbRow.slip_url,
+                                delivery_photo_url: dbRow.delivery_photo_url,
                                 status: dbRow.status,
                                 created_at: dbRow.created_at
                             };

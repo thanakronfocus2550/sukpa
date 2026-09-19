@@ -402,18 +402,20 @@
                 }
 
                 // Slip preview
-                if (ord.slipDataUrl && trackSlipContainer && trackSlipImg) {
-                    trackSlipImg.src = ord.slipDataUrl;
+                const slipUrl = ord.slipDataUrl || ord.slipUrl || ord.slip_url || ord.slip_data_url || '';
+                if (slipUrl && trackSlipContainer && trackSlipImg) {
+                    trackSlipImg.src = slipUrl;
                     trackSlipContainer.classList.remove('hidden');
                 } else if (trackSlipContainer) {
                     trackSlipContainer.classList.add('hidden');
                 }
 
                 // Delivery Photo preview
+                const deliveryPhotoUrl = ord.deliveryPhotoUrl || ord.delivery_photo_url || '';
                 const trackDeliveryPhotoContainer = document.getElementById('track-delivery-photo-container');
                 const trackDeliveryPhotoImg = document.getElementById('track-delivery-photo-img');
-                if (ord.deliveryPhotoUrl && trackDeliveryPhotoContainer && trackDeliveryPhotoImg) {
-                    trackDeliveryPhotoImg.src = ord.deliveryPhotoUrl;
+                if (deliveryPhotoUrl && trackDeliveryPhotoContainer && trackDeliveryPhotoImg) {
+                    trackDeliveryPhotoImg.src = deliveryPhotoUrl;
                     trackDeliveryPhotoContainer.classList.remove('hidden');
                 } else if (trackDeliveryPhotoContainer) {
                     trackDeliveryPhotoContainer.classList.add('hidden');

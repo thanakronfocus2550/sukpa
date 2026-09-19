@@ -2210,7 +2210,7 @@ END $$;`;
                 });
             }
 
-            function updateOrderDeliveryPhoto(orderId, photoUrl) {
+            async function updateOrderDeliveryPhoto(orderId, photoUrl) {
                 const orders = JSON.parse(localStorage.getItem('sp_orders') || '[]');
                 const idx = orders.findIndex(o => o.orderId === orderId);
                 if (idx !== -1) {
@@ -2218,7 +2218,7 @@ END $$;`;
                     orders[idx].status = 'delivered'; // Auto set to delivered when photo attached!
                     localStorage.setItem('sp_orders', JSON.stringify(orders));
                     if (window.SukpaDB) {
-                        window.SukpaDB.saveOrder(orders[idx]);
+                        await window.SukpaDB.saveOrder(orders[idx]);
                     }
                     renderDashboard();
                     showToast(`📸 แนบรูปยืนยันส่งผ้า #${orderId} เรียบร้อยแล้ว!`);
